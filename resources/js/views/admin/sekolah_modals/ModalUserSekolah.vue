@@ -84,6 +84,7 @@ import { ref, computed, watch } from 'vue';
 import BaseModal from '../../../components/BaseModal.vue';
 import BaseButton from '../../../components/BaseButton.vue';
 import api from '../../../services/api';
+import { useToast } from '../../../composables/useToast';
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
@@ -91,12 +92,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['update:modelValue']);
-
-// Simple toast mock (since composable doesn't exist yet)
-const toast = {
-  success: (msg) => alert('SUKSES: ' + msg),
-  error: (msg) => alert('ERROR: ' + msg)
-};
+const toast = useToast();
 
 const isOpen = computed({
   get: () => props.modelValue,
