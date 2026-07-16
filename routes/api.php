@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\Admin\DataSekolahController;
+use App\Http\Controllers\Api\Admin\UserSekolahController;
 
 // ========== PUBLIC API (No Auth Required) ==========
 
@@ -14,6 +15,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
 
-    // Data Sekolah (List Data Pemilihan / Progress Pemilihan Sekolah)
+    // Admin & Sekolah API
     Route::get('/admin/data-sekolah', [DataSekolahController::class, 'index']);
+    
+    // User Sekolah (Level 2) API
+    Route::get('/admin/data-sekolah/{npsn}/users', [UserSekolahController::class, 'index']);
+    Route::post('/admin/data-sekolah/{npsn}/users', [UserSekolahController::class, 'store']);
+    Route::put('/admin/data-sekolah/{npsn}/users/{id}', [UserSekolahController::class, 'update']);
+    Route::delete('/admin/data-sekolah/{npsn}/users/{id}', [UserSekolahController::class, 'destroy']);
 });
