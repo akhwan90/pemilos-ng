@@ -119,7 +119,7 @@ const routes = [
             {
                 path: 'dpt',
                 name: 'admin-sekolah-data-dpt',
-                component: () => import('../views/admin_sekolah/Placeholder.vue'),
+                component: () => import('../views/admin_sekolah/DataDpt.vue'),
             },
             {
                 path: 'dokumentasi',

@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\AdminSekolah\IdentitasSekolahController;
 use App\Http\Controllers\Api\AdminSekolah\DataSiswaController;
 use App\Http\Controllers\Api\AdminSekolah\UploadSiswaController;
 use App\Http\Controllers\Api\AdminSekolah\KandidatController;
+use App\Http\Controllers\Api\AdminSekolah\DataDptController;
 
 // ========== PUBLIC API (No Auth Required) ==========
 
@@ -81,4 +82,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/admin-sekolah/kandidat', [KandidatController::class, 'store']); // Create
     Route::post('/admin-sekolah/kandidat/{id}', [KandidatController::class, 'update']); // Update
     Route::delete('/admin-sekolah/kandidat/{id}', [KandidatController::class, 'destroy']);
+
+    // Data DPT (Daftar Pemilih Tetap - tb_siswa_tps)
+    Route::get('/admin-sekolah/dpt', [DataDptController::class, 'index']);
+    Route::get('/admin-sekolah/dpt/siswa-belum-dpt', [DataDptController::class, 'siswaBelumDpt']);
+    Route::get('/admin-sekolah/dpt/tps-aktif', [DataDptController::class, 'listTpsAktif']);
+    Route::post('/admin-sekolah/dpt/bulk-insert', [DataDptController::class, 'storeBulk']);
+    Route::post('/admin-sekolah/dpt/bulk-delete', [DataDptController::class, 'destroyBulk']);
 });
