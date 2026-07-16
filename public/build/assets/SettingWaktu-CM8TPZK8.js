@@ -1,1 +1,0 @@
-import{_ as a,c as n,b as t,o as s}from"./app--ma2jGvW.js";const o={},c={class:"p-6"};function l(r,e){return s(),n("div",c,[...e[0]||(e[0]=[t("h2",{class:"text-2xl font-bold mb-4"},"Setting Waktu",-1),t("p",null,"Halaman sedang dalam pengembangan...",-1)])])}const _=a(o,[["render",l]]);export{_ as default};

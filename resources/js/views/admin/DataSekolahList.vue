@@ -157,6 +157,8 @@ const tahunOptions = [
   { value: '2026', label: 'Pilih tahun: 2026' },
   { value: '2025', label: 'Pilih tahun: 2025' },
   { value: '2024', label: 'Pilih tahun: 2024' },
+  { value: '2023', label: 'Pilih tahun: 2023' },
+  { value: '2022', label: 'Pilih tahun: 2022' },
 ];
 
 const tingkatOptions = [
@@ -167,13 +169,23 @@ const tingkatOptions = [
 ];
 
 const orderByOptions = [
-  { value: '', label: '- Urutkan Berdasarkan -' },
-  { value: 'jml_siswa_desc', label: 'Jumlah Siswa: Terbesar' },
-  { value: 'jml_siswa_asc', label: 'Jumlah Siswa: Terkecil' },
-  { value: 'persentase_memilih_desc', label: 'Progres Pemilihan: Terbesar' },
-  { value: 'jml_dpt_desc', label: 'Jumlah DPT: Terbesar' },
-  { value: 'npsn_asc', label: 'NPSN Sekolah (A-Z)' },
-  { value: 'nama_sekolah_asc', label: 'Nama Sekolah (A-Z)' },
+  { value: '', label: '- Sort by -' },
+  { value: 'jml_siswa_asc', label: 'Sort by Jumlah Siswa : Terkecil > Terbesar' },
+  { value: 'jml_siswa_desc', label: 'Sort by Jumlah Siswa : Terbesar > Terkecil' },
+  { value: 'jml_dpt_asc', label: 'Sort by Jumlah DPT : Terkecil > Terbesar' },
+  { value: 'jml_dpt_desc', label: 'Sort by Jumlah DPT : Terbesar > Terkecil' },
+  { value: 'jml_tps_asc', label: 'Sort by Jumlah TPS : Terkecil > Terbesar' },
+  { value: 'jml_tps_desc', label: 'Sort by Jumlah TPS : Terbesar > Terkecil' },
+  { value: 'jml_kandidat_asc', label: 'Sort by Jumlah Kandidat : Terkecil > Terbesar' },
+  { value: 'jml_kandidat_desc', label: 'Sort by Jumlah Kandidat : Terbesar > Terkecil' },
+  { value: 'jenjang_asc', label: 'Sort by Jenjang : Terkecil > Terbesar' },
+  { value: 'jenjang_desc', label: 'Sort by Jenjang : Terbesar > Terkecil' },
+  { value: 'nama_sekolah_asc', label: 'Sort by Nama Sekolah : Terkecil > Terbesar' },
+  { value: 'nama_sekolah_desc', label: 'Sort by Nama Sekolah : Terbesar > Terkecil' },
+  { value: 'npsn_asc', label: 'Sort by NPSN Sekolah : Terkecil > Terbesar' },
+  { value: 'npsn_desc', label: 'Sort by NPSN Sekolah : Terbesar > Terkecil' },
+  { value: 'persentase_dpt_desc', label: 'Sort by Persentase DPT : Terbesar > Terkecil' },
+  { value: 'persentase_memilih_desc', label: 'Sort by Persentase Memilih : Terbesar > Terkecil' },
 ];
 
 const pagination = ref({
