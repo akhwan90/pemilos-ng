@@ -1,1 +1,0 @@
-import{_ as o,c as n,b as e,o as s}from"./app-BnRebLnk.js";const t={},l={class:"p-6"};function r(c,a){return s(),n("div",l,[...a[0]||(a[0]=[e("h2",{class:"text-2xl font-bold mb-4"},"Log Approval",-1),e("p",null,"Halaman sedang dalam pengembangan...",-1)])])}const d=o(t,[["render",r]]);export{d as default};

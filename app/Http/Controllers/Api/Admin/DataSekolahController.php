@@ -18,14 +18,13 @@ class DataSekolahController extends Controller
         $query = DB::table('tb_sekolah')
             ->select([
                 'tb_sekolah.*',
-                DB::raw("(SELECT COUNT(tb_pilihan.id) FROM tb_pilihan WHERE tb_pilihan.npsn = tb_sekolah.npsn AND tb_pilihan.tahun = ?) AS jml_kandidat"),
+                DB::raw("(SELECT COUNT(tb_pilihan.id) FROM tb_pilihan WHERE tb_pilihan.npsn = tb_sekolah.npsn AND tb_pilihan.tahun = '{$tahun}') AS jml_kandidat"),
                 DB::raw("(SELECT COUNT(tb_kelas.kd_kelas) FROM tb_kelas WHERE tb_kelas.npsn = tb_sekolah.npsn AND tb_kelas.is_hapus = 0) AS jml_tps"),
-                DB::raw("(SELECT COUNT(tb_kelas_generate_token.id) FROM tb_kelas_generate_token WHERE tb_kelas_generate_token.npsn = tb_sekolah.npsn AND tb_kelas_generate_token.is_generate_token = 1 AND tb_kelas_generate_token.tahun = ?) AS jml_tps_generate_token"),
-                DB::raw("(SELECT COUNT(tb_siswa_tps.id) FROM tb_siswa_tps WHERE tb_siswa_tps.npsn = tb_sekolah.npsn AND tb_siswa_tps.tahun = ?) AS jml_dpt"),
-                DB::raw("(SELECT COUNT(tb_siswa_tps.id) FROM tb_siswa_tps WHERE tb_siswa_tps.npsn = tb_sekolah.npsn AND tb_siswa_tps.tahun = ? AND tb_siswa_tps.pilihan IS NOT NULL) AS jml_memilih"),
+                DB::raw("(SELECT COUNT(tb_kelas_generate_token.id) FROM tb_kelas_generate_token WHERE tb_kelas_generate_token.npsn = tb_sekolah.npsn AND tb_kelas_generate_token.is_generate_token = 1 AND tb_kelas_generate_token.tahun = '{$tahun}') AS jml_tps_generate_token"),
+                DB::raw("(SELECT COUNT(tb_siswa_tps.id) FROM tb_siswa_tps WHERE tb_siswa_tps.npsn = tb_sekolah.npsn AND tb_siswa_tps.tahun = '{$tahun}') AS jml_dpt"),
+                DB::raw("(SELECT COUNT(tb_siswa_tps.id) FROM tb_siswa_tps WHERE tb_siswa_tps.npsn = tb_sekolah.npsn AND tb_siswa_tps.tahun = '{$tahun}' AND tb_siswa_tps.pilihan IS NOT NULL) AS jml_memilih"),
                 DB::raw("(SELECT COUNT(tb_siswa.id) FROM tb_siswa WHERE tb_siswa.npsn = tb_sekolah.npsn) AS jml_siswa")
             ])
-            ->setBindings([$tahun, $tahun, $tahun, $tahun])
             ->where('is_delete', 0);
 
         // Filter: Search

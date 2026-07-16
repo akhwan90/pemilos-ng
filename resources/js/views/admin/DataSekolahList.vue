@@ -1,10 +1,50 @@
 <template>
-  <div class="p-6">
+  <div class="space-y-6">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div>
+        <h2 class="text-xl font-bold text-gray-800">Data Sekolah & Progres Pemilihan</h2>
+        <p class="text-sm text-gray-500">Monitoring progres pemilihan di setiap sekolah yang terdaftar.</p>
+      </div>
+      <div v-if="auth.user?.level === 1" class="flex gap-2">
+        <BaseButton @click="$router.push('/admin/data-sekolah/tambah')" variant="primary">
+          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+          Tambah Sekolah
+        </BaseButton>
+      </div>
+    </div>
+
+    <!-- Filter Card -->
+    <BaseCard>
+      <form @submit.prevent="fetchData(1)" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div>
+          <BaseSelect v-model="filterTahun" :options="tahunOptions" :valueKey="'value'" :labelKey="'label'" />
+        </div>
+        <div>
+          <input v-model="filterSearch" type="search" placeholder="Cari nama, NPSN, dll..." class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" />
+        </div>
+        <div>
+          <BaseSelect v-model="filterOrderBy" :options="orderByOptions" :valueKey="'value'" :labelKey="'label'" />
+        </div>
+        <div>
+          <BaseSelect v-model="filterTingkat" :options="tingkatOptions" :valueKey="'value'" :labelKey="'label'" />
+        </div>
+        <div>
+          <BaseButton type="submit" variant="primary" class="w-full justify-center">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+            Cari / Urutkan
+          </BaseButton>
+        </div>
+      </form>
+    </BaseCard>
+
+    <!-- Table Card -->
+    <BaseCard class="overflow-hidden p-0">
+      <div class="overflow-x-auto">
         <table class="w-full text-sm text-left">
           <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b">
             <tr>
               <th class="px-4 py-3 w-16 text-center">No</th>
-              <th class="px-4 py-3 w-24">Aksi</th>
+              <th class="px-4 py-3 w-32">Aksi</th>
               <th class="px-4 py-3">Nama Sekolah</th>
               <th class="px-4 py-3">NPSN</th>
               <th class="px-4 py-3 text-center">Kandidat</th>
@@ -15,8 +55,9 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-if="loading" class="bg-white">
+            <tr v-if="isLoading" class="bg-white">
               <td colspan="9" class="px-4 py-8 text-center text-gray-500">
+                <svg class="animate-spin h-8 w-8 mx-auto mb-2 text-indigo-500" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
                 Memuat data...
               </td>
             </tr>
@@ -26,13 +67,30 @@
             <tr v-else v-for="(item, index) in items" :key="item.npsn" class="bg-white border-b hover:bg-gray-50">
               <td class="px-4 py-3 text-center">{{ (pagination.current_page - 1) * pagination.per_page + index + 1 }}</td>
               <td class="px-4 py-3">
-                <div class="flex gap-1">
-                  <BaseButton v-if="auth.user?.level === 1" @click="$router.push('/admin/data-sekolah/edit/' + item.npsn)" variant="warning" class="px-2 py-1 !min-h-0 text-xs">
+                <div class="flex gap-1 relative">
+                  <BaseButton v-if="auth.user?.level === 1" @click="$router.push('/admin/data-sekolah/edit/' + item.npsn)" variant="warning" class="px-2 py-1 !min-h-0 text-xs" title="Edit">
                     Edit
                   </BaseButton>
-                  <BaseButton @click="$router.push('/admin/data-sekolah/' + item.npsn)" variant="success" class="px-2 py-1 !min-h-0 text-xs">
-                    Detail
-                  </BaseButton>
+                  
+                  <!-- Dropdown Action Click -->
+                  <div class="relative">
+                    <BaseButton @click="toggleDropdown(item.npsn)" variant="primary" class="px-2 py-1 !min-h-0 cursor-pointer text-xs flex items-center gap-1">
+                      Opsi
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                    </BaseButton>
+                    <div v-show="activeDropdown === item.npsn" class="absolute left-0 mt-1 w-56 bg-white border border-gray-200 rounded-md shadow-lg z-50">
+                      <div class="py-1">
+                        <router-link :to="'/admin/data-sekolah/buat-user/' + item.npsn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Buat User (Level 2)</router-link>
+                        <router-link :to="'/admin/data-sekolah/setting-jadwal/' + item.npsn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Setting Jadwal Pemilihan</router-link>
+                        <div class="border-t border-gray-100 my-1"></div>
+                        <router-link :to="'/admin/data-sekolah/kandidat/' + item.npsn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Data Kandidat</router-link>
+                        <router-link :to="'/admin/data-sekolah/tps/' + item.npsn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Data TPS</router-link>
+                        <router-link :to="'/admin/data-sekolah/siswa/' + item.npsn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Data DPT (Siswa)</router-link>
+                        <div class="border-t border-gray-100 my-1"></div>
+                        <router-link :to="'/admin/monitoring/hasil-vote/' + item.npsn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 font-medium text-emerald-600">Monitoring Hasil Vote</router-link>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </td>
               <td class="px-4 py-3 font-medium text-gray-900">{{ item.nama_sekolah }}</td>
@@ -60,5 +118,125 @@
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- Pagination -->
+      <div v-if="pagination.total > 0" class="px-4 py-3 border-t border-gray-200 bg-gray-50 flex items-center justify-between">
+        <span class="text-sm text-gray-700">
+          Menampilkan <span class="font-semibold">{{ pagination.from }}</span> - <span class="font-semibold">{{ pagination.to }}</span> dari <span class="font-semibold">{{ pagination.total }}</span> data
+        </span>
+        <div class="flex gap-2">
+          <button @click="fetchData(pagination.current_page - 1)" :disabled="!pagination.prev_page_url" class="px-3 py-1 border border-gray-300 rounded bg-white text-sm disabled:opacity-50 hover:bg-gray-50">Sebelumnya</button>
+          <button @click="fetchData(pagination.current_page + 1)" :disabled="!pagination.next_page_url" class="px-3 py-1 border border-gray-300 rounded bg-white text-sm disabled:opacity-50 hover:bg-gray-50">Selanjutnya</button>
+        </div>
+      </div>
+    </BaseCard>
   </div>
 </template>
+
+<script setup>
+import { ref, onMounted } from 'vue';
+import { useAuthStore } from '../../stores/auth';
+import BaseCard from '../../components/BaseCard.vue';
+import BaseButton from '../../components/BaseButton.vue';
+import BaseSelect from '../../components/BaseSelect.vue';
+import api from '../../services/api';
+
+const auth = useAuthStore();
+const items = ref([]);
+const isLoading = ref(false);
+const activeDropdown = ref(null); // Track active dropdown by npsn
+
+// Close dropdown when clicking outside
+onMounted(() => {
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.relative')) {
+      activeDropdown.value = null;
+    }
+  });
+});
+
+function toggleDropdown(npsn) {
+  if (activeDropdown.value === npsn) {
+    activeDropdown.value = null; // Toggle off if clicked again
+  } else {
+    activeDropdown.value = npsn; // Open the clicked one
+  }
+}
+
+const currentYear = new Date().getFullYear();
+const filterTahun = ref(currentYear.toString());
+const filterSearch = ref('');
+const filterOrderBy = ref('');
+const filterTingkat = ref('');
+
+const tahunOptions = [
+  { value: '', label: '- Pilih Tahun -' },
+  { value: '2026', label: 'Pilih tahun: 2026' },
+  { value: '2025', label: 'Pilih tahun: 2025' },
+  { value: '2024', label: 'Pilih tahun: 2024' },
+];
+
+const tingkatOptions = [
+  { value: '', label: 'Semua Tingkat' },
+  { value: 'kemenag', label: 'Kemenag' },
+  { value: 'smp', label: 'SMP' },
+  { value: 'sma', label: 'SMA/SMK' },
+];
+
+const orderByOptions = [
+  { value: '', label: '- Urutkan Berdasarkan -' },
+  { value: 'jml_siswa_desc', label: 'Jumlah Siswa: Terbesar' },
+  { value: 'jml_siswa_asc', label: 'Jumlah Siswa: Terkecil' },
+  { value: 'persentase_memilih_desc', label: 'Progres Pemilihan: Terbesar' },
+  { value: 'jml_dpt_desc', label: 'Jumlah DPT: Terbesar' },
+  { value: 'npsn_asc', label: 'NPSN Sekolah (A-Z)' },
+  { value: 'nama_sekolah_asc', label: 'Nama Sekolah (A-Z)' },
+];
+
+const pagination = ref({
+  current_page: 1,
+  last_page: 1,
+  per_page: 20,
+  total: 0,
+  from: 0,
+  to: 0,
+  prev_page_url: null,
+  next_page_url: null
+});
+
+async function fetchData(page = 1) {
+  isLoading.value = true;
+  try {
+    const response = await api.get('/admin/data-sekolah', {
+      params: {
+        page: page,
+        tahun: filterTahun.value,
+        cari: filterSearch.value,
+        order_by: filterOrderBy.value,
+        filter_by: filterTingkat.value
+      }
+    });
+    
+    items.value = response.data.data.data;
+    pagination.value = {
+      current_page: response.data.data.current_page,
+      last_page: response.data.data.last_page,
+      per_page: response.data.data.per_page,
+      total: response.data.data.total,
+      from: response.data.data.from,
+      to: response.data.data.to,
+      prev_page_url: response.data.data.prev_page_url,
+      next_page_url: response.data.data.next_page_url
+    };
+  } catch (error) {
+    console.error('Gagal mengambil data sekolah:', error);
+  } finally {
+    isLoading.value = false;
+  }
+}
+
+onMounted(() => {
+  fetchData();
+});
+</script>
