@@ -3,66 +3,53 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\AduanAspirasi;
-use App\Models\PermohonanAudiensi;
-use App\Models\TamuDprd;
-use App\Models\TamuSetwan;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
-    public function stats(): JsonResponse
+    public function stats(Request $request)
     {
-        $totalAduan = AduanAspirasi::count();
-        $totalTamuSetwan = TamuSetwan::count();
-        $totalTamuDprd = TamuDprd::count();
-        $totalAudiensi = PermohonanAudiensi::count();
+        $tahun = env('TAHUN_AKTIF', date('Y'));
 
-        $aduanBaru = AduanAspirasi::where('status', 'baru')->count();
-        $setwanBaru = TamuSetwan::where('status', 'baru')->count();
-        $dprdBaru = TamuDprd::where('status', 'baru')->count();
-        $audiensiBaru = PermohonanAudiensi::where('status', 'baru')->count();
+        // Statistik Total
+        $totalSekolah = DB::table('tb_sekolah')->where('is_delete', 0)->count();
+        $totalSiswa = DB::table('tb_siswa')->where('tahun', $tahun)->whereIn('status', [1, 4])->count();
+        $totalKandidat = DB::table('tb_pilihan')->where('tahun', $tahun)->count();
+        $totalTps = DB::table('tb_kelas')->where('is_hapus', 0)->count();
 
-        // Monthly trends (last 6 months)
-        $months = collect(range(5, 0))->map(function ($i) {
-            return now()->subMonths($i)->format('Y-m');
-        });
+        // Hitung partisipasi (Berapa yang sudah memilih)
+        $totalDpt = DB::table('tb_siswa_tps')->where('tahun', $tahun)->count();
+        $sudahPilih = DB::table('tb_siswa_tps')->where('tahun', $tahun)->whereNotNull('waktu_pilih')->count();
+        
+        $persentasePartisipasi = $totalDpt > 0 ? round(($sudahPilih / $totalDpt) * 100, 1) : 0;
 
-        $trendAduan = $months->map(function ($month) {
-            return AduanAspirasi::where('created_at', 'like', "$month%")->count();
-        });
-
-        $trendKunjungan = collect();
-        foreach ($months as $month) {
-            $trendKunjungan->push(
-                TamuSetwan::where('created_at', 'like', "$month%")->count() +
-                TamuDprd::where('created_at', 'like', "$month%")->count()
-            );
-        }
+        // Progress Jadwal Pemilihan (Global)
+        $jadwalAktif = DB::table('tb_setting_waktu_pemilihan')
+            ->where('tahun', $tahun)
+            ->whereNull('npsn')
+            ->where('waktu_mulai', '<=', now())
+            ->where('waktu_selesai', '>=', now())
+            ->get();
 
         return response()->json([
             'success' => true,
             'data' => [
                 'totals' => [
-                    'total_aduan' => $totalAduan,
-                    'total_tamu_setwan' => $totalTamuSetwan,
-                    'total_tamu_dprd' => $totalTamuDprd,
-                    'total_audiensi' => $totalAudiensi,
-                    'total_semua' => $totalAduan + $totalTamuSetwan + $totalTamuDprd + $totalAudiensi,
+                    'sekolah' => $totalSekolah,
+                    'siswa_aktif' => $totalSiswa,
+                    'kandidat' => $totalKandidat,
+                    'tps' => $totalTps
                 ],
-                'new_submissions' => [
-                    'aduan_baru' => $aduanBaru,
-                    'setwan_baru' => $setwanBaru,
-                    'dprd_baru' => $dprdBaru,
-                    'audiensi_baru' => $audiensiBaru,
-                    'total_baru' => $aduanBaru + $setwanBaru + $dprdBaru + $audiensiBaru,
+                'partisipasi' => [
+                    'total_dpt' => $totalDpt,
+                    'sudah_memilih' => $sudahPilih,
+                    'belum_memilih' => $totalDpt - $sudahPilih,
+                    'persentase' => $persentasePartisipasi
                 ],
-                'trends' => [
-                    'months' => $months,
-                    'aduan' => $trendAduan,
-                    'kunjungan' => $trendKunjungan,
-                ],
-            ],
+                'jadwal_berlangsung' => $jadwalAktif
+            ]
         ]);
     }
 }

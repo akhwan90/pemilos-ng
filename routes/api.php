@@ -15,12 +15,13 @@ use App\Http\Controllers\Api\AdminSekolah\DokumentasiController;
 use App\Http\Controllers\Api\AdminSekolah\DashboardController;
 
 // ========== PUBLIC API (No Auth Required) ==========
-
-// Auth (login admin/sekolah)
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:6,1');
 
 // ========== ADMIN API (Sanctum Auth Required) ==========
 Route::middleware('auth:sanctum')->group(function () {
+    // Dashboard Stats Super Admin (Dari project Gesit)
+    Route::get('/admin/dashboard/stats', [App\Http\Controllers\Api\Admin\DashboardController::class, 'stats']);
+
     // Auth
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
