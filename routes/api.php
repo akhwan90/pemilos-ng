@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\Admin\DataSekolahController;
 use App\Http\Controllers\Api\Admin\UserSekolahController;
+use App\Http\Controllers\Api\Admin\JadwalSekolahController;
 
 // ========== PUBLIC API (No Auth Required) ==========
 
@@ -23,4 +24,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/admin/data-sekolah/{npsn}/users', [UserSekolahController::class, 'store']);
     Route::put('/admin/data-sekolah/{npsn}/users/{id}', [UserSekolahController::class, 'update']);
     Route::delete('/admin/data-sekolah/{npsn}/users/{id}', [UserSekolahController::class, 'destroy']);
+
+    // Jadwal Sekolah API
+    Route::get('/admin/data-sekolah/{npsn}/jadwal', [JadwalSekolahController::class, 'index']);
+    Route::post('/admin/data-sekolah/{npsn}/jadwal', [JadwalSekolahController::class, 'store']);
 });
