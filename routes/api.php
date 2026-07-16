@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\Admin\KandidatSekolahController;
 use App\Http\Controllers\Api\Admin\TpsSekolahController;
 use App\Http\Controllers\Api\AdminSekolah\IdentitasSekolahController;
 use App\Http\Controllers\Api\AdminSekolah\DataSiswaController;
+use App\Http\Controllers\Api\AdminSekolah\UploadSiswaController;
 
 // ========== PUBLIC API (No Auth Required) ==========
 
@@ -61,4 +62,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/admin-sekolah/siswa/bulk-delete', [DataSiswaController::class, 'bulkDestroy']);
     Route::put('/admin-sekolah/siswa/{id}', [DataSiswaController::class, 'update']);
     Route::post('/admin-sekolah/siswa/{id}/delete', [DataSiswaController::class, 'destroy']);
+
+    // Upload Siswa API
+    Route::get('/admin-sekolah/upload-siswa', [UploadSiswaController::class, 'history']);
+    Route::post('/admin-sekolah/upload-siswa', [UploadSiswaController::class, 'upload']);
+    Route::get('/admin-sekolah/upload-siswa/{id}/logs', [UploadSiswaController::class, 'logs']);
 });

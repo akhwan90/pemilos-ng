@@ -104,7 +104,7 @@ const routes = [
             {
                 path: 'upload-siswa',
                 name: 'admin-sekolah-upload-siswa',
-                component: () => import('../views/admin_sekolah/Placeholder.vue'),
+                component: () => import('../views/admin_sekolah/UploadSiswa.vue'),
             },
             {
                 path: 'tps',
