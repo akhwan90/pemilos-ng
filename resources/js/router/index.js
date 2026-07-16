@@ -60,6 +60,11 @@ const routes = [
                 component: () => import('../views/admin/DataSekolahList.vue'),
             },
             {
+                path: 'data-sekolah/edit/:npsn',
+                name: 'admin-data-sekolah-edit',
+                component: () => import('../views/admin/DataSekolahEdit.vue'),
+            },
+            {
                 path: 'setting-waktu',
                 name: 'admin-setting-waktu',
                 component: () => import('../views/admin/SettingWaktu.vue'),
