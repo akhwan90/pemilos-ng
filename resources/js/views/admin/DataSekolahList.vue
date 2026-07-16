@@ -38,8 +38,8 @@
     </BaseCard>
 
     <!-- Table Card -->
-    <BaseCard class="overflow-hidden p-0">
-      <div class="overflow-x-auto">
+    <BaseCard class="overflow-visible p-0">
+      <div class="overflow-visible min-h-[300px]">
         <table class="w-full text-sm text-left">
           <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b">
             <tr>
