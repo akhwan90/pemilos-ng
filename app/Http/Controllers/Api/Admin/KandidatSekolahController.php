@@ -107,9 +107,14 @@ class KandidatSekolahController extends Controller
     }
 
     // Mengambil 1 detail kandidat untuk di-edit
-    public function show(Request $request, $npsn = null, $id)
+    public function show(Request $request, $npsn = null, $id = null)
     {
+        // Handle beda pola parameter dari Router:
+        // Super Admin : /admin/data-sekolah/{npsn}/kandidat/{id} -> $npsn terisi, $id terisi
+        // Admin Sek.  : /admin-sekolah/kandidat/{id}             -> $npsn diisi oleh nilai {id} dari URL, $id = null
+        
         if ($request->user()->level == 2) {
+            $id = $npsn; // Geser parameter dari npsn ke id
             $npsn = $request->user()->npsn;
         }
 
@@ -133,9 +138,10 @@ class KandidatSekolahController extends Controller
     }
 
     // Update kandidat
-    public function update(Request $request, $npsn = null, $id)
+    public function update(Request $request, $npsn = null, $id = null)
     {
         if ($request->user()->level == 2) {
+            $id = $npsn; // Geser parameter
             $npsn = $request->user()->npsn;
         }
 
@@ -193,9 +199,10 @@ class KandidatSekolahController extends Controller
     }
 
     // Hapus kandidat
-    public function destroy(Request $request, $npsn = null, $id)
+    public function destroy(Request $request, $npsn = null, $id = null)
     {
         if ($request->user()->level == 2) {
+            $id = $npsn; // Geser parameter
             $npsn = $request->user()->npsn;
         }
 
