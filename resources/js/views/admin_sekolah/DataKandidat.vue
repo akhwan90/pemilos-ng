@@ -16,7 +16,7 @@
             <tr>
               <th class="px-4 py-3 w-16 text-center">No Urut</th>
               <th class="px-4 py-3 w-24">Photo</th>
-              <th class="px-4 py-3">Nama Lengkap &amp; Kampanye</th>
+              <th class="px-4 py-3">Nama Lengkap &amp; Link Kampanye</th>
               <th class="px-4 py-3 w-32 text-center">Aksi</th>
             </tr>
           </thead>
@@ -36,7 +36,12 @@
               <td class="px-4 py-3">
                 <div class="font-bold text-lg text-indigo-700">{{ k.nama }}</div>
                 <div class="text-xs text-gray-500 mb-2">NISN: {{ k.nisn }}</div>
-                <div v-if="k.kampanye" class="text-sm italic bg-yellow-50 text-yellow-800 p-2 border border-yellow-200 rounded">"{{ k.kampanye }}"</div>
+                <div v-if="k.kampanye" class="text-xs">
+                  <a :href="k.kampanye" target="_blank" class="text-red-600 hover:underline flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
+                    Lihat Video YouTube
+                  </a>
+                </div>
               </td>
               <td class="px-4 py-3 text-center align-middle">
                 <div class="flex flex-col gap-2 justify-center items-center">
@@ -78,8 +83,8 @@
               <input v-model="form.nisn" type="text" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-indigo-500">
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Slogan / Jargon Kampanye</label>
-              <input v-model="form.kampanye" type="text" placeholder="Cth: Muda Mudi Berkarya" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-indigo-500">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Link YouTube Kampanye</label>
+              <input v-model="form.kampanye" type="text" placeholder="Cth: https://youtube.com/watch?v=..." class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-indigo-500">
             </div>
             
             <div class="pt-2 border-t mt-4">

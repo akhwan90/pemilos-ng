@@ -85,9 +85,9 @@ class KandidatSekolahController extends Controller
             'misi' => $request->misi,
             'proker' => $request->proker,
             'pengalaman' => $request->pengalaman,
-            'prestasi' => $request->prestasi,
-            'waktu_input' => now(),
-            'id_user' => $request->user()->id // Catat siapa admin yang input
+            'prestasi' => $request->prestasi
+            // 'waktu_input' => now(), // Di tabel tb_pilihan tidak ada kolom waktu_input
+            // 'id_user' => $request->user()->id 
         ];
 
         // Handle upload file
