@@ -147,16 +147,12 @@
           <label class="block text-sm font-medium text-gray-700 mb-2">Alasan Hapus</label>
           <div class="flex flex-col gap-2">
             <label class="flex items-center">
-              <input type="radio" v-model="bulkDeleteReason" value="Lulus" required class="text-indigo-600 focus:ring-indigo-500 mr-2">
+              <input type="radio" v-model="bulkDeleteReason" value="2" required class="text-indigo-600 focus:ring-indigo-500 mr-2">
               <span class="text-sm">Lulus</span>
             </label>
             <label class="flex items-center">
-              <input type="radio" v-model="bulkDeleteReason" value="Pindah" required class="text-indigo-600 focus:ring-indigo-500 mr-2">
+              <input type="radio" v-model="bulkDeleteReason" value="3" required class="text-indigo-600 focus:ring-indigo-500 mr-2">
               <span class="text-sm">Pindah / Mutasi Keluar</span>
-            </label>
-            <label class="flex items-center">
-              <input type="radio" v-model="bulkDeleteReason" value="Lainnya" required class="text-indigo-600 focus:ring-indigo-500 mr-2">
-              <span class="text-sm">Lainnya</span>
             </label>
           </div>
         </div>

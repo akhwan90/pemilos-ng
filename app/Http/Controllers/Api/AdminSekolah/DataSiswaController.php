@@ -108,7 +108,7 @@ class DataSiswaController extends Controller
             ->where('id', $id)
             ->where('npsn', $npsn)
             ->update([
-                'status' => 0, // Soft delete
+                'status' => 0, // Default soft delete (bukan lulus/pindah)
                 'hapus_time' => date('Y-m-d H:i:s'),
                 'hapus_user_id' => $user_id
             ]);
@@ -131,17 +131,17 @@ class DataSiswaController extends Controller
         $request->validate([
             'ids' => 'required|array',
             'ids.*' => 'integer',
-            'alasan_hapus' => 'required|string|in:Lulus,Pindah,Lainnya'
+            'alasan_hapus' => 'required|integer|in:2,3' // 2: Lulus, 3: Pindah
         ]);
 
         $affected = DB::table('tb_siswa')
             ->whereIn('id', $request->ids)
             ->where('npsn', $npsn)
             ->update([
-                'status' => 0,
+                'status' => $request->alasan_hapus,
+                'npsn' => null, // Lepas dari ikatan sekolah
                 'hapus_time' => date('Y-m-d H:i:s'),
-                'hapus_user_id' => $user_id,
-                'alasan_hapus' => $request->alasan_hapus
+                'hapus_user_id' => $user_id
             ]);
 
         return response()->json([
