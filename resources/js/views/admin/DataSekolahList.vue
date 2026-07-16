@@ -72,25 +72,24 @@
                     Edit
                   </BaseButton>
                   
-                  <!-- Dropdown Action Click -->
-                  <div class="relative">
-                    <BaseButton @click="toggleDropdown(item.npsn)" variant="primary" class="px-2 py-1 !min-h-0 cursor-pointer text-xs flex items-center gap-1">
-                      Opsi
-                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
-                    </BaseButton>
-                    <div v-show="activeDropdown === item.npsn" class="absolute left-0 mt-1 w-56 bg-white border border-gray-200 rounded-md shadow-lg z-50">
-                      <div class="py-1">
-                        <router-link :to="'/admin/data-sekolah/buat-user/' + item.npsn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Buat User (Level 2)</router-link>
-                        <router-link :to="'/admin/data-sekolah/setting-jadwal/' + item.npsn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Setting Jadwal Pemilihan</router-link>
-                        <div class="border-t border-gray-100 my-1"></div>
-                        <router-link :to="'/admin/data-sekolah/kandidat/' + item.npsn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Data Kandidat</router-link>
-                        <router-link :to="'/admin/data-sekolah/tps/' + item.npsn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Data TPS</router-link>
-                        <router-link :to="'/admin/data-sekolah/siswa/' + item.npsn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Data DPT (Siswa)</router-link>
-                        <div class="border-t border-gray-100 my-1"></div>
-                        <router-link :to="'/admin/monitoring/hasil-vote/' + item.npsn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 font-medium text-emerald-600">Monitoring Hasil Vote</router-link>
-                      </div>
-                    </div>
-                  </div>
+                  <!-- Dropdown Component -->
+                  <BaseDropdown widthClass="w-56" alignClass="left-0">
+                    <template #trigger>
+                      <BaseButton variant="primary" class="px-2 py-1 !min-h-0 cursor-pointer text-xs flex items-center gap-1">
+                        Opsi
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                      </BaseButton>
+                    </template>
+                    
+                    <router-link :to="'/admin/data-sekolah/buat-user/' + item.npsn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Buat User (Level 2)</router-link>
+                    <router-link :to="'/admin/data-sekolah/setting-jadwal/' + item.npsn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Setting Jadwal Pemilihan</router-link>
+                    <div class="border-t border-gray-100 my-1"></div>
+                    <router-link :to="'/admin/data-sekolah/kandidat/' + item.npsn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Data Kandidat</router-link>
+                    <router-link :to="'/admin/data-sekolah/tps/' + item.npsn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Data TPS</router-link>
+                    <router-link :to="'/admin/data-sekolah/siswa/' + item.npsn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Data DPT (Siswa)</router-link>
+                    <div class="border-t border-gray-100 my-1"></div>
+                    <router-link :to="'/admin/monitoring/hasil-vote/' + item.npsn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 font-medium text-emerald-600">Monitoring Hasil Vote</router-link>
+                  </BaseDropdown>
                 </div>
               </td>
               <td class="px-4 py-3 font-medium text-gray-900">{{ item.nama_sekolah }}</td>
@@ -140,29 +139,12 @@ import { useAuthStore } from '../../stores/auth';
 import BaseCard from '../../components/BaseCard.vue';
 import BaseButton from '../../components/BaseButton.vue';
 import BaseSelect from '../../components/BaseSelect.vue';
+import BaseDropdown from '../../components/BaseDropdown.vue';
 import api from '../../services/api';
 
 const auth = useAuthStore();
 const items = ref([]);
 const isLoading = ref(false);
-const activeDropdown = ref(null); // Track active dropdown by npsn
-
-// Close dropdown when clicking outside
-onMounted(() => {
-  document.addEventListener('click', (e) => {
-    if (!e.target.closest('.relative')) {
-      activeDropdown.value = null;
-    }
-  });
-});
-
-function toggleDropdown(npsn) {
-  if (activeDropdown.value === npsn) {
-    activeDropdown.value = null; // Toggle off if clicked again
-  } else {
-    activeDropdown.value = npsn; // Open the clicked one
-  }
-}
 
 const currentYear = new Date().getFullYear();
 const filterTahun = ref(currentYear.toString());
