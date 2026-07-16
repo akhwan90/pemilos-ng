@@ -86,6 +86,48 @@ const routes = [
             },
         ],
     },
+    {
+        path: '/admin-sekolah',
+        component: () => import('../views/admin/AdminLayout.vue'),
+        meta: { requiresAuth: true, level: 2 }, // Khusus level 2 Admin Sekolah
+        children: [
+            {
+                path: 'identitas',
+                name: 'admin-sekolah-identitas',
+                component: () => import('../views/admin_sekolah/IdentitasSekolah.vue'),
+            },
+            {
+                path: 'siswa',
+                name: 'admin-sekolah-data-siswa',
+                component: () => import('../views/admin_sekolah/Placeholder.vue'),
+            },
+            {
+                path: 'upload-siswa',
+                name: 'admin-sekolah-upload-siswa',
+                component: () => import('../views/admin_sekolah/Placeholder.vue'),
+            },
+            {
+                path: 'tps',
+                name: 'admin-sekolah-data-tps',
+                component: () => import('../views/admin_sekolah/Placeholder.vue'),
+            },
+            {
+                path: 'calon',
+                name: 'admin-sekolah-calon-kandidat',
+                component: () => import('../views/admin_sekolah/Placeholder.vue'),
+            },
+            {
+                path: 'dpt',
+                name: 'admin-sekolah-data-dpt',
+                component: () => import('../views/admin_sekolah/Placeholder.vue'),
+            },
+            {
+                path: 'dokumentasi',
+                name: 'admin-sekolah-dokumentasi',
+                component: () => import('../views/admin_sekolah/Placeholder.vue'),
+            }
+        ],
+    },
 ];
 
 const router = createRouter({
