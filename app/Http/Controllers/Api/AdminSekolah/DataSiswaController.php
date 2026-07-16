@@ -122,4 +122,31 @@ class DataSiswaController extends Controller
             'message' => 'Data Siswa berhasil dihapus'
         ]);
     }
+
+    public function bulkDestroy(Request $request)
+    {
+        $npsn = $request->user()->npsn;
+        $user_id = $request->user()->id;
+
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'integer',
+            'alasan_hapus' => 'required|string|in:Lulus,Pindah,Lainnya'
+        ]);
+
+        $affected = DB::table('tb_siswa')
+            ->whereIn('id', $request->ids)
+            ->where('npsn', $npsn)
+            ->update([
+                'status' => 0,
+                'hapus_time' => date('Y-m-d H:i:s'),
+                'hapus_user_id' => $user_id,
+                'alasan_hapus' => $request->alasan_hapus
+            ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => "Berhasil menghapus {$affected} siswa secara simultan"
+        ]);
+    }
 }

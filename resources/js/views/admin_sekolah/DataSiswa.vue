@@ -15,11 +15,19 @@
     <BaseCard class="p-0">
       <!-- Toolbar -->
       <div class="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
-        <div class="relative w-64">
-          <input v-model="searchQuery" @keyup.enter="fetchSiswa(1)" type="text" placeholder="Cari NISN, Nama, atau Kelas..." 
-            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500">
-          <svg class="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+        <div class="flex gap-2 items-center">
+          <div class="relative w-64">
+            <input v-model="searchQuery" @keyup.enter="fetchSiswa(1)" type="text" placeholder="Cari NISN, Nama, atau Kelas..." 
+              class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500">
+            <svg class="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+          </div>
+          
+          <!-- Bulk Delete Trigger Button -->
+          <BaseButton v-if="selectedIds.length > 0" variant="danger" @click="isBulkDeleteModalOpen = true" class="!py-2 !h-[38px] text-xs">
+            Hapus {{ selectedIds.length }} Terpilih
+          </BaseButton>
         </div>
+
         <div class="flex gap-2 text-sm text-gray-500">
           Total: <span class="font-bold text-gray-700">{{ pagination.total }}</span> siswa
         </div>
@@ -30,6 +38,9 @@
         <table class="w-full text-sm text-left">
           <thead class="text-xs text-gray-700 uppercase bg-gray-100 border-b">
             <tr>
+              <th class="px-4 py-3 w-10 text-center">
+                <input type="checkbox" @change="toggleAll" :checked="isAllSelected" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 w-4 h-4" />
+              </th>
               <th class="px-4 py-3 w-16 text-center">No</th>
               <th class="px-4 py-3">NISN</th>
               <th class="px-4 py-3">Nama Siswa</th>
@@ -41,12 +52,15 @@
           </thead>
           <tbody>
             <tr v-if="isLoading" class="bg-white border-b">
-              <td colspan="7" class="px-4 py-8 text-center text-gray-500">Memuat data siswa...</td>
+              <td colspan="8" class="px-4 py-8 text-center text-gray-500">Memuat data siswa...</td>
             </tr>
             <tr v-else-if="items.length === 0" class="bg-white border-b">
-              <td colspan="7" class="px-4 py-8 text-center text-gray-500">Tidak ada data siswa ditemukan.</td>
+              <td colspan="8" class="px-4 py-8 text-center text-gray-500">Tidak ada data siswa ditemukan.</td>
             </tr>
-            <tr v-else v-for="(item, index) in items" :key="item.id" class="bg-white border-b hover:bg-gray-50">
+            <tr v-else v-for="(item, index) in items" :key="item.id" class="bg-white border-b hover:bg-gray-50" :class="{ 'bg-indigo-50/50': isSelected(item.id) }">
+              <td class="px-4 py-3 text-center">
+                <input type="checkbox" :value="item.id" v-model="selectedIds" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 w-4 h-4" />
+              </td>
               <td class="px-4 py-3 text-center">{{ (pagination.current_page - 1) * pagination.per_page + index + 1 }}</td>
               <td class="px-4 py-3 font-mono text-gray-600">{{ item.nisn }}</td>
               <td class="px-4 py-3 font-medium text-gray-800">{{ item.nm_siswa }}</td>
@@ -122,11 +136,43 @@
       </form>
     </BaseModal>
 
+    <!-- Modal Konfirmasi Hapus Bulk -->
+    <BaseModal v-model="isBulkDeleteModalOpen" title="Hapus Siswa Terpilih" max-width="md">
+      <form @submit.prevent="submitBulkDelete" class="space-y-4">
+        <p class="text-sm text-gray-600 mb-4">
+          Anda akan menghapus <strong>{{ selectedIds.length }}</strong> siswa. Silakan pilih alasan penghapusan (akan dicatat di database).
+        </p>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Alasan Hapus</label>
+          <div class="flex flex-col gap-2">
+            <label class="flex items-center">
+              <input type="radio" v-model="bulkDeleteReason" value="Lulus" required class="text-indigo-600 focus:ring-indigo-500 mr-2">
+              <span class="text-sm">Lulus</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" v-model="bulkDeleteReason" value="Pindah" required class="text-indigo-600 focus:ring-indigo-500 mr-2">
+              <span class="text-sm">Pindah / Mutasi Keluar</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" v-model="bulkDeleteReason" value="Lainnya" required class="text-indigo-600 focus:ring-indigo-500 mr-2">
+              <span class="text-sm">Lainnya</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="mt-6 flex justify-end gap-3 border-t pt-4">
+          <BaseButton type="button" variant="secondary" @click="isBulkDeleteModalOpen = false">Batal</BaseButton>
+          <BaseButton type="submit" variant="danger" :loading="isSubmittingBulkDelete">Konfirmasi Hapus</BaseButton>
+        </div>
+      </form>
+    </BaseModal>
+
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import BaseCard from '../../components/BaseCard.vue';
 import BaseButton from '../../components/BaseButton.vue';
 import BaseModal from '../../components/BaseModal.vue';
@@ -153,6 +199,28 @@ const form = ref({
   difabel: '0'
 });
 
+// State for Bulk Delete
+const selectedIds = ref([]);
+const isBulkDeleteModalOpen = ref(false);
+const bulkDeleteReason = ref('');
+const isSubmittingBulkDelete = ref(false);
+
+const isAllSelected = computed(() => {
+  return items.value.length > 0 && selectedIds.value.length === items.value.length;
+});
+
+function toggleAll(event) {
+  if (event.target.checked) {
+    selectedIds.value = items.value.map(item => item.id);
+  } else {
+    selectedIds.value = [];
+  }
+}
+
+function isSelected(id) {
+  return selectedIds.value.includes(id);
+}
+
 onMounted(() => {
   fetchSiswa(1);
 });
@@ -162,6 +230,9 @@ async function fetchSiswa(page = 1) {
   try {
     const res = await api.get(`/admin-sekolah/siswa?page=${page}&cari=${searchQuery.value}`);
     items.value = res.data.data.data;
+    // Reset selection on fetch
+    selectedIds.value = [];
+    
     pagination.value = {
       current_page: res.data.data.current_page,
       last_page: res.data.data.last_page,
@@ -225,6 +296,30 @@ async function deleteSiswa(id) {
     fetchSiswa(pagination.value.current_page);
   } catch (error) {
     toast.error('Gagal menghapus siswa');
+  }
+}
+async function submitBulkDelete() {
+  if (selectedIds.value.length === 0) return;
+  
+  isSubmittingBulkDelete.value = true;
+  try {
+    const payload = {
+      ids: selectedIds.value,
+      alasan_hapus: bulkDeleteReason.value
+    };
+    
+    await api.post(`/admin-sekolah/siswa/bulk-delete`, payload);
+    
+    toast.success(`${selectedIds.value.length} siswa berhasil dihapus`);
+    isBulkDeleteModalOpen.value = false;
+    bulkDeleteReason.value = '';
+    
+    // Refresh table
+    fetchSiswa(pagination.value.current_page);
+  } catch (error) {
+    toast.error('Gagal melakukan hapus massal');
+  } finally {
+    isSubmittingBulkDelete.value = false;
   }
 }
 </script>

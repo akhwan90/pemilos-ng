@@ -1,1 +1,0 @@
-import{_ as e}from"./_plugin-vue_export-helper-DlAUqK2U.js";import{c as n,b as a,o as s}from"./app-DinA7Rjj.js";const t={},r={class:"p-6"};function l(c,o){return s(),n("div",r,[...o[0]||(o[0]=[a("h2",{class:"text-2xl font-bold mb-4"},"Log Approval",-1),a("p",null,"Halaman sedang dalam pengembangan...",-1)])])}const d=e(t,[["render",l]]);export{d as default};

@@ -57,6 +57,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Data Siswa API
     Route::get('/admin-sekolah/siswa', [DataSiswaController::class, 'index']);
     Route::post('/admin-sekolah/siswa', [DataSiswaController::class, 'store']);
+    Route::post('/admin-sekolah/siswa/bulk-delete', [DataSiswaController::class, 'bulkDestroy']);
     Route::put('/admin-sekolah/siswa/{id}', [DataSiswaController::class, 'update']);
     Route::delete('/admin-sekolah/siswa/{id}', [DataSiswaController::class, 'destroy']);
 });
