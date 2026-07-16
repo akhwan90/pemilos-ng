@@ -1,0 +1,13 @@
+.git
+.github
+node_modules
+npm-debug.log
+vendor
+.env
+.env.backup
+phpunit.xml
+tests
+docker
+docker-compose.yml
+Dockerfile
+Penetration_Testing_Spec.md
