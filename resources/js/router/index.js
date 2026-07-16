@@ -99,7 +99,7 @@ const routes = [
             {
                 path: 'siswa',
                 name: 'admin-sekolah-data-siswa',
-                component: () => import('../views/admin_sekolah/Placeholder.vue'),
+                component: () => import('../views/admin_sekolah/DataSiswa.vue'),
             },
             {
                 path: 'upload-siswa',

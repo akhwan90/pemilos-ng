@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\Admin\JadwalSekolahController;
 use App\Http\Controllers\Api\Admin\KandidatSekolahController;
 use App\Http\Controllers\Api\Admin\TpsSekolahController;
 use App\Http\Controllers\Api\AdminSekolah\IdentitasSekolahController;
+use App\Http\Controllers\Api\AdminSekolah\DataSiswaController;
 
 // ========== PUBLIC API (No Auth Required) ==========
 
@@ -52,4 +53,10 @@ Route::middleware('auth:sanctum')->group(function () {
     // ==========================================
     Route::get('/admin-sekolah/identitas', [IdentitasSekolahController::class, 'show']);
     Route::post('/admin-sekolah/identitas', [IdentitasSekolahController::class, 'update']);
+
+    // Data Siswa API
+    Route::get('/admin-sekolah/siswa', [DataSiswaController::class, 'index']);
+    Route::post('/admin-sekolah/siswa', [DataSiswaController::class, 'store']);
+    Route::put('/admin-sekolah/siswa/{id}', [DataSiswaController::class, 'update']);
+    Route::delete('/admin-sekolah/siswa/{id}', [DataSiswaController::class, 'destroy']);
 });

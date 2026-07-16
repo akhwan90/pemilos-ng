@@ -45,7 +45,7 @@ class IdentitasSekolahController extends Controller
             'alamat_sekolah' => $request->alamat_sekolah,
             'kepala_sekolah' => $request->kepala_sekolah,
             'jenjang' => $request->jenjang,
-            'jenjang2' => $request->jenjang2,
+            'jenjang2' => $request->jenjang2 ?: $request->jenjang,
             'desa' => $request->desa,
             'kecamatan' => $request->kecamatan,
             'negeri_or_swasta' => $request->negeri_or_swasta,
