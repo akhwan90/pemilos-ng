@@ -16,7 +16,7 @@ import BaseModal from '../../../components/BaseModal.vue';
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
-  npsn: { type: String, default: null }
+  npsn: { type: [String, Number], default: null }
 });
 
 const emit = defineEmits(['update:modelValue']);
