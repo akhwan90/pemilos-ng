@@ -68,7 +68,7 @@
               <td class="px-4 py-3 text-center">{{ (pagination.current_page - 1) * pagination.per_page + index + 1 }}</td>
               <td class="px-4 py-3">
                 <div class="flex gap-1 relative">
-                  <BaseButton v-if="auth.user?.level === 1" @click="$router.push('/admin/data-sekolah/edit/' + item.npsn)" variant="warning" class="px-2 py-1 !min-h-0 text-xs" title="Edit">
+                  <BaseButton v-if="auth.user?.level === 1" @click="openModal('edit', item.npsn)" variant="warning" class="px-2 py-1 !min-h-0 text-xs" title="Edit">
                     Edit
                   </BaseButton>
                   
@@ -132,6 +132,7 @@
     </BaseCard>
 
     <!-- Modals -->
+    <ModalEditSekolah v-model="modals.edit" :npsn="selectedNpsn" @updated="fetchData(pagination.current_page)" />
     <ModalUserSekolah v-model="modals.user" :npsn="selectedNpsn" />
     <ModalJadwalSekolah v-model="modals.jadwal" :npsn="selectedNpsn" />
     <ModalKandidat v-model="modals.kandidat" :npsn="selectedNpsn" />
@@ -155,6 +156,7 @@ import ModalJadwalSekolah from './sekolah_modals/ModalJadwalSekolah.vue';
 import ModalKandidat from './sekolah_modals/ModalKandidat.vue';
 import ModalTps from './sekolah_modals/ModalTps.vue';
 import ModalSiswaDpt from './sekolah_modals/ModalSiswaDpt.vue';
+import ModalEditSekolah from './sekolah_modals/ModalEditSekolah.vue';
 
 const auth = useAuthStore();
 const items = ref([]);
@@ -163,6 +165,7 @@ const isLoading = ref(false);
 // Modals State
 const selectedNpsn = ref(null);
 const modals = ref({
+  edit: false,
   user: false,
   jadwal: false,
   kandidat: false,
