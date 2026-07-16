@@ -7,6 +7,13 @@
         <h4 class="text-sm font-semibold text-gray-700 mb-3">Tambah User Baru</h4>
         <form @submit.prevent="submitForm" class="flex flex-col sm:flex-row gap-3 items-end">
           <div class="flex-1 w-full">
+            <label class="block text-xs font-medium text-gray-600 mb-1">Level Akun</label>
+            <select v-model="form.level" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500">
+              <option value="2">Admin Sekolah (Level 2)</option>
+              <option value="3">Admin TPS (Level 3)</option>
+            </select>
+          </div>
+          <div class="flex-1 w-full">
             <label class="block text-xs font-medium text-gray-600 mb-1">Username (Min 6 Karakter)</label>
             <input v-model="form.username" type="text" required minlength="6" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Masukkan username unik">
           </div>
@@ -15,8 +22,8 @@
             <input v-model="form.password" type="password" required minlength="6" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Masukkan password">
           </div>
           <div class="w-full sm:w-auto">
-            <BaseButton type="submit" variant="primary" :loading="isSubmitting" class="w-full sm:w-auto">
-              Simpan User
+            <BaseButton type="submit" variant="primary" :loading="isSubmitting" class="w-full sm:w-auto h-[38px]">
+              Simpan
             </BaseButton>
           </div>
         </form>
@@ -46,8 +53,14 @@
                 <td class="px-4 py-3 text-center">{{ index + 1 }}</td>
                 <td class="px-4 py-3 font-medium">{{ user.username }}</td>
                 <td class="px-4 py-3">
-                  <span class="px-2 py-1 text-xs font-semibold rounded bg-blue-100 text-blue-800">
+                  <span v-if="user.level == 2" class="px-2 py-1 text-xs font-semibold rounded bg-blue-100 text-blue-800">
                     Admin Sekolah
+                  </span>
+                  <span v-else-if="user.level == 3" class="px-2 py-1 text-xs font-semibold rounded bg-green-100 text-green-800">
+                    Admin TPS
+                  </span>
+                  <span v-else class="px-2 py-1 text-xs font-semibold rounded bg-gray-100 text-gray-800">
+                    Level {{ user.level }}
                   </span>
                 </td>
                 <td class="px-4 py-3 text-center">
@@ -96,7 +109,8 @@ const isSubmitting = ref(false);
 
 const form = ref({
   username: '',
-  password: ''
+  password: '',
+  level: '2'
 });
 
 // Watch when modal opens and npsn is available
@@ -105,6 +119,7 @@ watch(() => isOpen.value, (newVal) => {
     fetchUsers();
     form.value.username = '';
     form.value.password = '';
+    form.value.level = '2';
   }
 });
 
