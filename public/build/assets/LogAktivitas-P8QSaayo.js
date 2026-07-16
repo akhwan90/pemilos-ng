@@ -1,0 +1,1 @@
+import{_ as t,c as s,b as e,o as n}from"./app-nBopsjb0.js";const o={},c={class:"p-6"};function l(r,a){return n(),s("div",c,[...a[0]||(a[0]=[e("h2",{class:"text-2xl font-bold mb-4"},"Log Aktivitas",-1),e("p",null,"Halaman sedang dalam pengembangan...",-1)])])}const i=t(o,[["render",l]]);export{i as default};
