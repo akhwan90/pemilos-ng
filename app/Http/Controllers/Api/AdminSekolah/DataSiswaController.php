@@ -13,6 +13,7 @@ class DataSiswaController extends Controller
         $npsn = $request->user()->npsn;
         $tahun = env('TAHUN_AKTIF', date('Y'));
         $search = $request->query('cari');
+        $filterKelas = $request->query('kelas');
 
         $query = DB::table('tb_siswa')
             ->where('npsn', $npsn)
@@ -22,9 +23,12 @@ class DataSiswaController extends Controller
         if (!empty($search)) {
             $query->where(function($q) use ($search) {
                 $q->where('nm_siswa', 'like', "%{$search}%")
-                  ->orWhere('nisn', 'like', "%{$search}%")
-                  ->orWhere('kelas', 'like', "%{$search}%");
+                  ->orWhere('nisn', 'like', "%{$search}%");
             });
+        }
+        
+        if (!empty($filterKelas)) {
+            $query->where('kelas', $filterKelas);
         }
 
         // Pagination
@@ -33,6 +37,28 @@ class DataSiswaController extends Controller
         return response()->json([
             'success' => true,
             'data' => $siswa
+        ]);
+    }
+
+    public function listKelas(Request $request)
+    {
+        $npsn = $request->user()->npsn;
+        $tahun = env('TAHUN_AKTIF', date('Y'));
+        
+        $kelas = DB::table('tb_siswa')
+            ->select('kelas')
+            ->where('npsn', $npsn)
+            ->where('tahun', $tahun)
+            ->where('status', 1)
+            ->whereNotNull('kelas')
+            ->where('kelas', '!=', '')
+            ->groupBy('kelas')
+            ->orderBy('kelas')
+            ->pluck('kelas');
+            
+        return response()->json([
+            'success' => true,
+            'data' => $kelas
         ]);
     }
 

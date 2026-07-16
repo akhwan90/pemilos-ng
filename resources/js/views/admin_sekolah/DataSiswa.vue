@@ -16,10 +16,21 @@
       <!-- Toolbar -->
       <div class="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
         <div class="flex gap-2 items-center">
-          <div class="relative w-64">
-            <input v-model="searchQuery" @keyup.enter="fetchSiswa(1)" type="text" placeholder="Cari NISN, Nama, atau Kelas..." 
-              class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500">
-            <svg class="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+          <!-- Filter Kelas -->
+          <div class="relative w-40">
+            <select v-model="filterKelas" @change="fetchSiswa(1)" class="w-full pl-3 pr-8 py-2 border border-gray-300 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500 appearance-none bg-white">
+              <option value="">Semua Kelas</option>
+              <option v-for="kls in daftarKelas" :key="kls" :value="kls">{{ kls }}</option>
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+            </div>
+          </div>
+          
+          <div class="relative w-56">
+            <input v-model="searchQuery" @keyup.enter="fetchSiswa(1)" type="text" placeholder="Cari NISN, Nama..." 
+              class="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500">
+            <svg class="w-4 h-4 text-gray-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
           </div>
           
           <!-- Bulk Delete Trigger Button -->
@@ -180,6 +191,8 @@ const toast = useToast();
 const items = ref([]);
 const isLoading = ref(false);
 const searchQuery = ref('');
+const filterKelas = ref('');
+const daftarKelas = ref([]);
 const pagination = ref({ current_page: 1, last_page: 1, total: 0, per_page: 20 });
 
 // Modal Form State
@@ -219,13 +232,23 @@ function isSelected(id) {
 }
 
 onMounted(() => {
+  fetchKelas();
   fetchSiswa(1);
 });
+
+async function fetchKelas() {
+  try {
+    const res = await api.get('/admin-sekolah/siswa/kelas');
+    daftarKelas.value = res.data.data;
+  } catch (error) {
+    console.error('Gagal mengambil daftar kelas', error);
+  }
+}
 
 async function fetchSiswa(page = 1) {
   isLoading.value = true;
   try {
-    const res = await api.get(`/admin-sekolah/siswa?page=${page}&cari=${searchQuery.value}`);
+    const res = await api.get(`/admin-sekolah/siswa?page=${page}&cari=${searchQuery.value}&kelas=${encodeURIComponent(filterKelas.value)}`);
     items.value = res.data.data.data;
     // Reset selection on fetch
     selectedIds.value = [];
