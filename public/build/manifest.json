@@ -1,39 +1,39 @@
 {
-  "_BaseButton-BM9SLHK2.js": {
-    "file": "assets/BaseButton-BM9SLHK2.js",
+  "_BaseButton-72Qiu74a.js": {
+    "file": "assets/BaseButton-72Qiu74a.js",
     "name": "BaseButton",
     "imports": [
       "resources/js/app.js"
     ]
   },
-  "_BaseCard-B9o9k5qb.js": {
-    "file": "assets/BaseCard-B9o9k5qb.js",
+  "_BaseCard-BO4l68om.js": {
+    "file": "assets/BaseCard-BO4l68om.js",
     "name": "BaseCard",
     "imports": [
       "resources/js/app.js"
     ]
   },
-  "_BaseModal-Ih3_cIyW.js": {
-    "file": "assets/BaseModal-Ih3_cIyW.js",
+  "_BaseModal-BNqLiDW-.js": {
+    "file": "assets/BaseModal-BNqLiDW-.js",
     "name": "BaseModal",
     "imports": [
       "resources/js/app.js"
     ]
   },
-  "_BaseSelect-BYV3jK3M.js": {
-    "file": "assets/BaseSelect-BYV3jK3M.js",
+  "_BaseSelect-CRkulTt-.js": {
+    "file": "assets/BaseSelect-CRkulTt-.js",
     "name": "BaseSelect",
     "imports": [
       "resources/js/app.js"
     ]
   },
-  "_GeneralConsentModal-DBSoRiOZ.js": {
-    "file": "assets/GeneralConsentModal-DBSoRiOZ.js",
+  "_GeneralConsentModal-DZU6iLY4.js": {
+    "file": "assets/GeneralConsentModal-DZU6iLY4.js",
     "name": "GeneralConsentModal",
     "imports": [
       "resources/js/app.js",
-      "_BaseModal-Ih3_cIyW.js",
-      "_BaseButton-BM9SLHK2.js"
+      "_BaseModal-BNqLiDW-.js",
+      "_BaseButton-72Qiu74a.js"
     ]
   },
   "__plugin-vue_export-helper-DlAUqK2U.js": {
@@ -44,8 +44,8 @@
     "file": "assets/api-xLeF5hQs.js",
     "name": "api"
   },
-  "_auth-xePcwJyz.js": {
-    "file": "assets/auth-xePcwJyz.js",
+  "_auth-CaODGWUE.js": {
+    "file": "assets/auth-CaODGWUE.js",
     "name": "auth",
     "imports": [
       "resources/js/app.js",
@@ -53,7 +53,7 @@
     ]
   },
   "resources/css/app.css": {
-    "file": "assets/app-B9c9F3Zp.css",
+    "file": "assets/app-Y3M3NvXC.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -62,7 +62,7 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-otW7v4Jd.js",
+    "file": "assets/app-CQtUCy4A.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
@@ -89,22 +89,22 @@
       "resources/js/views/admin_sekolah/DataTps.vue",
       "resources/js/views/admin_sekolah/DataKandidat.vue",
       "resources/js/views/admin_sekolah/DataDpt.vue",
-      "resources/js/views/admin_sekolah/Placeholder.vue"
+      "resources/js/views/admin_sekolah/Dokumentasi.vue"
     ]
   },
   "resources/js/views/admin/AdminLayout.vue": {
-    "file": "assets/AdminLayout-CqMXE4Qq.js",
+    "file": "assets/AdminLayout-B-5m4qCd.js",
     "name": "AdminLayout",
     "src": "resources/js/views/admin/AdminLayout.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
-      "_auth-xePcwJyz.js",
+      "_auth-CaODGWUE.js",
       "_api-xLeF5hQs.js"
     ]
   },
   "resources/js/views/admin/DaftarUser.vue": {
-    "file": "assets/DaftarUser-1XRYHrm_.js",
+    "file": "assets/DaftarUser-Ca1ixnHy.js",
     "name": "DaftarUser",
     "src": "resources/js/views/admin/DaftarUser.vue",
     "isDynamicEntry": true,
@@ -114,7 +114,7 @@
     ]
   },
   "resources/js/views/admin/Dashboard.vue": {
-    "file": "assets/Dashboard-DIIUzURX.js",
+    "file": "assets/Dashboard-QAYb41dl.js",
     "name": "Dashboard",
     "src": "resources/js/views/admin/Dashboard.vue",
     "isDynamicEntry": true,
@@ -124,22 +124,22 @@
     ]
   },
   "resources/js/views/admin/DataSekolahList.vue": {
-    "file": "assets/DataSekolahList-OvdVGl5H.js",
+    "file": "assets/DataSekolahList-BkXhafiK.js",
     "name": "DataSekolahList",
     "src": "resources/js/views/admin/DataSekolahList.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
-      "_auth-xePcwJyz.js",
-      "_BaseCard-B9o9k5qb.js",
-      "_BaseButton-BM9SLHK2.js",
-      "_BaseSelect-BYV3jK3M.js",
+      "_auth-CaODGWUE.js",
+      "_BaseCard-BO4l68om.js",
+      "_BaseButton-72Qiu74a.js",
+      "_BaseSelect-CRkulTt-.js",
       "_api-xLeF5hQs.js",
-      "_BaseModal-Ih3_cIyW.js"
+      "_BaseModal-BNqLiDW-.js"
     ]
   },
   "resources/js/views/admin/LogAktivitas.vue": {
-    "file": "assets/LogAktivitas-ByAh1F8W.js",
+    "file": "assets/LogAktivitas-C2imjZx7.js",
     "name": "LogAktivitas",
     "src": "resources/js/views/admin/LogAktivitas.vue",
     "isDynamicEntry": true,
@@ -149,7 +149,7 @@
     ]
   },
   "resources/js/views/admin/LogApproval.vue": {
-    "file": "assets/LogApproval-m1JFt6Nk.js",
+    "file": "assets/LogApproval-CfdzEAO7.js",
     "name": "LogApproval",
     "src": "resources/js/views/admin/LogApproval.vue",
     "isDynamicEntry": true,
@@ -159,18 +159,18 @@
     ]
   },
   "resources/js/views/admin/Login.vue": {
-    "file": "assets/Login-DIsXCXTW.js",
+    "file": "assets/Login-BGtKo-FE.js",
     "name": "Login",
     "src": "resources/js/views/admin/Login.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
-      "_auth-xePcwJyz.js",
+      "_auth-CaODGWUE.js",
       "_api-xLeF5hQs.js"
     ]
   },
   "resources/js/views/admin/SettingWaktu.vue": {
-    "file": "assets/SettingWaktu-DL5cYjKd.js",
+    "file": "assets/SettingWaktu-CTe1MnFT.js",
     "name": "SettingWaktu",
     "src": "resources/js/views/admin/SettingWaktu.vue",
     "isDynamicEntry": true,
@@ -180,7 +180,7 @@
     ]
   },
   "resources/js/views/admin/Settings.vue": {
-    "file": "assets/Settings-C9uoji6n.js",
+    "file": "assets/Settings-Bw6Ix_F_.js",
     "name": "Settings",
     "src": "resources/js/views/admin/Settings.vue",
     "isDynamicEntry": true,
@@ -190,132 +190,134 @@
     ]
   },
   "resources/js/views/admin_sekolah/DataDpt.vue": {
-    "file": "assets/DataDpt-DCLcCL_S.js",
+    "file": "assets/DataDpt-CcdCVH5J.js",
     "name": "DataDpt",
     "src": "resources/js/views/admin_sekolah/DataDpt.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
-      "_BaseCard-B9o9k5qb.js",
-      "_BaseButton-BM9SLHK2.js",
-      "_BaseModal-Ih3_cIyW.js",
+      "_BaseCard-BO4l68om.js",
+      "_BaseButton-72Qiu74a.js",
+      "_BaseModal-BNqLiDW-.js",
       "_api-xLeF5hQs.js"
     ]
   },
   "resources/js/views/admin_sekolah/DataKandidat.vue": {
-    "file": "assets/DataKandidat-CnuyxKuk.js",
+    "file": "assets/DataKandidat-BG1UGtlL.js",
     "name": "DataKandidat",
     "src": "resources/js/views/admin_sekolah/DataKandidat.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
-      "_BaseCard-B9o9k5qb.js",
-      "_BaseButton-BM9SLHK2.js",
+      "_BaseCard-BO4l68om.js",
+      "_BaseButton-72Qiu74a.js",
       "_api-xLeF5hQs.js"
     ]
   },
   "resources/js/views/admin_sekolah/DataSiswa.vue": {
-    "file": "assets/DataSiswa-B39kip1R.js",
+    "file": "assets/DataSiswa-C-9pkQTv.js",
     "name": "DataSiswa",
     "src": "resources/js/views/admin_sekolah/DataSiswa.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
-      "_BaseCard-B9o9k5qb.js",
-      "_BaseButton-BM9SLHK2.js",
-      "_BaseModal-Ih3_cIyW.js",
+      "_BaseCard-BO4l68om.js",
+      "_BaseButton-72Qiu74a.js",
+      "_BaseModal-BNqLiDW-.js",
       "_api-xLeF5hQs.js"
     ]
   },
   "resources/js/views/admin_sekolah/DataTps.vue": {
-    "file": "assets/DataTps-Brr6FR2Z.js",
+    "file": "assets/DataTps-BV5jtwiN.js",
     "name": "DataTps",
     "src": "resources/js/views/admin_sekolah/DataTps.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
-      "_BaseCard-B9o9k5qb.js",
-      "_BaseButton-BM9SLHK2.js",
+      "_BaseCard-BO4l68om.js",
+      "_BaseButton-72Qiu74a.js",
+      "_api-xLeF5hQs.js"
+    ]
+  },
+  "resources/js/views/admin_sekolah/Dokumentasi.vue": {
+    "file": "assets/Dokumentasi-BDB2Tbsd.js",
+    "name": "Dokumentasi",
+    "src": "resources/js/views/admin_sekolah/Dokumentasi.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_BaseButton-72Qiu74a.js",
+      "_BaseModal-BNqLiDW-.js",
       "_api-xLeF5hQs.js"
     ]
   },
   "resources/js/views/admin_sekolah/IdentitasSekolah.vue": {
-    "file": "assets/IdentitasSekolah-DZ8JV6Ok.js",
+    "file": "assets/IdentitasSekolah-CfRxYKD-.js",
     "name": "IdentitasSekolah",
     "src": "resources/js/views/admin_sekolah/IdentitasSekolah.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
-      "_BaseCard-B9o9k5qb.js",
-      "_BaseButton-BM9SLHK2.js",
+      "_BaseCard-BO4l68om.js",
+      "_BaseButton-72Qiu74a.js",
       "_api-xLeF5hQs.js",
-      "_auth-xePcwJyz.js"
-    ]
-  },
-  "resources/js/views/admin_sekolah/Placeholder.vue": {
-    "file": "assets/Placeholder-gcCh5BSr.js",
-    "name": "Placeholder",
-    "src": "resources/js/views/admin_sekolah/Placeholder.vue",
-    "isDynamicEntry": true,
-    "imports": [
-      "resources/js/app.js",
-      "_BaseCard-B9o9k5qb.js"
+      "_auth-CaODGWUE.js"
     ]
   },
   "resources/js/views/admin_sekolah/UploadSiswa.vue": {
-    "file": "assets/UploadSiswa-6Q7AklG0.js",
+    "file": "assets/UploadSiswa-1dLT8_Lp.js",
     "name": "UploadSiswa",
     "src": "resources/js/views/admin_sekolah/UploadSiswa.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
-      "_BaseCard-B9o9k5qb.js",
-      "_BaseButton-BM9SLHK2.js",
-      "_BaseModal-Ih3_cIyW.js",
+      "_BaseCard-BO4l68om.js",
+      "_BaseButton-72Qiu74a.js",
+      "_BaseModal-BNqLiDW-.js",
       "_api-xLeF5hQs.js"
     ]
   },
   "resources/js/views/public/AduanAspirasiForm.vue": {
-    "file": "assets/AduanAspirasiForm-D02C7YTv.js",
+    "file": "assets/AduanAspirasiForm-7G-_hzX_.js",
     "name": "AduanAspirasiForm",
     "src": "resources/js/views/public/AduanAspirasiForm.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
       "_api-xLeF5hQs.js",
-      "_BaseCard-B9o9k5qb.js",
-      "_GeneralConsentModal-DBSoRiOZ.js",
-      "_BaseSelect-BYV3jK3M.js",
-      "_BaseButton-BM9SLHK2.js",
-      "_BaseModal-Ih3_cIyW.js"
+      "_BaseCard-BO4l68om.js",
+      "_GeneralConsentModal-DZU6iLY4.js",
+      "_BaseSelect-CRkulTt-.js",
+      "_BaseButton-72Qiu74a.js",
+      "_BaseModal-BNqLiDW-.js"
     ]
   },
   "resources/js/views/public/LandingPage.vue": {
-    "file": "assets/LandingPage-DUaqWEHU.js",
+    "file": "assets/LandingPage-BnLaYXzW.js",
     "name": "LandingPage",
     "src": "resources/js/views/public/LandingPage.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_BaseCard-B9o9k5qb.js",
+      "_BaseCard-BO4l68om.js",
       "resources/js/app.js"
     ]
   },
   "resources/js/views/public/PermohonanAudiensiForm.vue": {
-    "file": "assets/PermohonanAudiensiForm-DvDe7H1D.js",
+    "file": "assets/PermohonanAudiensiForm-BhM6H7ZR.js",
     "name": "PermohonanAudiensiForm",
     "src": "resources/js/views/public/PermohonanAudiensiForm.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
       "_api-xLeF5hQs.js",
-      "_BaseCard-B9o9k5qb.js",
-      "_GeneralConsentModal-DBSoRiOZ.js",
-      "_BaseButton-BM9SLHK2.js",
-      "_BaseModal-Ih3_cIyW.js"
+      "_BaseCard-BO4l68om.js",
+      "_GeneralConsentModal-DZU6iLY4.js",
+      "_BaseButton-72Qiu74a.js",
+      "_BaseModal-BNqLiDW-.js"
     ]
   },
   "resources/js/views/public/SuccessPage.vue": {
-    "file": "assets/SuccessPage-D6MWHuCd.js",
+    "file": "assets/SuccessPage-BhTnTFfk.js",
     "name": "SuccessPage",
     "src": "resources/js/views/public/SuccessPage.vue",
     "isDynamicEntry": true,
@@ -325,33 +327,33 @@
     ]
   },
   "resources/js/views/public/TamuDprdForm.vue": {
-    "file": "assets/TamuDprdForm-DkSLWSMr.js",
+    "file": "assets/TamuDprdForm-Dk85xs6M.js",
     "name": "TamuDprdForm",
     "src": "resources/js/views/public/TamuDprdForm.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
       "_api-xLeF5hQs.js",
-      "_BaseCard-B9o9k5qb.js",
-      "_GeneralConsentModal-DBSoRiOZ.js",
-      "_BaseSelect-BYV3jK3M.js",
-      "_BaseButton-BM9SLHK2.js",
-      "_BaseModal-Ih3_cIyW.js"
+      "_BaseCard-BO4l68om.js",
+      "_GeneralConsentModal-DZU6iLY4.js",
+      "_BaseSelect-CRkulTt-.js",
+      "_BaseButton-72Qiu74a.js",
+      "_BaseModal-BNqLiDW-.js"
     ]
   },
   "resources/js/views/public/TamuSetwanForm.vue": {
-    "file": "assets/TamuSetwanForm-CwZ8o5-y.js",
+    "file": "assets/TamuSetwanForm-iEZjy6J_.js",
     "name": "TamuSetwanForm",
     "src": "resources/js/views/public/TamuSetwanForm.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
       "_api-xLeF5hQs.js",
-      "_BaseCard-B9o9k5qb.js",
-      "_GeneralConsentModal-DBSoRiOZ.js",
-      "_BaseSelect-BYV3jK3M.js",
-      "_BaseButton-BM9SLHK2.js",
-      "_BaseModal-Ih3_cIyW.js"
+      "_BaseCard-BO4l68om.js",
+      "_GeneralConsentModal-DZU6iLY4.js",
+      "_BaseSelect-CRkulTt-.js",
+      "_BaseButton-72Qiu74a.js",
+      "_BaseModal-BNqLiDW-.js"
     ]
   }
 }

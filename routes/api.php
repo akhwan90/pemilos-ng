@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\AdminSekolah\DataSiswaController;
 use App\Http\Controllers\Api\AdminSekolah\UploadSiswaController;
 use App\Http\Controllers\Api\AdminSekolah\KandidatController;
 use App\Http\Controllers\Api\AdminSekolah\DataDptController;
+use App\Http\Controllers\Api\AdminSekolah\DokumentasiController;
 
 // ========== PUBLIC API (No Auth Required) ==========
 
@@ -89,4 +90,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/admin-sekolah/dpt/tps-aktif', [DataDptController::class, 'listTpsAktif']);
     Route::post('/admin-sekolah/dpt/bulk-insert', [DataDptController::class, 'storeBulk']);
     Route::post('/admin-sekolah/dpt/bulk-delete', [DataDptController::class, 'destroyBulk']);
+
+    // Dokumentasi Pelaksanaan Pemilos
+    Route::get('/admin-sekolah/dokumentasi', [DokumentasiController::class, 'index']);
+    Route::post('/admin-sekolah/dokumentasi', [DokumentasiController::class, 'store']); // Create / Upload Foto
+    Route::delete('/admin-sekolah/dokumentasi/{id}', [DokumentasiController::class, 'destroy']);
 });

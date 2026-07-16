@@ -124,7 +124,7 @@ const routes = [
             {
                 path: 'dokumentasi',
                 name: 'admin-sekolah-dokumentasi',
-                component: () => import('../views/admin_sekolah/Placeholder.vue'),
+                component: () => import('../views/admin_sekolah/Dokumentasi.vue'),
             }
         ],
     },
