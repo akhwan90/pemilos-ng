@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\Admin\DataSekolahController;
 use App\Http\Controllers\Api\Admin\UserSekolahController;
 use App\Http\Controllers\Api\Admin\JadwalSekolahController;
 use App\Http\Controllers\Api\Admin\KandidatSekolahController;
+use App\Http\Controllers\Api\Admin\TpsSekolahController;
 
 // ========== PUBLIC API (No Auth Required) ==========
 
@@ -33,6 +34,12 @@ Route::middleware('auth:sanctum')->group(function () {
     // Kandidat Sekolah API
     Route::get('/admin/data-sekolah/{npsn}/kandidat', [KandidatSekolahController::class, 'index']);
     Route::get('/admin/data-sekolah/{npsn}/kandidat/{id}', [KandidatSekolahController::class, 'show']);
-    Route::post('/admin/data-sekolah/{npsn}/kandidat/{id}', [KandidatSekolahController::class, 'update']); // Pakai POST krn update multipart/form-data utk photo
+    Route::post('/admin/data-sekolah/{npsn}/kandidat/{id}', [KandidatSekolahController::class, 'update']);
     Route::delete('/admin/data-sekolah/{npsn}/kandidat/{id}', [KandidatSekolahController::class, 'destroy']);
+
+    // TPS / Kelas Sekolah API
+    Route::get('/admin/data-sekolah/{npsn}/tps', [TpsSekolahController::class, 'index']);
+    Route::post('/admin/data-sekolah/{npsn}/tps', [TpsSekolahController::class, 'store']);
+    Route::put('/admin/data-sekolah/{npsn}/tps/{kd_kelas}', [TpsSekolahController::class, 'update']);
+    Route::delete('/admin/data-sekolah/{npsn}/tps/{kd_kelas}', [TpsSekolahController::class, 'destroy']);
 });
