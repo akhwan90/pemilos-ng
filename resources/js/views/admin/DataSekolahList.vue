@@ -81,12 +81,12 @@
                       </BaseButton>
                     </template>
                     
-                    <router-link :to="'/admin/data-sekolah/buat-user/' + item.npsn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Buat User (Level 2)</router-link>
-                    <router-link :to="'/admin/data-sekolah/setting-jadwal/' + item.npsn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Setting Jadwal Pemilihan</router-link>
+                    <a href="#" @click.prevent="openModal('user', item.npsn)" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Buat User (Level 2)</a>
+                    <a href="#" @click.prevent="openModal('jadwal', item.npsn)" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Setting Jadwal Pemilihan</a>
                     <div class="border-t border-gray-100 my-1"></div>
-                    <router-link :to="'/admin/data-sekolah/kandidat/' + item.npsn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Data Kandidat</router-link>
-                    <router-link :to="'/admin/data-sekolah/tps/' + item.npsn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Data TPS</router-link>
-                    <router-link :to="'/admin/data-sekolah/siswa/' + item.npsn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Data DPT (Siswa)</router-link>
+                    <a href="#" @click.prevent="openModal('kandidat', item.npsn)" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Data Kandidat</a>
+                    <a href="#" @click.prevent="openModal('tps', item.npsn)" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Data TPS</a>
+                    <a href="#" @click.prevent="openModal('siswa', item.npsn)" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Data DPT (Siswa)</a>
                     <div class="border-t border-gray-100 my-1"></div>
                     <router-link :to="'/admin/monitoring/hasil-vote/' + item.npsn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 font-medium text-emerald-600">Monitoring Hasil Vote</router-link>
                   </BaseDropdown>
@@ -130,6 +130,13 @@
         </div>
       </div>
     </BaseCard>
+
+    <!-- Modals -->
+    <ModalUserSekolah v-model="modals.user" :npsn="selectedNpsn" />
+    <ModalJadwalSekolah v-model="modals.jadwal" :npsn="selectedNpsn" />
+    <ModalKandidat v-model="modals.kandidat" :npsn="selectedNpsn" />
+    <ModalTps v-model="modals.tps" :npsn="selectedNpsn" />
+    <ModalSiswaDpt v-model="modals.siswa" :npsn="selectedNpsn" />
   </div>
 </template>
 
@@ -142,9 +149,31 @@ import BaseSelect from '../../components/BaseSelect.vue';
 import BaseDropdown from '../../components/BaseDropdown.vue';
 import api from '../../services/api';
 
+// Import Modals
+import ModalUserSekolah from './sekolah_modals/ModalUserSekolah.vue';
+import ModalJadwalSekolah from './sekolah_modals/ModalJadwalSekolah.vue';
+import ModalKandidat from './sekolah_modals/ModalKandidat.vue';
+import ModalTps from './sekolah_modals/ModalTps.vue';
+import ModalSiswaDpt from './sekolah_modals/ModalSiswaDpt.vue';
+
 const auth = useAuthStore();
 const items = ref([]);
 const isLoading = ref(false);
+
+// Modals State
+const selectedNpsn = ref(null);
+const modals = ref({
+  user: false,
+  jadwal: false,
+  kandidat: false,
+  tps: false,
+  siswa: false
+});
+
+function openModal(modalName, npsn) {
+  selectedNpsn.value = npsn;
+  modals.value[modalName] = true;
+}
 
 const currentYear = new Date().getFullYear();
 const filterTahun = ref(currentYear.toString());
