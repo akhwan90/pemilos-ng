@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\Admin\DataSekolahController;
 use App\Http\Controllers\Api\Admin\UserSekolahController;
 use App\Http\Controllers\Api\Admin\JadwalSekolahController;
+use App\Http\Controllers\Api\Admin\KandidatSekolahController;
 
 // ========== PUBLIC API (No Auth Required) ==========
 
@@ -28,4 +29,10 @@ Route::middleware('auth:sanctum')->group(function () {
     // Jadwal Sekolah API
     Route::get('/admin/data-sekolah/{npsn}/jadwal', [JadwalSekolahController::class, 'index']);
     Route::post('/admin/data-sekolah/{npsn}/jadwal', [JadwalSekolahController::class, 'store']);
+
+    // Kandidat Sekolah API
+    Route::get('/admin/data-sekolah/{npsn}/kandidat', [KandidatSekolahController::class, 'index']);
+    Route::get('/admin/data-sekolah/{npsn}/kandidat/{id}', [KandidatSekolahController::class, 'show']);
+    Route::post('/admin/data-sekolah/{npsn}/kandidat/{id}', [KandidatSekolahController::class, 'update']); // Pakai POST krn update multipart/form-data utk photo
+    Route::delete('/admin/data-sekolah/{npsn}/kandidat/{id}', [KandidatSekolahController::class, 'destroy']);
 });

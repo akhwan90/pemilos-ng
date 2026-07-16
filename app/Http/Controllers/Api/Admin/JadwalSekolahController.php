@@ -64,7 +64,7 @@ class JadwalSekolahController extends Controller
 
         // Kita perlu tau jenjang sekolah ini apa
         $sekolah = DB::table('tb_sekolah')->where('npsn', $npsn)->first();
-        $jenjang = $sekolah ? $sekolah->tingkat : '';
+        $jenjang = $sekolah ? $sekolah->jenjang : '';
 
         DB::beginTransaction();
         try {
