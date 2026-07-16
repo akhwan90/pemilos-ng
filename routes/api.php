@@ -59,5 +59,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/admin-sekolah/siswa', [DataSiswaController::class, 'store']);
     Route::post('/admin-sekolah/siswa/bulk-delete', [DataSiswaController::class, 'bulkDestroy']);
     Route::put('/admin-sekolah/siswa/{id}', [DataSiswaController::class, 'update']);
-    Route::delete('/admin-sekolah/siswa/{id}', [DataSiswaController::class, 'destroy']);
+    Route::post('/admin-sekolah/siswa/{id}/delete', [DataSiswaController::class, 'destroy']);
 });

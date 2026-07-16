@@ -103,12 +103,17 @@ class DataSiswaController extends Controller
     {
         $npsn = $request->user()->npsn;
         $user_id = $request->user()->id; // id admin login
+        
+        $request->validate([
+            'alasan_hapus' => 'required|integer|in:2,3' // 2: Lulus, 3: Pindah
+        ]);
 
         $affected = DB::table('tb_siswa')
             ->where('id', $id)
             ->where('npsn', $npsn)
             ->update([
-                'status' => 0, // Default soft delete (bukan lulus/pindah)
+                'status' => $request->alasan_hapus,
+                'npsn' => null, // Lepas ikatan dengan sekolah
                 'hapus_time' => date('Y-m-d H:i:s'),
                 'hapus_user_id' => $user_id
             ]);

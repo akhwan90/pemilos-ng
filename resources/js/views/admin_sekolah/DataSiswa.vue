@@ -23,7 +23,7 @@
           </div>
           
           <!-- Bulk Delete Trigger Button -->
-          <BaseButton v-if="selectedIds.length > 0" variant="danger" @click="isBulkDeleteModalOpen = true" class="!py-2 !h-[38px] text-xs">
+          <BaseButton v-if="selectedIds.length > 0" variant="danger" @click="openBulkDeleteModal()" class="!py-2 !h-[38px] text-xs">
             Hapus {{ selectedIds.length }} Terpilih
           </BaseButton>
         </div>
@@ -76,7 +76,7 @@
               <td class="px-4 py-3 text-center">
                 <div class="flex gap-2 justify-center">
                   <button @click="openModal('edit', item)" class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 px-2 py-1 rounded text-xs">Edit</button>
-                  <button @click="deleteSiswa(item.id)" class="text-red-600 hover:text-red-900 bg-red-50 px-2 py-1 rounded text-xs">Hapus</button>
+                  <button @click="openSingleDeleteModal(item.id)" class="text-red-600 hover:text-red-900 bg-red-50 px-2 py-1 rounded text-xs">Hapus</button>
                 </div>
               </td>
             </tr>
@@ -140,7 +140,7 @@
     <BaseModal v-model="isBulkDeleteModalOpen" title="Hapus Siswa Terpilih" max-width="md">
       <form @submit.prevent="submitBulkDelete" class="space-y-4">
         <p class="text-sm text-gray-600 mb-4">
-          Anda akan menghapus <strong>{{ selectedIds.length }}</strong> siswa. Silakan pilih alasan penghapusan (akan dicatat di database).
+          Anda akan menghapus <strong v-if="singleDeleteId === null">{{ selectedIds.length }}</strong><strong v-else>1</strong> siswa. Silakan pilih alasan penghapusan (akan dicatat di database).
         </p>
         
         <div>
@@ -200,6 +200,7 @@ const selectedIds = ref([]);
 const isBulkDeleteModalOpen = ref(false);
 const bulkDeleteReason = ref('');
 const isSubmittingBulkDelete = ref(false);
+const singleDeleteId = ref(null); // Tambahan untuk Single Delete
 
 const isAllSelected = computed(() => {
   return items.value.length > 0 && selectedIds.value.length === items.value.length;
@@ -284,36 +285,48 @@ async function submitForm() {
   }
 }
 
-async function deleteSiswa(id) {
-  if (!confirm('Anda yakin ingin menghapus data siswa ini?')) return;
-  try {
-    await api.delete(`/admin-sekolah/siswa/${id}`);
-    toast.success('Siswa berhasil dihapus (soft delete)');
-    fetchSiswa(pagination.value.current_page);
-  } catch (error) {
-    toast.error('Gagal menghapus siswa');
-  }
+function openBulkDeleteModal() {
+  singleDeleteId.value = null;
+  bulkDeleteReason.value = '';
+  isBulkDeleteModalOpen.value = true;
 }
+
+function openSingleDeleteModal(id) {
+  singleDeleteId.value = id;
+  bulkDeleteReason.value = '';
+  isBulkDeleteModalOpen.value = true;
+}
+
 async function submitBulkDelete() {
-  if (selectedIds.value.length === 0) return;
+  const isSingle = singleDeleteId.value !== null;
+  const targetIds = isSingle ? [singleDeleteId.value] : selectedIds.value;
+
+  if (targetIds.length === 0) return;
   
   isSubmittingBulkDelete.value = true;
   try {
-    const payload = {
-      ids: selectedIds.value,
-      alasan_hapus: bulkDeleteReason.value
-    };
+    if (isSingle) {
+      await api.post(`/admin-sekolah/siswa/${singleDeleteId.value}/delete`, {
+        alasan_hapus: bulkDeleteReason.value
+      });
+      toast.success('1 siswa berhasil dihapus');
+    } else {
+      const payload = {
+        ids: targetIds,
+        alasan_hapus: bulkDeleteReason.value
+      };
+      await api.post(`/admin-sekolah/siswa/bulk-delete`, payload);
+      toast.success(`${targetIds.length} siswa berhasil dihapus`);
+    }
     
-    await api.post(`/admin-sekolah/siswa/bulk-delete`, payload);
-    
-    toast.success(`${selectedIds.value.length} siswa berhasil dihapus`);
     isBulkDeleteModalOpen.value = false;
+    singleDeleteId.value = null;
     bulkDeleteReason.value = '';
     
     // Refresh table
     fetchSiswa(pagination.value.current_page);
   } catch (error) {
-    toast.error('Gagal melakukan hapus massal');
+    toast.error('Gagal menghapus data siswa');
   } finally {
     isSubmittingBulkDelete.value = false;
   }
