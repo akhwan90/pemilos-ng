@@ -67,4 +67,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/admin-sekolah/upload-siswa', [UploadSiswaController::class, 'history']);
     Route::post('/admin-sekolah/upload-siswa', [UploadSiswaController::class, 'upload']);
     Route::get('/admin-sekolah/upload-siswa/{id}/logs', [UploadSiswaController::class, 'logs']);
+
+    // Data TPS / Kelas API (Admin Sekolah share logic with Super Admin TpsSekolahController)
+    Route::get('/admin-sekolah/tps', [TpsSekolahController::class, 'index']);
+    Route::post('/admin-sekolah/tps', [TpsSekolahController::class, 'store']);
+    Route::put('/admin-sekolah/tps/{kd_kelas}', [TpsSekolahController::class, 'update']);
+    Route::delete('/admin-sekolah/tps/{kd_kelas}', [TpsSekolahController::class, 'destroy']);
 });

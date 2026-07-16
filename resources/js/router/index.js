@@ -109,7 +109,7 @@ const routes = [
             {
                 path: 'tps',
                 name: 'admin-sekolah-data-tps',
-                component: () => import('../views/admin_sekolah/Placeholder.vue'),
+                component: () => import('../views/admin_sekolah/DataTps.vue'),
             },
             {
                 path: 'calon',

@@ -44,14 +44,14 @@ class UploadSiswaController extends Controller
 
         if ($cekSudahMemilih > 0) {
             return response()->json([
-                'success' => false, 
+                'success' => false,
                 'message' => 'Sekolah ini sudah melakukan pemilihan. Data sudah tidak bisa ditambah/diedit via upload.'
             ], 403);
         }
 
         $file = $request->file('file_excel');
         $filename = time() . '_' . Str::random(10) . '.xlsx';
-        
+
         // Pindahkan ke folder public/uploads/xlsx_temp
         $file->move(public_path('uploads/xlsx_temp'), $filename);
 
@@ -62,7 +62,8 @@ class UploadSiswaController extends Controller
             'create_at' => date('Y-m-d H:i:s'),
             'is_selesai' => 0,
             'npsn' => $user->npsn,
-            'pid' => 0 // Legacy field, diisi 0 karena sekarang pakai Laravel Queue
+            'pid' => 0, // Legacy field, diisi 0 karena sekarang pakai Laravel Queue
+            'finish_at'=>now(),
         ]);
 
         // Dispatch Job ke Queue Laravel

@@ -6,14 +6,22 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+// Middleware yang membatasi hak akses CRUD TPS sesuai NPSN admin sekolah
+// =========================================================================
+
 class TpsSekolahController extends Controller
 {
     // List TPS (tb_kelas)
-    public function index($npsn)
+    public function index(Request $request, $npsn = null)
     {
+        // Jika level 2 (Admin Sekolah), timpa $npsn dari URL dengan npsn miliknya
+        if ($request->user()->level == 2) {
+            $npsn = $request->user()->npsn;
+        }
+
         $tps = DB::table('tb_kelas')
             ->where('npsn', $npsn)
-            ->get(); // Tampilkan semuanya agar bisa di-edit status is_hapus-nya
+            ->get(); 
 
         return response()->json([
             'success' => true,
@@ -22,8 +30,12 @@ class TpsSekolahController extends Controller
     }
 
     // Menambah TPS Baru
-    public function store(Request $request, $npsn)
+    public function store(Request $request, $npsn = null)
     {
+        if ($request->user()->level == 2) {
+            $npsn = $request->user()->npsn;
+        }
+
         $request->validate([
             'nm_kelas' => 'required|string|max:32',
             'is_tps_luar_sekolah' => 'required|boolean'
@@ -45,9 +57,13 @@ class TpsSekolahController extends Controller
         ]);
     }
 
-    // Mengupdate Data TPS
-    public function update(Request $request, $npsn, $kd_kelas)
+    // Edit TPS
+    public function update(Request $request, $npsn = null, $kd_kelas)
     {
+        if ($request->user()->level == 2) {
+            $npsn = $request->user()->npsn;
+        }
+
         $request->validate([
             'nm_kelas' => 'required|string|max:32',
             'is_tps_luar_sekolah' => 'required|boolean',
@@ -64,24 +80,28 @@ class TpsSekolahController extends Controller
             ]);
 
         if ($affected === 0) {
-            // Bisa jadi tidak ada perubahan data (0 rows affected), kita anggap sukses saja
+            return response()->json(['success' => false, 'message' => 'Data tidak ditemukan atau tidak ada perubahan'], 404);
         }
 
         return response()->json([
             'success' => true,
-            'message' => 'Data TPS berhasil diperbarui'
+            'message' => 'Data TPS / Kelas berhasil diperbarui'
         ]);
     }
 
-    // Soft delete TPS
-    public function destroy($npsn, $kd_kelas)
+    // Soft Delete TPS
+    public function destroy(Request $request, $npsn = null, $kd_kelas)
     {
-        // Set is_hapus = 1
+        if ($request->user()->level == 2) {
+            $npsn = $request->user()->npsn;
+        }
+
         $affected = DB::table('tb_kelas')
             ->where('kd_kelas', $kd_kelas)
             ->where('npsn', $npsn)
-            ->update(['is_hapus' => 1]);
-
+            ->update([
+                'is_hapus' => 1
+            ]);
         if ($affected) {
             return response()->json([
                 'success' => true,

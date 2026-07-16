@@ -1,1 +1,0 @@
-import{_ as a}from"./_plugin-vue_export-helper-DlAUqK2U.js";import{c as n,b as e,o}from"./app-BvWHAoKb.js";const s={},r={class:"p-6"};function c(l,t){return o(),n("div",r,[...t[0]||(t[0]=[e("h2",{class:"text-2xl font-bold mb-4"},"Setting Waktu",-1),e("p",null,"Halaman sedang dalam pengembangan...",-1)])])}const _=a(s,[["render",c]]);export{_ as default};
