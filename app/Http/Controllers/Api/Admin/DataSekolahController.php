@@ -1,0 +1,108 @@
+<?php
+
+namespace App\Http\Controllers\Api\Admin;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
+class DataSekolahController extends Controller
+{
+    public function index(Request $request)
+    {
+        $tahun = $request->query('tahun', date('Y'));
+        $search = $request->query('cari');
+        $orderBy = $request->query('order_by');
+        $filterBy = $request->query('filter_by');
+
+        $query = DB::table('tb_sekolah')
+            ->select([
+                'tb_sekolah.*',
+                DB::raw("(SELECT COUNT(tb_pilihan.id) FROM tb_pilihan WHERE tb_pilihan.npsn = tb_sekolah.npsn AND tb_pilihan.tahun = ?) AS jml_kandidat"),
+                DB::raw("(SELECT COUNT(tb_kelas.kd_kelas) FROM tb_kelas WHERE tb_kelas.npsn = tb_sekolah.npsn AND tb_kelas.is_hapus = 0) AS jml_tps"),
+                DB::raw("(SELECT COUNT(tb_kelas_generate_token.id) FROM tb_kelas_generate_token WHERE tb_kelas_generate_token.npsn = tb_sekolah.npsn AND tb_kelas_generate_token.is_generate_token = 1 AND tb_kelas_generate_token.tahun = ?) AS jml_tps_generate_token"),
+                DB::raw("(SELECT COUNT(tb_siswa_tps.id) FROM tb_siswa_tps WHERE tb_siswa_tps.npsn = tb_sekolah.npsn AND tb_siswa_tps.tahun = ?) AS jml_dpt"),
+                DB::raw("(SELECT COUNT(tb_siswa_tps.id) FROM tb_siswa_tps WHERE tb_siswa_tps.npsn = tb_sekolah.npsn AND tb_siswa_tps.tahun = ? AND tb_siswa_tps.pilihan IS NOT NULL) AS jml_memilih"),
+                DB::raw("(SELECT COUNT(tb_siswa.id) FROM tb_siswa WHERE tb_siswa.npsn = tb_sekolah.npsn) AS jml_siswa")
+            ])
+            ->setBindings([$tahun, $tahun, $tahun, $tahun])
+            ->where('is_delete', 0);
+
+        // Filter: Search
+        if (!empty($search)) {
+            $query->where(function($q) use ($search) {
+                $q->where('tb_sekolah.nama_sekolah', 'like', "%{$search}%")
+                  ->orWhere('tb_sekolah.alamat_sekolah', 'like', "%{$search}%")
+                  ->orWhere('tb_sekolah.jenjang', 'like', "%{$search}%")
+                  ->orWhere('tb_sekolah.npsn', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter: Jenjang/Tingkat
+        if (!empty($filterBy)) {
+            if ($filterBy === 'kemenag') {
+                $query->where('tb_sekolah.is_kemenag', 1);
+            } elseif ($filterBy === 'smp') {
+                $query->where('tb_sekolah.jenjang', 'smp');
+            } elseif ($filterBy === 'sma') {
+                $query->whereIn('tb_sekolah.jenjang', ['sma', 'smk']);
+            }
+        }
+
+        // Filter: Sorting
+        if (!empty($orderBy)) {
+            switch ($orderBy) {
+                case 'jml_siswa_desc': $query->orderBy('jml_siswa', 'desc'); break;
+                case 'jml_siswa_asc': $query->orderBy('jml_siswa', 'asc'); break;
+                case 'jml_dpt_desc': $query->orderBy('jml_dpt', 'desc'); break;
+                case 'jml_dpt_asc': $query->orderBy('jml_dpt', 'asc'); break;
+                case 'jml_tps_desc': $query->orderBy('jml_tps', 'desc'); break;
+                case 'jml_tps_asc': $query->orderBy('jml_tps', 'asc'); break;
+                case 'jml_kandidat_desc': $query->orderBy('jml_kandidat', 'desc'); break;
+                case 'jml_kandidat_asc': $query->orderBy('jml_kandidat', 'asc'); break;
+                case 'jenjang_asc': $query->orderBy('jenjang', 'asc'); break;
+                case 'jenjang_desc': $query->orderBy('jenjang', 'desc'); break;
+                case 'nama_sekolah_asc': $query->orderBy('nama_sekolah', 'asc'); break;
+                case 'nama_sekolah_desc': $query->orderBy('nama_sekolah', 'desc'); break;
+                case 'npsn_asc': $query->orderBy('npsn', 'asc'); break;
+                case 'npsn_desc': $query->orderBy('npsn', 'desc'); break;
+                case 'persentase_dpt_desc': 
+                    $query->orderByRaw('(jml_dpt/jml_siswa) DESC')->orderBy('jml_siswa', 'desc'); 
+                    break;
+                case 'persentase_memilih_desc': 
+                    $query->orderByRaw('(jml_memilih/jml_dpt) DESC')->orderBy('jml_dpt', 'desc'); 
+                    break;
+                default: $query->orderBy('nama_sekolah', 'asc'); break;
+            }
+        } else {
+            $query->orderBy('nama_sekolah', 'asc');
+        }
+
+        // Get and Process data (Calculate percentages like the CI3 did)
+        $sekolahs = $query->paginate(20)->through(function ($item) {
+            $item->persentase_dpt = 0;
+            $item->persentase_memilih = 0;
+            $item->persentase_belum_memilih = 0;
+            $item->is_over_capacity = false; // "melebihi_class bg-warning" di CI3
+
+            if ($item->jml_siswa > 0) {
+                $item->persentase_dpt = round((($item->jml_dpt / $item->jml_siswa) * 100), 2);
+            }
+            if ($item->jml_memilih > 0 && $item->jml_dpt > 0) {
+                $item->persentase_memilih = round((($item->jml_memilih / $item->jml_dpt) * 100), 2);
+                $item->persentase_belum_memilih = 100 - $item->persentase_memilih;
+            }
+
+            if ($item->jml_dpt > $item->jml_siswa) {
+                $item->is_over_capacity = true;
+            }
+
+            return $item;
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => $sekolahs
+        ]);
+    }
+}
