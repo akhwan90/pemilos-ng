@@ -77,6 +77,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Data Kandidat Calon (Admin Sekolah share logic with Super Admin KandidatSekolahController)
     Route::get('/admin-sekolah/kandidat', [KandidatSekolahController::class, 'index']);
     Route::get('/admin-sekolah/kandidat/{id}', [KandidatSekolahController::class, 'show']);
-    Route::post('/admin-sekolah/kandidat/{id}', [KandidatSekolahController::class, 'update']); // Pakai POST karena kirim File (Multipart/form-data)
+    Route::post('/admin-sekolah/kandidat', [KandidatSekolahController::class, 'store']); // Create
+    Route::post('/admin-sekolah/kandidat/{id}', [KandidatSekolahController::class, 'update']); // Update
     Route::delete('/admin-sekolah/kandidat/{id}', [KandidatSekolahController::class, 'destroy']);
 });

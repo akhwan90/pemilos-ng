@@ -41,6 +41,71 @@ class KandidatSekolahController extends Controller
         ]);
     }
 
+    // Tambah Kandidat (Khusus untuk level Admin Sekolah, tapi disatukan)
+    public function store(Request $request, $npsn = null)
+    {
+        if ($request->user()->level == 2) {
+            $npsn = $request->user()->npsn;
+        }
+
+        $request->validate([
+            'no' => 'required|integer',
+            'nama' => 'required|string|max:100',
+            'nisn' => 'required|string|max:32',
+            'kampanye' => 'nullable|string|max:250',
+            'visi' => 'nullable|string',
+            'misi' => 'nullable|string',
+            'proker' => 'nullable|string',
+            'pengalaman' => 'nullable|string',
+            'prestasi' => 'nullable|string',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048' // max 2MB
+        ]);
+
+        $tahun = env('TAHUN_AKTIF', date('Y'));
+
+        // Cek apakah No Urut sudah dipakai di sekolah tsb pada tahun yang sama
+        $exists = DB::table('tb_pilihan')
+            ->where('npsn', $npsn)
+            ->where('tahun', $tahun)
+            ->where('no', $request->no)
+            ->exists();
+
+        if ($exists) {
+            return response()->json(['success' => false, 'message' => 'No urut kandidat sudah dipakai!'], 400);
+        }
+
+        $dataInsert = [
+            'npsn' => $npsn,
+            'tahun' => $tahun,
+            'no' => $request->no,
+            'nama' => $request->nama,
+            'nisn' => $request->nisn,
+            'kampanye' => $request->kampanye,
+            'visi' => $request->visi,
+            'misi' => $request->misi,
+            'proker' => $request->proker,
+            'pengalaman' => $request->pengalaman,
+            'prestasi' => $request->prestasi,
+            'waktu_input' => now(),
+            'id_user' => $request->user()->id // Catat siapa admin yang input
+        ];
+
+        // Handle upload file
+        if ($request->hasFile('photo')) {
+            $file = $request->file('photo');
+            $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/kandidat'), $filename);
+            $dataInsert['photo'] = $filename;
+        }
+
+        DB::table('tb_pilihan')->insert($dataInsert);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Kandidat baru berhasil ditambahkan'
+        ]);
+    }
+
     // Mengambil 1 detail kandidat untuk di-edit
     public function show(Request $request, $npsn = null, $id)
     {

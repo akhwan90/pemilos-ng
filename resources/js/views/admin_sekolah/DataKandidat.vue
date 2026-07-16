@@ -5,6 +5,7 @@
         <h2 class="text-xl font-bold text-gray-800">Data Calon Kandidat</h2>
         <p class="text-sm text-gray-500">Kelola informasi, visi misi, dan foto calon ketua (Kandidat).</p>
       </div>
+      <BaseButton v-if="!isEditing" variant="primary" @click="addKandidat">Tambah Kandidat Baru</BaseButton>
     </div>
 
     <!-- Tabel List Kandidat (View Mode) -->
@@ -53,8 +54,8 @@
     <BaseCard v-else class="!p-0 border-indigo-200 shadow-md">
       <div class="bg-indigo-50 border-b border-indigo-100 p-4 flex justify-between items-center">
         <h3 class="font-bold text-indigo-800 flex items-center gap-2">
-          <span class="bg-indigo-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">{{ form.no }}</span> 
-          Edit Data Kandidat
+          <span v-if="form.no" class="bg-indigo-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">{{ form.no }}</span> 
+          {{ form.id ? 'Edit Data Kandidat' : 'Tambah Data Kandidat' }}
         </h3>
         <button @click="cancelEdit" class="text-sm font-semibold text-gray-500 hover:text-gray-800 bg-white px-3 py-1 rounded border shadow-sm">Batal / Kembali</button>
       </div>
@@ -64,6 +65,10 @@
           
           <!-- Kolom Kiri -->
           <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Nomor Urut</label>
+              <input v-model="form.no" type="number" required placeholder="Cth: 1" class="w-24 px-3 py-2 border rounded-lg text-sm focus:ring-indigo-500 text-center font-bold">
+            </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
               <input v-model="form.nama" type="text" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-indigo-500">
@@ -233,10 +238,30 @@ function cancelEdit() {
   fileToUpload.value = null;
 }
 
+function addKandidat() {
+  isEditing.value = true;
+  form.value = {
+    id: null,
+    no: null,
+    nama: '',
+    nisn: '',
+    kampanye: '',
+    visi: '',
+    misi: '',
+    proker: '',
+    pengalaman: '',
+    prestasi: '',
+    existing_photo_url: null
+  };
+  photoPreview.value = null;
+  fileToUpload.value = null;
+}
+
 async function submitForm() {
   isSubmitting.value = true;
   
   const formData = new FormData();
+  formData.append('no', form.value.no);
   formData.append('nama', form.value.nama);
   formData.append('nisn', form.value.nisn);
   formData.append('kampanye', form.value.kampanye);
@@ -251,17 +276,26 @@ async function submitForm() {
   }
 
   try {
-    await api.post(`/admin-sekolah/kandidat/${form.value.id}`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    });
+    if (form.value.id) {
+      await api.post(`/admin-sekolah/kandidat/${form.value.id}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      toast.success(`Kandidat No ${form.value.no} berhasil diperbarui`);
+    } else {
+      await api.post(`/admin-sekolah/kandidat`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      toast.success(`Kandidat baru berhasil ditambahkan`);
+    }
     
-    toast.success(`Kandidat No ${form.value.no} berhasil diperbarui`);
     isEditing.value = false;
     fetchKandidat();
   } catch (error) {
-    toast.error('Gagal memperbarui kandidat');
+    if (error.response?.data?.message) {
+      toast.error(error.response.data.message);
+    } else {
+      toast.error('Gagal menyimpan kandidat');
+    }
   } finally {
     isSubmitting.value = false;
   }
