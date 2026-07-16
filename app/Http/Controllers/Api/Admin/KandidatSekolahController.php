@@ -4,148 +4,37 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
+use App\Services\KandidatService;
+use Exception;
 
 class KandidatSekolahController extends Controller
 {
-    // Get list kandidat
-    public function index(Request $request, $npsn = null)
+    protected $kandidatService;
+
+    public function __construct(KandidatService $kandidatService)
     {
-        if ($request->user()->level == 2) {
-            $npsn = $request->user()->npsn;
-        }
-
-        $tahun = env('TAHUN_AKTIF', date('Y'));
-
-        $kandidat = DB::table('tb_pilihan')
-            ->where('npsn', $npsn)
-            ->where('tahun', $tahun)
-            ->orderBy('no', 'asc') // Urutkan berdasarkan no urut kandidat
-            ->get();
-
-        // Tambahkan base URL untuk photo jika ada
-        foreach ($kandidat as $k) {
-            if ($k->photo) {
-                // Asumsi photo disimpan di public/uploads/kandidat/ atau sesuai legacy
-                $k->photo_url = url('/uploads/kandidat/' . $k->photo);
-            } else {
-                $k->photo_url = null;
-            }
-        }
-
-        return response()->json([
-            'success' => true,
-            'data' => $kandidat
-        ]);
+        $this->kandidatService = $kandidatService;
     }
 
-    // Tambah Kandidat (Khusus untuk level Admin Sekolah, tapi disatukan)
-    public function store(Request $request, $npsn = null)
+    public function index($npsn)
     {
-        if ($request->user()->level == 2) {
-            $npsn = $request->user()->npsn;
-        }
-
-        $request->validate([
-            'no' => 'required|integer',
-            'nama' => 'required|string|max:100',
-            'nisn' => 'required|string|max:32',
-            'kampanye' => 'nullable|string|max:250',
-            'visi' => 'nullable|string',
-            'misi' => 'nullable|string',
-            'proker' => 'nullable|string',
-            'pengalaman' => 'nullable|string',
-            'prestasi' => 'nullable|string',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048' // max 2MB
-        ]);
-
-        $tahun = env('TAHUN_AKTIF', date('Y'));
-
-        // Cek apakah No Urut sudah dipakai di sekolah tsb pada tahun yang sama
-        $exists = DB::table('tb_pilihan')
-            ->where('npsn', $npsn)
-            ->where('tahun', $tahun)
-            ->where('no', $request->no)
-            ->exists();
-
-        if ($exists) {
-            return response()->json(['success' => false, 'message' => 'No urut kandidat sudah dipakai!'], 400);
-        }
-
-        $dataInsert = [
-            'npsn' => $npsn,
-            'tahun' => $tahun,
-            'no' => $request->no,
-            'nama' => $request->nama,
-            'nisn' => $request->nisn,
-            'kampanye' => $request->kampanye,
-            'visi' => $request->visi,
-            'misi' => $request->misi,
-            'proker' => $request->proker,
-            'pengalaman' => $request->pengalaman,
-            'prestasi' => $request->prestasi
-            // 'waktu_input' => now(), // Di tabel tb_pilihan tidak ada kolom waktu_input
-            // 'id_user' => $request->user()->id 
-        ];
-
-        // Handle upload file
-        if ($request->hasFile('photo')) {
-            $file = $request->file('photo');
-            $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('uploads/kandidat'), $filename);
-            $dataInsert['photo'] = $filename;
-        }
-
-        DB::table('tb_pilihan')->insert($dataInsert);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Kandidat baru berhasil ditambahkan'
-        ]);
+        $data = $this->kandidatService->getAll($npsn);
+        return response()->json(['success' => true, 'data' => $data]);
     }
 
-    // Mengambil 1 detail kandidat untuk di-edit
-    public function show(Request $request, $npsn = null, $id = null)
+    public function show($npsn, $id)
     {
-        // Handle beda pola parameter dari Router:
-        // Super Admin : /admin/data-sekolah/{npsn}/kandidat/{id} -> $npsn terisi, $id terisi
-        // Admin Sek.  : /admin-sekolah/kandidat/{id}             -> $npsn diisi oleh nilai {id} dari URL, $id = null
-        
-        if ($request->user()->level == 2) {
-            $id = $npsn; // Geser parameter dari npsn ke id
-            $npsn = $request->user()->npsn;
-        }
-
-        $kandidat = DB::table('tb_pilihan')
-            ->where('id', $id)
-            ->where('npsn', $npsn)
-            ->first();
-
-        if (!$kandidat) {
+        $data = $this->kandidatService->find($npsn, $id);
+        if (!$data) {
             return response()->json(['success' => false, 'message' => 'Kandidat tidak ditemukan'], 404);
         }
-
-        if ($kandidat->photo) {
-            $kandidat->photo_url = url('/uploads/kandidat/' . $kandidat->photo);
-        }
-
-        return response()->json([
-            'success' => true,
-            'data' => $kandidat
-        ]);
+        return response()->json(['success' => true, 'data' => $data]);
     }
 
-    // Update kandidat
-    public function update(Request $request, $npsn = null, $id = null)
+    public function update(Request $request, $npsn, $id)
     {
-        if ($request->user()->level == 2) {
-            $id = $npsn; // Geser parameter
-            $npsn = $request->user()->npsn;
-        }
-
         $request->validate([
+            'no' => 'nullable|integer',
             'kampanye' => 'nullable|string|max:250',
             'nisn' => 'required|string|max:32',
             'nama' => 'required|string|max:100',
@@ -154,74 +43,24 @@ class KandidatSekolahController extends Controller
             'proker' => 'nullable|string',
             'pengalaman' => 'nullable|string',
             'prestasi' => 'nullable|string',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048' // max 2MB
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
-        $kandidat = DB::table('tb_pilihan')->where('id', $id)->where('npsn', $npsn)->first();
-
-        if (!$kandidat) {
-            return response()->json(['success' => false, 'message' => 'Kandidat tidak ditemukan'], 404);
+        try {
+            $this->kandidatService->update($npsn, $id, $request->all(), $request->file('photo'));
+            return response()->json(['success' => true, 'message' => 'Data kandidat berhasil diperbarui']);
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 404);
         }
-
-        $dataUpdate = [
-            'kampanye' => $request->kampanye,
-            'nisn' => $request->nisn,
-            'nama' => $request->nama,
-            'visi' => $request->visi,
-            'misi' => $request->misi,
-            'proker' => $request->proker,
-            'pengalaman' => $request->pengalaman,
-            'prestasi' => $request->prestasi,
-        ];
-
-        // Handle upload file
-        if ($request->hasFile('photo')) {
-            $file = $request->file('photo');
-            $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
-            
-            // Kita simpan ke public/uploads/kandidat/ agar kompatibel dengan URL lama
-            $file->move(public_path('uploads/kandidat'), $filename);
-            
-            // Hapus file lama jika ada (opsional, tergantung kebijakan storage)
-            if ($kandidat->photo && file_exists(public_path('uploads/kandidat/' . $kandidat->photo))) {
-                @unlink(public_path('uploads/kandidat/' . $kandidat->photo));
-            }
-
-            $dataUpdate['photo'] = $filename;
-        }
-
-        DB::table('tb_pilihan')->where('id', $id)->update($dataUpdate);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Data kandidat berhasil diperbarui'
-        ]);
     }
 
-    // Hapus kandidat
-    public function destroy(Request $request, $npsn = null, $id = null)
+    public function destroy($npsn, $id)
     {
-        if ($request->user()->level == 2) {
-            $id = $npsn; // Geser parameter
-            $npsn = $request->user()->npsn;
+        try {
+            $this->kandidatService->delete($npsn, $id);
+            return response()->json(['success' => true, 'message' => 'Kandidat berhasil dihapus']);
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 404);
         }
-
-        $kandidat = DB::table('tb_pilihan')->where('id', $id)->where('npsn', $npsn)->first();
-
-        if (!$kandidat) {
-            return response()->json(['success' => false, 'message' => 'Kandidat tidak ditemukan'], 404);
-        }
-
-        // Hapus file photo jika ada
-        if ($kandidat->photo && file_exists(public_path('uploads/kandidat/' . $kandidat->photo))) {
-            @unlink(public_path('uploads/kandidat/' . $kandidat->photo));
-        }
-
-        DB::table('tb_pilihan')->where('id', $id)->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Kandidat berhasil dihapus'
-        ]);
     }
 }

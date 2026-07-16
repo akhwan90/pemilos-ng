@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\Admin\TpsSekolahController;
 use App\Http\Controllers\Api\AdminSekolah\IdentitasSekolahController;
 use App\Http\Controllers\Api\AdminSekolah\DataSiswaController;
 use App\Http\Controllers\Api\AdminSekolah\UploadSiswaController;
+use App\Http\Controllers\Api\AdminSekolah\KandidatController;
 
 // ========== PUBLIC API (No Auth Required) ==========
 
@@ -74,10 +75,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/admin-sekolah/tps/{kd_kelas}', [TpsSekolahController::class, 'update']);
     Route::delete('/admin-sekolah/tps/{kd_kelas}', [TpsSekolahController::class, 'destroy']);
 
-    // Data Kandidat Calon (Admin Sekolah share logic with Super Admin KandidatSekolahController)
-    Route::get('/admin-sekolah/kandidat', [KandidatSekolahController::class, 'index']);
-    Route::get('/admin-sekolah/kandidat/{id}', [KandidatSekolahController::class, 'show']);
-    Route::post('/admin-sekolah/kandidat', [KandidatSekolahController::class, 'store']); // Create
-    Route::post('/admin-sekolah/kandidat/{id}', [KandidatSekolahController::class, 'update']); // Update
-    Route::delete('/admin-sekolah/kandidat/{id}', [KandidatSekolahController::class, 'destroy']);
+    // Data Kandidat Calon (Admin Sekolah khusus CRUD Kandidat Sendiri)
+    Route::get('/admin-sekolah/kandidat', [KandidatController::class, 'index']);
+    Route::get('/admin-sekolah/kandidat/{id}', [KandidatController::class, 'show']);
+    Route::post('/admin-sekolah/kandidat', [KandidatController::class, 'store']); // Create
+    Route::post('/admin-sekolah/kandidat/{id}', [KandidatController::class, 'update']); // Update
+    Route::delete('/admin-sekolah/kandidat/{id}', [KandidatController::class, 'destroy']);
 });
