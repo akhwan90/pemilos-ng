@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\AdminSekolah\UploadSiswaController;
 use App\Http\Controllers\Api\AdminSekolah\KandidatController;
 use App\Http\Controllers\Api\AdminSekolah\DataDptController;
 use App\Http\Controllers\Api\AdminSekolah\DokumentasiController;
+use App\Http\Controllers\Api\AdminSekolah\DashboardController;
 
 // ========== PUBLIC API (No Auth Required) ==========
 
@@ -95,4 +96,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/admin-sekolah/dokumentasi', [DokumentasiController::class, 'index']);
     Route::post('/admin-sekolah/dokumentasi', [DokumentasiController::class, 'store']); // Create / Upload Foto
     Route::delete('/admin-sekolah/dokumentasi/{id}', [DokumentasiController::class, 'destroy']);
+
+    // Dashboard Info
+    Route::get('/admin-sekolah/dashboard', [DashboardController::class, 'index']);
 });

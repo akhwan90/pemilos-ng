@@ -92,6 +92,11 @@ const routes = [
         meta: { requiresAuth: true, level: 2 }, // Khusus level 2 Admin Sekolah
         children: [
             {
+                path: 'dashboard',
+                name: 'admin-sekolah-dashboard',
+                component: () => import('../views/admin_sekolah/Dashboard.vue'),
+            },
+            {
                 path: 'identitas',
                 name: 'admin-sekolah-identitas',
                 component: () => import('../views/admin_sekolah/IdentitasSekolah.vue'),
