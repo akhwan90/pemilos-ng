@@ -114,7 +114,7 @@ const routes = [
             {
                 path: 'calon',
                 name: 'admin-sekolah-calon-kandidat',
-                component: () => import('../views/admin_sekolah/Placeholder.vue'),
+                component: () => import('../views/admin_sekolah/DataKandidat.vue'),
             },
             {
                 path: 'dpt',

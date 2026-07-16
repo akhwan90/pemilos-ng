@@ -73,4 +73,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/admin-sekolah/tps', [TpsSekolahController::class, 'store']);
     Route::put('/admin-sekolah/tps/{kd_kelas}', [TpsSekolahController::class, 'update']);
     Route::delete('/admin-sekolah/tps/{kd_kelas}', [TpsSekolahController::class, 'destroy']);
+
+    // Data Kandidat Calon (Admin Sekolah share logic with Super Admin KandidatSekolahController)
+    Route::get('/admin-sekolah/kandidat', [KandidatSekolahController::class, 'index']);
+    Route::get('/admin-sekolah/kandidat/{id}', [KandidatSekolahController::class, 'show']);
+    Route::post('/admin-sekolah/kandidat/{id}', [KandidatSekolahController::class, 'update']); // Pakai POST karena kirim File (Multipart/form-data)
+    Route::delete('/admin-sekolah/kandidat/{id}', [KandidatSekolahController::class, 'destroy']);
 });

@@ -1,0 +1,1 @@
+import{_ as e}from"./_plugin-vue_export-helper-DlAUqK2U.js";import{c as o,b as a,o as s}from"./app-BZAxni6e.js";const n={},r={class:"p-6"};function c(l,t){return s(),o("div",r,[...t[0]||(t[0]=[a("h2",{class:"text-2xl font-bold mb-4"},"Log Aktivitas",-1),a("p",null,"Halaman sedang dalam pengembangan...",-1)])])}const d=e(n,[["render",c]]);export{d as default};

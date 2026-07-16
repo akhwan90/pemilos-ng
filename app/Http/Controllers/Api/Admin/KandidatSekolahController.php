@@ -11,9 +11,13 @@ use Illuminate\Support\Str;
 class KandidatSekolahController extends Controller
 {
     // Get list kandidat
-    public function index($npsn)
+    public function index(Request $request, $npsn = null)
     {
-        $tahun = env('TAHUN_AKTIF', 2026);
+        if ($request->user()->level == 2) {
+            $npsn = $request->user()->npsn;
+        }
+
+        $tahun = env('TAHUN_AKTIF', date('Y'));
 
         $kandidat = DB::table('tb_pilihan')
             ->where('npsn', $npsn)
@@ -38,8 +42,12 @@ class KandidatSekolahController extends Controller
     }
 
     // Mengambil 1 detail kandidat untuk di-edit
-    public function show($npsn, $id)
+    public function show(Request $request, $npsn = null, $id)
     {
+        if ($request->user()->level == 2) {
+            $npsn = $request->user()->npsn;
+        }
+
         $kandidat = DB::table('tb_pilihan')
             ->where('id', $id)
             ->where('npsn', $npsn)
@@ -60,8 +68,12 @@ class KandidatSekolahController extends Controller
     }
 
     // Update kandidat
-    public function update(Request $request, $npsn, $id)
+    public function update(Request $request, $npsn = null, $id)
     {
+        if ($request->user()->level == 2) {
+            $npsn = $request->user()->npsn;
+        }
+
         $request->validate([
             'kampanye' => 'nullable|string|max:250',
             'nisn' => 'required|string|max:32',
@@ -116,8 +128,12 @@ class KandidatSekolahController extends Controller
     }
 
     // Hapus kandidat
-    public function destroy($npsn, $id)
+    public function destroy(Request $request, $npsn = null, $id)
     {
+        if ($request->user()->level == 2) {
+            $npsn = $request->user()->npsn;
+        }
+
         $kandidat = DB::table('tb_pilihan')->where('id', $id)->where('npsn', $npsn)->first();
 
         if (!$kandidat) {
