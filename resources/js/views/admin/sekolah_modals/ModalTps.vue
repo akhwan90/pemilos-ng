@@ -23,6 +23,13 @@
               <option :value="true">Di Luar Sekolah</option>
             </select>
           </div>
+          <div class="flex-1 w-full">
+            <label class="block text-xs font-medium text-gray-600 mb-1">Status Penghapusan</label>
+            <select v-model="form.is_hapus" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500">
+              <option :value="false">0 - Aktif</option>
+              <option :value="true">1 - Terhapus</option>
+            </select>
+          </div>
           <div class="w-full sm:w-auto">
             <BaseButton type="submit" variant="primary" :loading="isSubmitting" class="w-full sm:w-auto h-[38px]">
               {{ isEditing ? 'Simpan Perubahan' : 'Simpan TPS' }}
@@ -41,7 +48,7 @@
                 <th class="px-4 py-3 w-12 text-center">No</th>
                 <th class="px-4 py-3">Nama TPS / Kelas</th>
                 <th class="px-4 py-3 text-center">Lokasi</th>
-                <th class="px-4 py-3 text-center">Status Generate Token</th>
+                <th class="px-4 py-3 text-center">Status Hapus</th>
                 <th class="px-4 py-3 w-32 text-center">Aksi</th>
               </tr>
             </thead>
@@ -60,8 +67,8 @@
                   <span v-else class="px-2 py-1 text-xs font-semibold rounded bg-blue-100 text-blue-800">Dalam Sekolah</span>
                 </td>
                 <td class="px-4 py-3 text-center">
-                  <span v-if="tps.is_generate_token == 1" class="text-green-600 font-medium">Sudah</span>
-                  <span v-else class="text-gray-400">Belum</span>
+                  <span v-if="tps.is_hapus == 1" class="px-2 py-1 text-xs font-semibold rounded bg-red-100 text-red-800">Terhapus (1)</span>
+                  <span v-else class="px-2 py-1 text-xs font-semibold rounded bg-green-100 text-green-800">Aktif (0)</span>
                 </td>
                 <td class="px-4 py-3 text-center">
                   <div class="flex gap-2 justify-center">
@@ -108,7 +115,8 @@ const isSubmitting = ref(false);
 const form = ref({
   kd_kelas: null,
   nm_kelas: '',
-  is_tps_luar_sekolah: false
+  is_tps_luar_sekolah: false,
+  is_hapus: false
 });
 
 watch(() => isOpen.value, (newVal) => {
@@ -136,6 +144,7 @@ function editTps(tps) {
   form.value.nm_kelas = tps.nm_kelas;
   // konversi integer 1/0 ke boolean true/false untuk select box
   form.value.is_tps_luar_sekolah = tps.is_tps_luar_sekolah == 1;
+  form.value.is_hapus = tps.is_hapus == 1;
 }
 
 function cancelEdit() {
@@ -143,6 +152,7 @@ function cancelEdit() {
   form.value.kd_kelas = null;
   form.value.nm_kelas = '';
   form.value.is_tps_luar_sekolah = false;
+  form.value.is_hapus = false;
 }
 
 async function submitForm() {
@@ -150,7 +160,8 @@ async function submitForm() {
   try {
     const payload = {
       nm_kelas: form.value.nm_kelas,
-      is_tps_luar_sekolah: form.value.is_tps_luar_sekolah
+      is_tps_luar_sekolah: form.value.is_tps_luar_sekolah,
+      is_hapus: form.value.is_hapus
     };
 
     if (isEditing.value) {
