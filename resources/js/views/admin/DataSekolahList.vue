@@ -6,7 +6,7 @@
         <p class="text-sm text-gray-500">Monitoring progres pemilihan di setiap sekolah yang terdaftar.</p>
       </div>
       <div v-if="auth.user?.level === 1" class="flex gap-2">
-        <BaseButton @click="$router.push('/admin/data-sekolah/tambah')" variant="primary">
+        <BaseButton @click="openModal('edit')" variant="primary">
           <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
           Tambah Sekolah
         </BaseButton>
@@ -132,7 +132,7 @@
     </BaseCard>
 
     <!-- Modals -->
-    <ModalEditSekolah v-model="modals.edit" :npsn="selectedNpsn" @updated="fetchData(pagination.current_page)" />
+    <ModalEditSekolah v-model="modals.edit" :npsn="selectedNpsn" :is-edit-mode="isEditMode" @updated="fetchData(pagination.current_page)" />
     <ModalUserSekolah v-model="modals.user" :npsn="selectedNpsn" />
     <ModalJadwalSekolah v-model="modals.jadwal" :npsn="selectedNpsn" />
     <ModalKandidat v-model="modals.kandidat" :npsn="selectedNpsn" />
@@ -164,6 +164,7 @@ const isLoading = ref(false);
 
 // Modals State
 const selectedNpsn = ref(null);
+const isEditMode = ref(true);
 const modals = ref({
   edit: false,
   user: false,
@@ -173,8 +174,11 @@ const modals = ref({
   siswa: false
 });
 
-function openModal(modalName, npsn) {
+function openModal(modalName, npsn = null) {
   selectedNpsn.value = npsn;
+  if (modalName === 'edit') {
+    isEditMode.value = npsn !== null;
+  }
   modals.value[modalName] = true;
 }
 

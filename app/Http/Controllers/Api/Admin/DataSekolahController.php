@@ -105,6 +105,45 @@ class DataSekolahController extends Controller
         ]);
     }
 
+    public function store(Request $request)
+    {
+        $request->validate([
+            'npsn' => 'required|numeric|unique:tb_sekolah,npsn',
+            'nama_sekolah' => 'required|string|max:50',
+            'jenjang' => 'required|string|max:5',
+            'jenjang2' => 'required|string|max:10',
+        ]);
+
+        $dataInsert = [
+            'npsn' => $request->npsn,
+            'nama_sekolah' => $request->nama_sekolah,
+            'alamat_sekolah' => $request->alamat_sekolah,
+            'kepala_sekolah' => $request->kepala_sekolah,
+            'jenjang' => $request->jenjang,
+            'jenjang2' => $request->jenjang2,
+            'desa' => $request->desa,
+            'kecamatan' => $request->kecamatan,
+            'negeri_or_swasta' => $request->negeri_or_swasta,
+            'is_kemenag' => $request->is_kemenag ? 1 : 0,
+            'is_delete' => 0,
+            'is_jadwal_sendiri' => 0
+        ];
+
+        if ($request->hasFile('logo')) {
+            $file = $request->file('logo');
+            $filename = time() . '_' . \Illuminate\Support\Str::random(10) . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/logo_sekolah'), $filename);
+            $dataInsert['logo'] = $filename;
+        }
+
+        DB::table('tb_sekolah')->insert($dataInsert);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data sekolah berhasil ditambahkan'
+        ]);
+    }
+
     public function show($npsn)
     {
         $sekolah = DB::table('tb_sekolah')->where('npsn', $npsn)->first();

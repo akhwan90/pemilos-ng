@@ -20,6 +20,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Admin & Sekolah API
     Route::get('/admin/data-sekolah', [DataSekolahController::class, 'index']);
+    Route::post('/admin/data-sekolah', [DataSekolahController::class, 'store']);
     Route::get('/admin/data-sekolah/{npsn}', [DataSekolahController::class, 'show']);
     Route::post('/admin/data-sekolah/{npsn}', [DataSekolahController::class, 'update']); // Pakai POST agar bisa upload logo
     
