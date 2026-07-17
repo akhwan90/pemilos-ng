@@ -19,8 +19,8 @@
         </div>
         <div class="ml-3">
           <p class="text-sm text-blue-700">
-            Pastikan format file Excel Anda mengikuti template standar. Baris pertama (header) akan diabaikan. Urutan kolom wajib: 
-            <strong>NISN | NIK | Nama Siswa | JK (L/P) | Kelas | Difabel (Ya/Tidak) | No. WA | Email</strong>.
+            Pastikan format file Excel Anda mengikuti template standar. Baris pertama (header) akan diabaikan. Urutan kolom wajib:
+            <strong>NISN | Nama Siswa | JK (1/2) | Kelas | Difabel (0/1/2/3)</strong>.
           </p>
         </div>
       </div>
@@ -83,7 +83,7 @@
           <input type="file" ref="fileInput" accept=".xlsx" required class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
           <p class="mt-2 text-xs text-gray-500">Maksimal ukuran file: 2 MB</p>
         </div>
-        
+
         <div class="mt-6 flex justify-end gap-3 border-t pt-4">
           <BaseButton type="button" variant="secondary" @click="isUploadModalOpen = false">Batal</BaseButton>
           <BaseButton type="submit" variant="primary" :loading="isSubmitting">Mulai Upload</BaseButton>
@@ -200,7 +200,7 @@ async function openLogs(jobId) {
   isLogModalOpen.value = true;
   isLoadingLogs.value = true;
   logs.value = [];
-  
+
   try {
     const res = await api.get(`/admin-sekolah/upload-siswa/${jobId}/logs`);
     logs.value = res.data.data;

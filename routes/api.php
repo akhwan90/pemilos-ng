@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\Admin\UserSekolahController;
 use App\Http\Controllers\Api\Admin\JadwalSekolahController;
 use App\Http\Controllers\Api\Admin\KandidatSekolahController;
 use App\Http\Controllers\Api\Admin\TpsSekolahController;
+use App\Http\Controllers\Api\Admin\DataSiswaGlobalController;
 use App\Http\Controllers\Api\AdminSekolah\IdentitasSekolahController;
 use App\Http\Controllers\Api\AdminSekolah\DataSiswaController;
 use App\Http\Controllers\Api\AdminSekolah\UploadSiswaController;
@@ -53,6 +54,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/admin/data-sekolah/{npsn}/tps', [TpsSekolahController::class, 'store']);
     Route::put('/admin/data-sekolah/{npsn}/tps/{kd_kelas}', [TpsSekolahController::class, 'update']);
     Route::delete('/admin/data-sekolah/{npsn}/tps/{kd_kelas}', [TpsSekolahController::class, 'destroy']);
+    Route::get('/admin/data-sekolah/{npsn}/tps/{kd_kelas}/admin', [TpsSekolahController::class, 'getAdmin']);
+    Route::post('/admin/data-sekolah/{npsn}/tps/{kd_kelas}/admin', [TpsSekolahController::class, 'storeAdmin']);
+    Route::delete('/admin/data-sekolah/{npsn}/tps/{kd_kelas}/admin/{id}', [TpsSekolahController::class, 'destroyAdmin']);
+    Route::put('/admin/data-sekolah/{npsn}/tps/{kd_kelas}/admin/{id}/password', [TpsSekolahController::class, 'updateAdminPassword']);
+
+    // Data Siswa Global
+    Route::get('/admin/data-siswa-global', [DataSiswaGlobalController::class, 'index']);
+    Route::delete('/admin/data-siswa-global/{id}', [DataSiswaGlobalController::class, 'destroy']);
 
     // ==========================================
     // LEVEL 2: ADMIN SEKOLAH API
@@ -73,11 +82,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/admin-sekolah/upload-siswa', [UploadSiswaController::class, 'upload']);
     Route::get('/admin-sekolah/upload-siswa/{id}/logs', [UploadSiswaController::class, 'logs']);
 
-    // Data TPS / Kelas API (Admin Sekolah share logic with Super Admin TpsSekolahController)
-    Route::get('/admin-sekolah/tps', [TpsSekolahController::class, 'index']);
-    Route::post('/admin-sekolah/tps', [TpsSekolahController::class, 'store']);
-    Route::put('/admin-sekolah/tps/{kd_kelas}', [TpsSekolahController::class, 'update']);
-    Route::delete('/admin-sekolah/tps/{kd_kelas}', [TpsSekolahController::class, 'destroy']);
+    // Data TPS / Kelas API (Admin Sekolah dipisah untuk menghindari argumen bentrok dengan Super Admin)
+    Route::get('/admin-sekolah/tps', [\App\Http\Controllers\Api\AdminSekolah\TpsController::class, 'index']);
+    Route::post('/admin-sekolah/tps', [\App\Http\Controllers\Api\AdminSekolah\TpsController::class, 'store']);
+    Route::put('/admin-sekolah/tps/{kd_kelas}', [\App\Http\Controllers\Api\AdminSekolah\TpsController::class, 'update']);
+    Route::delete('/admin-sekolah/tps/{kd_kelas}', [\App\Http\Controllers\Api\AdminSekolah\TpsController::class, 'destroy']);
+    Route::get('/admin-sekolah/tps/{kd_kelas}/admin', [\App\Http\Controllers\Api\AdminSekolah\TpsController::class, 'getAdmin']);
+    Route::post('/admin-sekolah/tps/{kd_kelas}/admin', [\App\Http\Controllers\Api\AdminSekolah\TpsController::class, 'storeAdmin']);
+    Route::delete('/admin-sekolah/tps/{kd_kelas}/admin/{id}', [\App\Http\Controllers\Api\AdminSekolah\TpsController::class, 'destroyAdmin']);
+    Route::put('/admin-sekolah/tps/{kd_kelas}/admin/{id}/password', [\App\Http\Controllers\Api\AdminSekolah\TpsController::class, 'updateAdminPassword']);
 
     // Data Kandidat Calon (Admin Sekolah khusus CRUD Kandidat Sendiri)
     Route::get('/admin-sekolah/kandidat', [KandidatController::class, 'index']);

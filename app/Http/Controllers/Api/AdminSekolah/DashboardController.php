@@ -13,7 +13,7 @@ class DashboardController extends Controller
     {
         $npsn = $request->user()->npsn;
         $tahun = env('TAHUN_AKTIF', date('Y'));
-        
+
         // Ambil data jenjang dari tb_sekolah
         $sekolah = DB::table('tb_sekolah')->where('npsn', $npsn)->first();
         $jenjang = $sekolah ? $sekolah->jenjang : null;
@@ -33,11 +33,11 @@ class DashboardController extends Controller
 
         // Cek status aktif
         $now = Carbon::now()->startOfDay();
-        
+
         foreach ($jadwal as $j) {
             $mulai = Carbon::parse($j->waktu_mulai)->startOfDay();
             $selesai = Carbon::parse($j->waktu_selesai)->endOfDay();
-            
+
             if ($now->between($mulai, $selesai)) {
                 $j->status = 'aktif';
             } elseif ($now->lt($mulai)) {
@@ -47,11 +47,23 @@ class DashboardController extends Controller
             }
         }
 
+        // Hitung statistik
+        $jml_siswa = DB::table('tb_siswa')->where('npsn', $npsn)->where('status', 1)->count();
+        $jml_tps = DB::table('tb_kelas')->where('npsn', $npsn)->where('is_hapus', 0)->count();
+        $jml_kandidat = DB::table('tb_pilihan')->where('npsn', $npsn)->where('tahun', $tahun)->count();
+        $jml_dpt = DB::table('tb_siswa_tps')->where('npsn', $npsn)->where('tahun', $tahun)->count();
+
         return response()->json([
             'success' => true,
             'data' => [
-                'sekolah' => $sekolah ? $sekolah->nm_sekolah : 'Unknown',
-                'jadwal' => $jadwal
+                'sekolah' => $sekolah ? $sekolah->nama_sekolah : 'Unknown',
+                'jadwal' => $jadwal,
+                'stats' => [
+                    'jml_siswa' => $jml_siswa,
+                    'jml_tps' => $jml_tps,
+                    'jml_kandidat' => $jml_kandidat,
+                    'jml_dpt' => $jml_dpt
+                ]
             ]
         ]);
     }

@@ -1,23 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\Api\Admin;
+namespace App\Http\Controllers\Api\AdminSekolah;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
-// Middleware yang membatasi hak akses CRUD TPS sesuai NPSN admin sekolah
-// =========================================================================
-
-class TpsSekolahController extends Controller
+class TpsController extends Controller
 {
     // List TPS (tb_kelas)
-    public function index(Request $request, $npsn)
+    public function index(Request $request)
     {
-        // Jika level 2 (Admin Sekolah), timpa $npsn dari URL dengan npsn miliknya
-        if ($request->user()->level == 2) {
-            $npsn = $request->user()->npsn;
-        }
+        $npsn = $request->user()->npsn;
 
         $tps = DB::table('tb_kelas')
             ->where('npsn', $npsn)
@@ -30,11 +25,9 @@ class TpsSekolahController extends Controller
     }
 
     // Menambah TPS Baru
-    public function store(Request $request, $npsn)
+    public function store(Request $request)
     {
-        if ($request->user()->level == 2) {
-            $npsn = $request->user()->npsn;
-        }
+        $npsn = $request->user()->npsn;
 
         $request->validate([
             'nm_kelas' => 'required|string|max:32',
@@ -45,24 +38,20 @@ class TpsSekolahController extends Controller
             'npsn' => $npsn,
             'nm_kelas' => $request->nm_kelas,
             'is_tps_luar_sekolah' => $request->is_tps_luar_sekolah ? 1 : 0,
-            'is_generate_token' => 0, // default
-            'is_cetak_ba' => 0,
             'is_hapus' => 0
         ]);
 
         return response()->json([
             'success' => true,
-            'message' => 'Data TPS berhasil ditambahkan',
+            'message' => 'TPS berhasil ditambahkan',
             'data' => ['kd_kelas' => $id]
         ]);
     }
 
-    // Edit TPS
-    public function update(Request $request, $npsn, $kd_kelas)
+    // Update Data TPS
+    public function update(Request $request, $kd_kelas)
     {
-        if ($request->user()->level == 2) {
-            $npsn = $request->user()->npsn;
-        }
+        $npsn = $request->user()->npsn;
 
         $request->validate([
             'nm_kelas' => 'required|string|max:32',
@@ -79,22 +68,20 @@ class TpsSekolahController extends Controller
                 'is_hapus' => $request->is_hapus ? 1 : 0
             ]);
 
-        if ($affected === 0) {
-            return response()->json(['success' => false, 'message' => 'Data tidak ditemukan atau tidak ada perubahan'], 404);
+        if ($affected) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Data TPS berhasil diperbarui'
+            ]);
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Data TPS / Kelas berhasil diperbarui'
-        ]);
+        return response()->json(['success' => false, 'message' => 'TPS tidak ditemukan atau tidak ada perubahan'], 404);
     }
 
-    // Soft Delete TPS
-    public function destroy(Request $request, $npsn, $kd_kelas)
+    // Menghapus TPS (Soft Delete / Hapus Permanen tergantung kebutuhan, saat ini diset soft delete is_hapus=1)
+    public function destroy(Request $request, $kd_kelas)
     {
-        if ($request->user()->level == 2) {
-            $npsn = $request->user()->npsn;
-        }
+        $npsn = $request->user()->npsn;
 
         $affected = DB::table('tb_kelas')
             ->where('kd_kelas', $kd_kelas)
@@ -102,6 +89,7 @@ class TpsSekolahController extends Controller
             ->update([
                 'is_hapus' => 1
             ]);
+
         if ($affected) {
             return response()->json([
                 'success' => true,
@@ -113,12 +101,10 @@ class TpsSekolahController extends Controller
     }
 
     // Get Admin TPS
-    public function getAdmin(Request $request, $npsn, $kd_kelas)
+    public function getAdmin(Request $request, $kd_kelas)
     {
-        if ($request->user()->level == 2) {
-            $npsn = $request->user()->npsn;
-        }
-        
+        $npsn = $request->user()->npsn;
+
         $admins = DB::table('tb_admin')
             ->where('npsn', $npsn)
             ->where('level', 3)
@@ -132,12 +118,10 @@ class TpsSekolahController extends Controller
     }
 
     // Store Admin TPS
-    public function storeAdmin(Request $request, $npsn, $kd_kelas)
+    public function storeAdmin(Request $request, $kd_kelas)
     {
-        if ($request->user()->level == 2) {
-            $npsn = $request->user()->npsn;
-        }
-        
+        $npsn = $request->user()->npsn;
+
         $request->validate([
             'username' => 'required|string|min:4|unique:tb_admin,username',
             'password' => 'required|string|min:4',
@@ -145,7 +129,7 @@ class TpsSekolahController extends Controller
 
         $id = DB::table('tb_admin')->insertGetId([
             'username' => $request->username,
-            'password' => \Illuminate\Support\Facades\Hash::make($request->password),
+            'password' => Hash::make($request->password),
             'level' => 3,
             'npsn' => $npsn,
             'id_tps' => $kd_kelas,
@@ -159,12 +143,10 @@ class TpsSekolahController extends Controller
     }
 
     // Delete Admin TPS
-    public function destroyAdmin(Request $request, $npsn, $kd_kelas, $id)
+    public function destroyAdmin(Request $request, $kd_kelas, $id)
     {
-        if ($request->user()->level == 2) {
-            $npsn = $request->user()->npsn;
-        }
-        
+        $npsn = $request->user()->npsn;
+
         $affected = DB::table('tb_admin')
             ->where('id', $id)
             ->where('npsn', $npsn)
@@ -183,11 +165,9 @@ class TpsSekolahController extends Controller
     }
 
     // Update Password Admin TPS
-    public function updateAdminPassword(Request $request, $npsn, $kd_kelas, $id)
+    public function updateAdminPassword(Request $request, $kd_kelas, $id)
     {
-        if ($request->user()->level == 2) {
-            $npsn = $request->user()->npsn;
-        }
+        $npsn = $request->user()->npsn;
 
         $request->validate([
             'password' => 'required|string|min:4',
@@ -199,7 +179,7 @@ class TpsSekolahController extends Controller
             ->where('level', 3)
             ->where('id_tps', $kd_kelas)
             ->update([
-                'password' => \Illuminate\Support\Facades\Hash::make($request->password)
+                'password' => Hash::make($request->password)
             ]);
 
         if ($affected) {

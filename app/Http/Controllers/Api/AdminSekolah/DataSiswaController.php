@@ -17,7 +17,7 @@ class DataSiswaController extends Controller
 
         $query = DB::table('tb_siswa')
             ->where('npsn', $npsn)
-            ->where('tahun', $tahun)
+            // ->where('tahun', $tahun)
             ->where('status', 1); // 1 = Aktif, 0 = Terhapus/Nonaktif
 
         if (!empty($search)) {
@@ -26,13 +26,13 @@ class DataSiswaController extends Controller
                   ->orWhere('nisn', 'like', "%{$search}%");
             });
         }
-        
+
         if (!empty($filterKelas)) {
             $query->where('kelas', $filterKelas);
         }
 
         // Pagination
-        $siswa = $query->orderBy('kelas')->orderBy('nm_siswa')->paginate(20);
+        $siswa = $query->orderBy('kelas')->orderBy('nm_siswa')->paginate(100);
 
         return response()->json([
             'success' => true,
@@ -44,7 +44,7 @@ class DataSiswaController extends Controller
     {
         $npsn = $request->user()->npsn;
         $tahun = env('TAHUN_AKTIF', date('Y'));
-        
+
         $kelas = DB::table('tb_siswa')
             ->select('kelas')
             ->where('npsn', $npsn)
@@ -55,7 +55,7 @@ class DataSiswaController extends Controller
             ->groupBy('kelas')
             ->orderBy('kelas')
             ->pluck('kelas');
-            
+
         return response()->json([
             'success' => true,
             'data' => $kelas
@@ -129,7 +129,7 @@ class DataSiswaController extends Controller
     {
         $npsn = $request->user()->npsn;
         $user_id = $request->user()->id; // id admin login
-        
+
         $request->validate([
             'alasan_hapus' => 'required|integer|in:2,3' // 2: Lulus, 3: Pindah
         ]);

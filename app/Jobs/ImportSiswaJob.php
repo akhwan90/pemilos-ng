@@ -33,23 +33,23 @@ class ImportSiswaJob implements ShouldQueue
 
         if (!file_exists($path)) {
             Log::error("ImportSiswaJob: File excel tidak ditemukan di {$path}");
-            
+
             DB::table('upload_job')->where('id', $this->jobId)->update([
                 'is_selesai' => 1,
                 'finish_at' => date('Y-m-d H:i:s')
             ]);
-            
+
             $this->logToDb("File excel {$this->filename} tidak ditemukan di server", 0);
             return;
         }
 
         try {
-            // Karena tidak ada PhpSpreadsheet, kita pakai cara kotor/sederhana 
+            // Karena tidak ada PhpSpreadsheet, kita pakai cara kotor/sederhana
             // Jika ada box/spout atau PhpSpreadsheet, gunakan itu. Di CI3 pakai box/spout.
             // Di Laravel, kita asumsikan butuh package Maatwebsite/Excel atau shuchkin/simplexlsx
-            // Untuk sementara kita biarkan fungsi parsing excel placeholder yang akan mencatat error "Package not installed" 
+            // Untuk sementara kita biarkan fungsi parsing excel placeholder yang akan mencatat error "Package not installed"
             // jika belum diinstall.
-            
+
             if (!class_exists('\Shuchkin\SimpleXLSX')) {
                  $this->logToDb("Package Shuchkin\SimpleXLSX belum diinstall di Laravel. Jalankan: composer require shuchkin/simplexlsx", 0);
                  $this->finishJob();
@@ -64,25 +64,58 @@ class ImportSiswaJob implements ShouldQueue
                         // Mapping struktur sesuai template excel lama CI3
                         // Asumsi kolom: A: NISN, B: NIK, C: Nama, D: JK(L/P), E: Kelas, F: Difabel, G: WA, H: Email
                         $nisn = trim($row[0] ?? '');
-                        $nik = trim($row[1] ?? '');
-                        $nama = trim($row[2] ?? '');
-                        $jk_str = trim(strtolower($row[3] ?? ''));
-                        $kelas = trim($row[4] ?? '');
-                        $difabel_str = trim(strtolower($row[5] ?? ''));
-                        
-                        // Parse JK (L=1, P=2)
-                        $jk = 1;
-                        if ($jk_str == 'p' || $jk_str == 'perempuan' || $jk_str == '2') {
+                        $nama = trim($row[1] ?? '');
+                        $jk_str = trim(strtolower($row[2] ?? ''));
+                        $kelas = trim($row[3] ?? '');
+                        $difabel_str = trim(strtolower($row[4] ?? ''));
+
+                        // Validasi JK (hanya menerima 1/Laki-laki atau 2/Perempuan)
+                        $jk = null;
+                        if (in_array($jk_str, ['1', 'l', 'laki', 'laki-laki', 'laki - laki', 'pria'])) {
+                            $jk = 1;
+                        } elseif (in_array($jk_str, ['2', 'p', 'perempuan', 'wanita'])) {
                             $jk = 2;
                         }
-                        
-                        // Parse difabel
-                        $difabel = 0;
-                        if ($difabel_str == 'ya' || $difabel_str == '1') {
+
+                        // Validasi difabel (hanya menerima angka)
+                        $difabel = null;
+                        if (is_numeric($difabel_str)) {
+                            $difabel = (int)$difabel_str;
+                        } elseif (in_array($difabel_str, ['ya', 'yes', 'true'])) {
                             $difabel = 1;
+                        } elseif (empty($difabel_str) || in_array($difabel_str, ['tidak', 'no', 'false', '-'])) {
+                            $difabel = 0;
                         }
 
                         if (!empty($nisn) && !empty($nama)) {
+                            // Validasi Nama minimal 3 karakter
+                            if (strlen($nama) < 3) {
+                                $this->logToDb("Gagal memproses baris {$no}: Nama '{$nama}' kurang dari 3 karakter (NISN: {$nisn})", 0, $nisn);
+                                $no++;
+                                continue;
+                            }
+
+                            // Validasi NISN minimal 10 digit
+                            if (strlen($nisn) < 10) {
+                                $this->logToDb("Gagal memproses {$nama}: NISN ({$nisn}) kurang dari 10 digit", 0, $nisn);
+                                $no++;
+                                continue;
+                            }
+
+                            // Cek validitas Jenis Kelamin
+                            if (is_null($jk)) {
+                                $this->logToDb("Gagal memproses {$nama}: Jenis kelamin '{$jk_str}' tidak valid (Gunakan 1 untuk L atau 2 untuk P)", 0, $nisn);
+                                $no++;
+                                continue;
+                            }
+
+                            // Cek validitas Difabel
+                            if (is_null($difabel) || $difabel < 0) {
+                                $this->logToDb("Gagal memproses {$nama}: Kode difabel '{$difabel_str}' tidak valid", 0, $nisn);
+                                $no++;
+                                continue;
+                            }
+
                             // Cek apakah NISN sudah ada di database
                             $cek_nisn = DB::table('tb_siswa')->where('nisn', $nisn)->first();
 
@@ -90,7 +123,6 @@ class ImportSiswaJob implements ShouldQueue
                                 // Insert baru
                                 DB::table('tb_siswa')->insert([
                                     'nisn' => $nisn,
-                                    'nik' => $nik,
                                     'nm_siswa' => $nama,
                                     'jk' => $jk,
                                     'kelas' => $kelas,
@@ -100,7 +132,7 @@ class ImportSiswaJob implements ShouldQueue
                                     'tahun' => env('TAHUN_AKTIF', date('Y')),
                                     'create_at' => date('Y-m-d H:i:s')
                                 ]);
-                                
+
                                 $this->logToDb("Berhasil insert {$nama} (NISN: {$nisn})", 1, $nisn);
                             } else {
                                 // Jika ada, cek npsn
@@ -119,9 +151,9 @@ class ImportSiswaJob implements ShouldQueue
                                     // Beda sekolah (Pindah Sekolah)
                                     $sekolah_lama = DB::table('tb_sekolah')->where('npsn', $cek_nisn->npsn)->first();
                                     $nama_sekolah_lama = $sekolah_lama ? $sekolah_lama->nama_sekolah : $cek_nisn->npsn;
-                                    
+
                                     $this->logToDb("NISN: {$nisn} terdaftar di {$nama_sekolah_lama}. Menunggu persetujuan pindah sekolah.", 0, $nisn, $cek_nisn->npsn);
-                                    
+
                                     // Masukkan ke tabel aproval_pindah_sekolah
                                     DB::table('aproval_pindah_sekolah')->updateOrInsert(
                                         ['nisn' => $nisn],
@@ -154,7 +186,7 @@ class ImportSiswaJob implements ShouldQueue
 
         $this->finishJob();
     }
-    
+
     private function logToDb($pesan, $isSuccess, $nisn = null, $npsn_lama = null)
     {
         DB::table('upload_job_log')->insert([
@@ -166,7 +198,7 @@ class ImportSiswaJob implements ShouldQueue
             'waktu' => date('Y-m-d H:i:s')
         ]);
     }
-    
+
     private function finishJob()
     {
         DB::table('upload_job')->where('id', $this->jobId)->update([

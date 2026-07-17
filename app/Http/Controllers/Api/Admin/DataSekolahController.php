@@ -77,6 +77,29 @@ class DataSekolahController extends Controller
             $query->orderBy('nama_sekolah', 'asc');
         }
 
+        // Check if no_pagination is requested
+        if ($request->query('no_pagination') == 1) {
+            $sekolahs = $query->get()->map(function ($item) {
+                $item->persentase_dpt = 0;
+                $item->persentase_memilih = 0;
+                $item->persentase_belum_memilih = 0;
+                $item->is_over_capacity = false;
+
+                if ($item->jml_siswa > 0) {
+                    $item->persentase_dpt = round((($item->jml_dpt / $item->jml_siswa) * 100), 2);
+                }
+                if ($item->jml_memilih > 0 && $item->jml_dpt > 0) {
+                    $item->persentase_memilih = round((($item->jml_memilih / $item->jml_dpt) * 100), 2);
+                    $item->persentase_belum_memilih = 100 - $item->persentase_memilih;
+                }
+                if ($item->jml_dpt > $item->jml_siswa) {
+                    $item->is_over_capacity = true;
+                }
+                return $item;
+            });
+            return response()->json($sekolahs);
+        }
+
         // Get and Process data (Calculate percentages like the CI3 did)
         $sekolahs = $query->paginate(20)->through(function ($item) {
             $item->persentase_dpt = 0;
