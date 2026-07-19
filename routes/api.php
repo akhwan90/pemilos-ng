@@ -32,7 +32,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/admin/data-sekolah', [DataSekolahController::class, 'store']);
     Route::get('/admin/data-sekolah/{npsn}', [DataSekolahController::class, 'show']);
     Route::post('/admin/data-sekolah/{npsn}', [DataSekolahController::class, 'update']); // Pakai POST agar bisa upload logo
-    
+
     // User Sekolah (Level 2) API
     Route::get('/admin/data-sekolah/{npsn}/users', [UserSekolahController::class, 'index']);
     Route::post('/admin/data-sekolah/{npsn}/users', [UserSekolahController::class, 'store']);
@@ -62,6 +62,11 @@ Route::middleware('auth:sanctum')->group(function () {
     // Data Siswa Global
     Route::get('/admin/data-siswa-global', [DataSiswaGlobalController::class, 'index']);
     Route::delete('/admin/data-siswa-global/{id}', [DataSiswaGlobalController::class, 'destroy']);
+
+    Route::prefix('admin/data-user')->group(function() {
+        Route::get('/', [App\Http\Controllers\Api\Admin\DataUserController::class, 'index']);
+    });
+
 
     // ==========================================
     // LEVEL 2: ADMIN SEKOLAH API
