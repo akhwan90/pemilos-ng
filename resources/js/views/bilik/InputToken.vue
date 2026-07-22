@@ -4,7 +4,7 @@
       <div class="flex justify-center flex-col items-center">
         <img src="/asset/KPU.png" alt="Logo" class="h-20 w-auto mb-4" />
         <h2 class="text-center text-4xl font-extrabold text-gray-900 tracking-wider">
-          BILIK SUARA
+          BILIK SUARA {{ bilikInfo?.is_luar_sekolah ? '(Luar Sekolah)' : '' }}
         </h2>
         <p class="mt-2 text-center text-lg text-indigo-700 font-bold bg-indigo-100 px-4 py-1 rounded-full">
           {{ bilikInfo?.nama_tps || 'TPS Aktif' }}
@@ -16,12 +16,31 @@
       <div class="bg-white py-10 px-4 shadow-xl border-t-4 border-indigo-600 sm:rounded-lg sm:px-10">
         
         <div class="text-center mb-8">
-          <h3 class="text-lg font-medium text-gray-700">Masukkan Token Pemilih Anda</h3>
-          <p class="text-sm text-gray-500 mt-1">Token 5 karakter yang Anda dapatkan dari panitia</p>
+          <h3 class="text-lg font-medium text-gray-700">Masukkan Data Pemilih Anda</h3>
+          <p class="text-sm text-gray-500 mt-1">Silakan masukkan {{ bilikInfo?.is_luar_sekolah ? 'NISN dan Token' : 'Token' }} Anda</p>
         </div>
 
         <form @submit.prevent="verifyToken" class="space-y-6">
+          <!-- Input NISN khusus Luar Sekolah -->
+          <div v-if="bilikInfo?.is_luar_sekolah">
+            <label class="block text-sm font-medium text-gray-700 text-center mb-2">NISN Anda</label>
+            <div class="flex justify-center">
+              <input 
+                ref="nisnInputRef"
+                v-model="nisnPemilih" 
+                type="text" 
+                class="appearance-none block w-full text-center text-2xl tracking-[0.2em] font-mono px-2 py-3 border-2 border-indigo-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50" 
+                placeholder="Ketik NISN Anda"
+                required 
+                autofocus
+                autocomplete="off"
+              />
+            </div>
+          </div>
+
+          <!-- Input Token -->
           <div>
+            <label v-if="bilikInfo?.is_luar_sekolah" class="block text-sm font-medium text-gray-700 text-center mb-2">Token Pemilihan</label>
             <div class="mt-1 flex justify-center">
               <!-- Kotak Input yang besar agar mudah ditekan di layar sentuh -->
               <input 
@@ -32,14 +51,14 @@
                 class="appearance-none block w-full text-center text-4xl tracking-[0.5em] sm:tracking-[0.8em] font-mono uppercase px-2 py-4 border-2 border-indigo-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50" 
                 placeholder="XXXXX"
                 required 
-                autofocus
+                :autofocus="!bilikInfo?.is_luar_sekolah"
                 autocomplete="off"
               />
             </div>
           </div>
 
           <div>
-            <button type="submit" :disabled="loading || tokenPemilih.length < 5" class="w-full flex justify-center py-4 px-4 border border-transparent rounded-lg shadow-sm text-lg font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:bg-gray-400 transition-colors">
+            <button type="submit" :disabled="loading || tokenPemilih.length < 5 || (bilikInfo?.is_luar_sekolah && !nisnPemilih)" class="w-full flex justify-center py-4 px-4 border border-transparent rounded-lg shadow-sm text-lg font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:bg-gray-400 transition-colors">
               <svg v-if="loading" class="animate-spin -ml-1 mr-3 h-6 w-6 text-white" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>

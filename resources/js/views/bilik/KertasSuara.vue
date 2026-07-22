@@ -137,6 +137,12 @@ onMounted(() => {
   const savedData = localStorage.getItem('pemilih_data');
   if (!savedData) {
     toast.error('Sesi pemilih tidak valid! Silakan masukkan token kembali.');
+    
+    // Jika bilik_info mengatakan ini mode luar sekolah mandiri, arahkan kembali ke login luar sekolah
+    const bilikInfo = JSON.parse(localStorage.getItem('bilik_info') || '{}');
+    if (bilikInfo.is_luar_sekolah_mode) {
+      return router.push('/tpsluarsekolah');
+    }
     return router.push('/tpssekolah/token');
   }
   
@@ -144,12 +150,20 @@ onMounted(() => {
   fetchKandidat();
 });
 
+function getBilikToken() {
+  const bilikInfo = JSON.parse(localStorage.getItem('bilik_info') || '{}');
+  if (bilikInfo.is_luar_sekolah_mode) {
+    return bilikInfo.token_akses;
+  }
+  return localStorage.getItem('bilik_token');
+}
+
 async function fetchKandidat() {
   loadingCalon.value = true;
   try {
     const res = await api.get('/bilik/calon', {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('bilik_token')}`
+        'Authorization': `Bearer ${getBilikToken()}`
       }
     });
     kandidatList.value = res.data.data || [];
@@ -175,7 +189,7 @@ async function submitVote() {
       id_calon: selectedKandidat.value.id
     }, {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('bilik_token')}`
+        'Authorization': `Bearer ${getBilikToken()}`
       }
     });
 
@@ -184,7 +198,17 @@ async function submitVote() {
     // Auto logout sesi si pemilih
     localStorage.removeItem('pemilih_data');
     
-    // Tutup modal dan lempar layar kembali ke form standby Input Token
+    // Cek apakah ini mode Luar Sekolah Mandiri
+    const bilikInfo = JSON.parse(localStorage.getItem('bilik_info') || '{}');
+    
+    if (bilikInfo.is_luar_sekolah_mode) {
+      // Bersihkan semuanya karena ini perangkat pribadinya sendiri
+      localStorage.removeItem('bilik_info');
+      showModal.value = false;
+      return router.push('/tpsluarsekolah');
+    }
+    
+    // Tutup modal dan lempar layar kembali ke form standby Input Token (Bilik Reguler)
     showModal.value = false;
     router.push('/tpssekolah/token');
 

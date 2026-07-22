@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\Bilik\BilikController;
 
 // ========== PUBLIC API (No Auth Required) ==========
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:6,1');
+Route::post('/bilik-luar-sekolah/verify', [BilikController::class, 'verifyLuarSekolah'])->middleware('throttle:10,1');
 
 // ========== ADMIN API (Sanctum Auth Required) ==========
 Route::middleware('auth:sanctum')->group(function () {

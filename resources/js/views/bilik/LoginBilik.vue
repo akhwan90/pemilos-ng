@@ -99,7 +99,8 @@ async function handleLogin() {
     localStorage.setItem('bilik_info', JSON.stringify({
       id_tps: user.id_tps,
       npsn: user.npsn,
-      nama_tps: user.nama_tps || 'TPS'
+      nama_tps: user.nama_tps || 'TPS',
+      is_luar_sekolah: !!user.is_tps_luar_sekolah
     }));
     
     // Arahkan langsung ke halaman input token (standby)

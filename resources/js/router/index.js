@@ -182,8 +182,13 @@ const routes = [
                 path: 'vote',
                 name: 'bilik-kertas-suara',
                 component: () => import('../views/bilik/KertasSuara.vue'),
-            }
+            },
         ]
+    },
+    {
+        path: '/tpsluarsekolah',
+        name: 'tps-luar-sekolah-login',
+        component: () => import('../views/bilik/LoginLuarSekolah.vue'),
     }
 ];
 

@@ -71,6 +71,15 @@ class AuthController extends Controller
         
         Log::info('Login API berhasil: ' . $admin->username);
 
+        // Jika dia Admin TPS (Level 3), ambil info tambahan apakah ini TPS Luar Sekolah
+        $isTpsLuarSekolah = 0;
+        if ((int) $admin->level === 3 && !empty($admin->id_tps)) {
+            $tpsInfo = DB::table('tb_kelas')->where('kd_kelas', $admin->id_tps)->first();
+            if ($tpsInfo) {
+                $isTpsLuarSekolah = $tpsInfo->is_tps_luar_sekolah ?? 0;
+            }
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Login berhasil',
@@ -81,6 +90,7 @@ class AuthController extends Controller
                     'level' => (int) $admin->level,
                     'npsn' => $admin->npsn,
                     'id_tps' => $admin->id_tps,
+                    'is_tps_luar_sekolah' => $isTpsLuarSekolah
                 ],
                 'sekolah' => $sekolahInfo, // Akan null jika bukan level 2
                 'token' => $token
