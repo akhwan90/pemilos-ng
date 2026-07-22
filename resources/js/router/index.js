@@ -165,6 +165,26 @@ const routes = [
             }
         ],
     },
+    {
+        path: '/tpssekolah',
+        children: [
+            {
+                path: 'login',
+                name: 'bilik-login',
+                component: () => import('../views/bilik/LoginBilik.vue'),
+            },
+            {
+                path: 'token',
+                name: 'bilik-input-token',
+                component: () => import('../views/bilik/InputToken.vue'),
+            },
+            {
+                path: 'vote',
+                name: 'bilik-kertas-suara',
+                component: () => import('../views/bilik/KertasSuara.vue'),
+            }
+        ]
+    }
 ];
 
 const router = createRouter({

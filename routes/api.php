@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\AdminSekolah\KandidatController;
 use App\Http\Controllers\Api\AdminSekolah\DataDptController;
 use App\Http\Controllers\Api\AdminSekolah\DokumentasiController;
 use App\Http\Controllers\Api\AdminSekolah\DashboardController;
+use App\Http\Controllers\Api\Bilik\BilikController;
 
 // ========== PUBLIC API (No Auth Required) ==========
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:6,1');
@@ -120,4 +121,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Dashboard Info
     Route::get('/admin-sekolah/dashboard', [DashboardController::class, 'index']);
+
+    // Bilik Suara API (Khusus Level 3)
+    Route::post('/bilik/verify-token', [BilikController::class, 'verifyToken']);
+    Route::get('/bilik/calon', [BilikController::class, 'listCalon']);
+    Route::post('/bilik/submit-vote', [BilikController::class, 'submitVote']);
 });
