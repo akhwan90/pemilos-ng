@@ -7,6 +7,7 @@ use App\Models\Admin;
 use App\Models\Sekolah;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Log;
 
@@ -74,7 +75,7 @@ class AuthController extends Controller
         // Jika dia Admin TPS (Level 3), ambil info tambahan apakah ini TPS Luar Sekolah
         $isTpsLuarSekolah = 0;
         if ((int) $admin->level === 3 && !empty($admin->id_tps)) {
-            $tpsInfo = DB::table('tb_kelas')->where('kd_kelas', $admin->id_tps)->first();
+            $tpsInfo = \Illuminate\Support\Facades\DB::table('tb_kelas')->where('kd_kelas', $admin->id_tps)->first();
             if ($tpsInfo) {
                 $isTpsLuarSekolah = $tpsInfo->is_tps_luar_sekolah ?? 0;
             }

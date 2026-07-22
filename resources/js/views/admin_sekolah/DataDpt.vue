@@ -241,6 +241,7 @@ const pagination = ref({ current_page: 1, last_page: 1, total: 0, per_page: 30 }
 const selectedIds = ref([]); 
 
 const isAddModalOpen = ref(false);
+const isSubmitting = ref(false);
 const isLoadingSiswa = ref(false);
 const siswaBelumDpt = ref([]);
 const searchSiswaBelumDpt = ref('');
