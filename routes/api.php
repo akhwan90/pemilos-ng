@@ -110,6 +110,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/admin-sekolah/dpt/tps-aktif', [DataDptController::class, 'listTpsAktif']);
     Route::post('/admin-sekolah/dpt/bulk-insert', [DataDptController::class, 'storeBulk']);
     Route::post('/admin-sekolah/dpt/bulk-delete', [DataDptController::class, 'destroyBulk']);
+    Route::post('/admin-sekolah/dpt/generate-token', [DataDptController::class, 'generateToken']);
+    Route::post('/admin-sekolah/dpt/cancel-token', [DataDptController::class, 'cancelToken']);
 
     // Dokumentasi Pelaksanaan Pemilos
     Route::get('/admin-sekolah/dokumentasi', [DokumentasiController::class, 'index']);

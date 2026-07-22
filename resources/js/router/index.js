@@ -138,6 +138,33 @@ const routes = [
             }
         ],
     },
+    {
+        path: '/admin-tps',
+        component: () => import('../views/admin/AdminLayout.vue'),
+        meta: { requiresAuth: true, level: 3 }, // Khusus level 3 Admin TPS
+        children: [
+            {
+                path: 'dashboard',
+                name: 'admin-tps-dashboard',
+                component: () => import('../views/admin_sekolah/Dashboard.vue'), // Menggunakan dashboard yang sama dengan sekolah
+            },
+            {
+                path: 'dpt',
+                name: 'admin-tps-data-dpt',
+                component: () => import('../views/admin_sekolah/DataDpt.vue'), // Placeholder
+            },
+            {
+                path: 'laporan-c1',
+                name: 'admin-tps-laporan-c1',
+                component: () => import('../views/admin_sekolah/Dashboard.vue'), // Placeholder
+            },
+            {
+                path: 'laporan-c2',
+                name: 'admin-tps-laporan-c2',
+                component: () => import('../views/admin_sekolah/Dashboard.vue'), // Placeholder
+            }
+        ],
+    },
 ];
 
 const router = createRouter({
@@ -151,11 +178,29 @@ const router = createRouter({
 // Navigation guard for auth
 router.beforeEach((to, from, next) => {
     const token = localStorage.getItem('admin_token');
+    const user = localStorage.getItem('admin_user') ? JSON.parse(localStorage.getItem('admin_user')) : null;
 
     if (to.meta.requiresAuth && !token) {
         next('/admin/login');
     } else if (to.path === '/admin/login' && token) {
-        next('/admin/dashboard');
+        if (user && parseInt(user.level) === 2) {
+            next('/admin-sekolah/dashboard');
+        } else if (user && parseInt(user.level) === 3) {
+            next('/admin-tps/dashboard');
+        } else {
+            next('/admin/dashboard');
+        }
+    } else if (to.meta.requiresAuth && token) {
+        // Cek permission level jika route mensyaratkan level tertentu (seperti meta: { level: 2 })
+        if (to.meta.level && user && parseInt(user.level) !== to.meta.level) {
+            // Redirect sesuai hak akses aslinya jika nyasar
+            if (parseInt(user.level) === 1) next('/admin/dashboard');
+            else if (parseInt(user.level) === 2) next('/admin-sekolah/dashboard');
+            else if (parseInt(user.level) === 3) next('/admin-tps/dashboard');
+            else next('/admin/login'); // fallback aman
+        } else {
+            next();
+        }
     } else {
         next();
     }

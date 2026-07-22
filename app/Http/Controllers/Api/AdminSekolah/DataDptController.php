@@ -7,8 +7,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Exception;
 
+use App\Services\GenerateTokenService;
+
 class DataDptController extends Controller
 {
+    protected $generateTokenService;
+
+    public function __construct(GenerateTokenService $generateTokenService)
+    {
+        $this->generateTokenService = $generateTokenService;
+    }
     // List DPT (tb_siswa_tps yang dijoin ke tb_siswa)
     public function index(Request $request)
     {
@@ -16,13 +24,42 @@ class DataDptController extends Controller
         $tahun = env('TAHUN_AKTIF', date('Y'));
         $search = $request->query('cari');
         $filterTps = $request->query('tps_id');
+        $belumMemilih = $request->query('belum_memilih') === 'true';
+
+        // Hitung rekapan (sebelum limit dan offset untuk pagination)
+        $rekapQuery = DB::table('tb_siswa_tps')
+            ->where('npsn', $npsn)
+            ->where('tahun', $tahun);
+        
+        if ($request->user()->level == 3) {
+            $rekapQuery->where('id_tps', $request->user()->id_tps);
+        } else if ($filterTps) {
+            $rekapQuery->where('id_tps', $filterTps);
+        }
+
+        $totalPemilih = $rekapQuery->count();
+        $sudahMemilih = (clone $rekapQuery)->whereNotNull('pilihan')->count();
+        $belumMemilihCount = $totalPemilih - $sudahMemilih;
 
         $query = DB::table('tb_siswa_tps as st')
             ->join('tb_siswa as s', 'st.nisn', '=', 's.nisn')
             ->leftJoin('tb_kelas as k', 'st.id_tps', '=', 'k.kd_kelas')
             ->where('st.npsn', $npsn)
-            ->where('st.tahun', $tahun)
-            ->select(
+            ->where('st.tahun', $tahun);
+
+        // Jika user adalah Admin TPS (Level 3), paksa filter query ke TPS-nya sendiri
+        if ($request->user()->level == 3) {
+            $query->where('st.id_tps', $request->user()->id_tps);
+        } else if ($filterTps) {
+            // Hanya izinkan filter by parameter jika dia Admin Sekolah (Level 2)
+            $query->where('st.id_tps', $filterTps);
+        }
+
+        if ($belumMemilih) {
+            $query->whereNull('st.pilihan');
+        }
+
+        $query->select(
                 'st.id', 
                 'st.nisn', 
                 's.nm_siswa', 
@@ -35,20 +72,23 @@ class DataDptController extends Controller
                 'st.waktu_pilih'
             );
 
-        if ($filterTps) {
-            $query->where('st.id_tps', $filterTps);
-        }
-
         if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('st.nisn', 'like', "%{$search}%")
-                  ->orWhere('s.nm_siswa', 'like', "%{$search}%");
+            $query->where(function($q) use ($search) {
+                $q->where('s.nm_siswa', 'like', '%' . $search . '%')
+                  ->orWhere('st.nisn', 'like', '%' . $search . '%');
             });
         }
 
+        $data = $query->paginate(30);
+
         return response()->json([
             'success' => true,
-            'data' => $query->paginate(30)
+            'data' => $data,
+            'rekap' => [
+                'total' => $totalPemilih,
+                'sudah_memilih' => $sudahMemilih,
+                'belum_memilih' => $belumMemilihCount
+            ]
         ]);
     }
 
@@ -161,6 +201,21 @@ class DataDptController extends Controller
             'ids' => 'required|array|min:1' // Array dari id tb_siswa_tps
         ]);
 
+        // Cek apakah ada di antara ID yang dipilih sudah memiliki token (sudah generate token)
+        $hasToken = DB::table('tb_siswa_tps')
+            ->where('npsn', $npsn)
+            ->where('tahun', $tahun)
+            ->whereIn('id', $request->ids)
+            ->whereNotNull('token')
+            ->exists();
+
+        if ($hasToken) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tidak dapat menghapus DPT! Terdapat siswa yang sudah di-generate tokennya.'
+            ], 422);
+        }
+
         DB::table('tb_siswa_tps')
             ->where('npsn', $npsn)
             ->where('tahun', $tahun)
@@ -171,5 +226,77 @@ class DataDptController extends Controller
             'success' => true,
             'message' => 'Data DPT berhasil dihapus'
         ]);
+    }
+
+    /**
+     * Endpoint untuk Generate Token DPT per TPS
+     */
+    public function generateToken(Request $request)
+    {
+        $user = $request->user();
+        $npsn = $user->npsn;
+        $tahun = env('TAHUN_AKTIF', date('Y'));
+
+        // Jika user adalah admin sekolah (level 2), mereka harus menyertakan id_tps di body
+        // Jika user adalah admin tps (level 3), id_tps otomatis diambil dari field id_tps mereka sendiri
+        $idTps = $user->level == 3 ? $user->id_tps : $request->input('id_tps');
+
+        if (!$idTps) {
+            return response()->json([
+                'success' => false,
+                'message' => 'ID TPS harus disertakan.'
+            ], 422);
+        }
+
+        $result = $this->generateTokenService->generateForTps($idTps, $npsn, $tahun);
+
+        if ($result['success']) {
+            return response()->json($result);
+        } else {
+            return response()->json($result, 400);
+        }
+    }
+
+    /**
+     * Endpoint untuk Batal Generate Token DPT per TPS
+     */
+    public function cancelToken(Request $request)
+    {
+        $user = $request->user();
+        $npsn = $user->npsn;
+        $tahun = env('TAHUN_AKTIF', date('Y'));
+
+        $idTps = $user->level == 3 ? $user->id_tps : $request->input('id_tps');
+
+        if (!$idTps) {
+            return response()->json([
+                'success' => false,
+                'message' => 'ID TPS harus disertakan.'
+            ], 422);
+        }
+
+        // Cek apakah ada siswa di TPS ini yang sudah terlanjur memilih.
+        // Jika ada, maka rollback token tidak diizinkan.
+        $hasVoted = DB::table('tb_siswa_tps')
+            ->where('id_tps', $idTps)
+            ->where('npsn', $npsn)
+            ->where('tahun', $tahun)
+            ->whereNotNull('pilihan')
+            ->exists();
+            
+        if ($hasVoted) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal membatalkan token! Terdapat pemilih di TPS ini yang sudah menggunakan hak pilihnya (mencoblos).'
+            ], 422);
+        }
+
+        $result = $this->generateTokenService->cancelForTps($idTps, $npsn, $tahun);
+
+        if ($result['success']) {
+            return response()->json($result);
+        } else {
+            return response()->json($result, 400);
+        }
     }
 }

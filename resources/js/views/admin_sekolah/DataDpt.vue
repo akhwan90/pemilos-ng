@@ -7,6 +7,22 @@
       </div>
     </div>
 
+    <!-- Rekapitulasi Data (Hanya tampil untuk Level 3 / TPS) -->
+    <div v-if="auth.user?.level === 3" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div class="bg-white rounded-lg shadow-sm p-4 border-l-4 border-blue-500">
+        <p class="text-sm text-gray-500 font-medium">Total Pemilih</p>
+        <p class="text-3xl font-bold text-gray-800">{{ rekapData.total }}</p>
+      </div>
+      <div class="bg-white rounded-lg shadow-sm p-4 border-l-4 border-green-500">
+        <p class="text-sm text-gray-500 font-medium">Sudah Memilih</p>
+        <p class="text-3xl font-bold text-green-600">{{ rekapData.sudah_memilih }}</p>
+      </div>
+      <div class="bg-white rounded-lg shadow-sm p-4 border-l-4 border-red-500">
+        <p class="text-sm text-gray-500 font-medium">Belum Memilih</p>
+        <p class="text-3xl font-bold text-red-600">{{ rekapData.belum_memilih }}</p>
+      </div>
+    </div>
+
     <!-- Toolbar Atas -->
     <BaseCard class="p-0">
       <div class="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 flex-wrap gap-4">
@@ -27,6 +43,18 @@
           </div>
           <BaseButton variant="secondary" @click="fetchDpt(1)" class="!py-2 text-sm shadow-sm">Cari</BaseButton>
           
+          <template v-if="auth.user?.level === 3">
+            <label class="flex items-center gap-2 text-sm text-gray-700 ml-4 cursor-pointer">
+              <input type="checkbox" v-model="filterBelumMemilih" @change="fetchDpt(1)" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+              Hanya yang Belum Memilih
+            </label>
+
+            <label class="flex items-center gap-2 text-sm text-gray-700 ml-2 cursor-pointer border-l border-gray-300 pl-4">
+              <input type="checkbox" v-model="isAutoRefreshEnabled" class="rounded border-gray-300 text-green-600 focus:ring-green-500">
+              <span :class="isAutoRefreshEnabled ? 'text-green-700 font-medium' : 'text-gray-500'">Auto Refresh (10s)</span>
+            </label>
+          </template>
+          
           <!-- Tombol Hapus Bulk Terpilih -->
           <BaseButton v-if="selectedIds.length > 0" variant="danger" @click="submitBulkDelete" class="!py-2 text-sm shadow-sm flex gap-1 items-center">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
@@ -34,11 +62,23 @@
           </BaseButton>
         </div>
 
-        <!-- Kolom Kanan: Tombol Tambah DPT -->
-        <BaseButton variant="primary" @click="openAddDptModal" class="!py-2 shadow-sm flex items-center gap-2">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-          Tambah DPT Baru
-        </BaseButton>
+        <!-- Kolom Kanan: Tombol Tambah DPT / Generate Token -->
+        <template v-if="auth.user?.level === 2">
+          <BaseButton variant="primary" @click="openAddDptModal" class="!py-2 shadow-sm flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            Tambah DPT Baru
+          </BaseButton>
+        </template>
+        <template v-else-if="auth.user?.level === 3">
+          <BaseButton variant="success" @click="generateToken" class="!py-2 shadow-sm flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
+            Generate Token
+          </BaseButton>
+          <BaseButton variant="danger" @click="cancelToken" class="!py-2 shadow-sm flex items-center gap-2" title="Batal Generate Token">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            Batal
+          </BaseButton>
+        </template>
       </div>
 
       <!-- Tabel DPT -->
@@ -54,26 +94,28 @@
               <th class="px-4 py-3 text-center">L/P</th>
               <th class="px-4 py-3">Kelas Asal</th>
               <th class="px-4 py-3 text-center bg-indigo-50 border-l border-r border-indigo-100 text-indigo-800">TPS Saat Ini</th>
+              <th class="px-4 py-3 text-center">Token</th>
               <th class="px-4 py-3 text-center">Status Pilih</th>
-              <th class="px-4 py-3 w-20 text-center">Aksi</th>
+              <th v-if="auth.user?.level === 2" class="px-4 py-3 w-20 text-center">Aksi</th>
             </tr>
           </thead>
           <tbody>
             <tr v-if="isLoading" class="bg-white border-b">
-              <td colspan="8" class="px-4 py-8 text-center text-gray-500">Memuat data DPT...</td>
+              <td :colspan="auth.user?.level === 2 ? 9 : 8" class="px-4 py-8 text-center text-gray-500">Memuat data DPT...</td>
             </tr>
             <tr v-else-if="items.length === 0" class="bg-white border-b">
-              <td colspan="8" class="px-4 py-8 text-center text-gray-500">Data DPT kosong. Silakan tambah DPT baru.</td>
+              <td :colspan="auth.user?.level === 2 ? 9 : 8" class="px-4 py-8 text-center text-gray-500">Data DPT kosong. Silakan tambah DPT baru.</td>
             </tr>
             <tr v-else v-for="item in items" :key="item.id" class="bg-white border-b hover:bg-gray-50" :class="{ 'bg-indigo-50': selectedIds.includes(item.id) }">
               <td class="px-4 py-3 text-center">
                 <input type="checkbox" :value="item.id" v-model="selectedIds" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
               </td>
               <td class="px-4 py-3 font-mono text-gray-600">{{ item.nisn }}</td>
-              <td class="px-4 py-3 font-bold text-gray-800">{{ item.nm_siswa }}</td>
-              <td class="px-4 py-3 text-center font-bold" :class="item.jk == 1 ? 'text-blue-600' : 'text-pink-500'">{{ item.jk == 1 ? 'L' : 'P' }}</td>
+              <td class="px-4 py-3 font-medium text-gray-800">{{ item.nm_siswa }}</td>
+              <td class="px-4 py-3 text-center">{{ item.jk }}</td>
               <td class="px-4 py-3">{{ item.nama_kelas_asal }}</td>
               <td class="px-4 py-3 text-center font-bold bg-indigo-50 border-l border-r border-indigo-100 text-indigo-700">{{ item.nama_tps }}</td>
+              <td class="px-4 py-3 text-center font-mono font-bold tracking-widest text-indigo-600 bg-gray-50">{{ item.token || '-' }}</td>
               <td class="px-4 py-3 text-center">
                 <span v-if="item.pilihan" class="px-2 py-1 text-xs font-semibold rounded bg-green-100 text-green-800 flex items-center justify-center gap-1">
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
@@ -81,8 +123,8 @@
                 </span>
                 <span v-else class="px-2 py-1 text-xs font-semibold rounded bg-gray-100 text-gray-600">Belum</span>
               </td>
-              <td class="px-4 py-3 text-center">
-                <button @click="submitSingleDelete(item.id, item.pilihan)" class="text-red-600 hover:text-red-900 bg-red-50 px-2 py-1 rounded text-xs">Keluarkan</button>
+              <td v-if="auth.user?.level === 2" class="px-4 py-3 text-center">
+                <button @click="submitSingleDelete(item.id, item.pilihan, item.token)" class="text-red-600 hover:text-red-900 bg-red-50 px-2 py-1 rounded text-xs">Keluarkan</button>
               </td>
             </tr>
           </tbody>
@@ -185,8 +227,10 @@ import BaseButton from '../../components/BaseButton.vue';
 import BaseModal from '../../components/BaseModal.vue';
 import api from '../../services/api';
 import { useToast } from '../../composables/useToast';
+import { useAuthStore } from '../../stores/auth';
 
 const toast = useToast();
+const auth = useAuthStore();
 
 const items = ref([]);
 const isLoading = ref(false);
@@ -202,7 +246,9 @@ const siswaBelumDpt = ref([]);
 const searchSiswaBelumDpt = ref('');
 const selectedNisnToDpt = ref([]);
 const targetTpsId = ref('');
-const isSubmitting = ref(false);
+const filterBelumMemilih = ref(false);
+const isAutoRefreshEnabled = ref(false);
+const rekapData = ref({ total: 0, sudah_memilih: 0, belum_memilih: 0 });
 
 const isAllSelected = computed(() => {
   return items.value.length > 0 && selectedIds.value.length === items.value.length;
@@ -223,9 +269,24 @@ const isAllSiswaModalSelected = computed(() => {
   return visible.length > 0 && visible.every(s => selectedNisnToDpt.value.includes(s.nisn));
 });
 
+let refreshInterval = null;
+
 onMounted(() => {
   fetchListTps();
   fetchDpt(1);
+  
+  // Auto refresh setiap 10 detik
+  refreshInterval = setInterval(() => {
+    // Jangan refresh jika fitur dimatikan, user sedang mengetik pencarian, atau menyeleksi checkbox
+    if (isAutoRefreshEnabled.value && !searchQuery.value && selectedIds.value.length === 0) {
+      fetchDpt(pagination.value.current_page, false); // pass false agar tidak memunculkan indikator loading yang mengganggu
+    }
+  }, 10000);
+});
+
+import { onUnmounted } from 'vue';
+onUnmounted(() => {
+  if (refreshInterval) clearInterval(refreshInterval);
 });
 
 async function fetchListTps() {
@@ -237,22 +298,55 @@ async function fetchListTps() {
   }
 }
 
-async function fetchDpt(page = 1) {
-  isLoading.value = true;
+const generateToken = async () => {
+  if (!confirm('Apakah Anda yakin ingin meng-generate token baru untuk seluruh DPT di TPS Anda?\n\nToken lama (jika ada) akan hangus/diganti.')) {
+    return;
+  }
+
   try {
-    const res = await api.get(`/admin-sekolah/dpt?page=${page}&cari=${searchQuery.value}&tps_id=${filterTps.value}`);
+    const res = await api.post('/admin-sekolah/dpt/generate-token');
+    toast.success(res.data.message || 'Token berhasil di-generate', 'Sukses');
+    fetchDpt(pagination.value.current_page);
+  } catch (error) {
+    toast.error(error.response?.data?.message || 'Gagal melakukan generate token', 'Error');
+  }
+};
+
+const cancelToken = async () => {
+  if (!confirm('Yakin ingin membatalkan/menghapus token untuk SELURUH DPT di TPS ini?')) {
+    return;
+  }
+
+  try {
+    const res = await api.post('/admin-sekolah/dpt/cancel-token');
+    toast.success(res.data.message || 'Token berhasil dibatalkan', 'Sukses');
+    fetchDpt(pagination.value.current_page);
+  } catch (error) {
+    toast.error(error.response?.data?.message || 'Gagal membatalkan token', 'Error');
+  }
+};
+
+async function fetchDpt(page = 1, showLoading = true) {
+  if (showLoading) isLoading.value = true;
+  try {
+    const res = await api.get(`/admin-sekolah/dpt?page=${page}&cari=${searchQuery.value}&tps_id=${filterTps.value}&belum_memilih=${filterBelumMemilih.value}`);
     items.value = res.data.data.data;
+    if (res.data.rekap) {
+      rekapData.value = res.data.rekap;
+    }
     pagination.value = {
       current_page: res.data.data.current_page,
       last_page: res.data.data.last_page,
       total: res.data.data.total,
       per_page: res.data.data.per_page
     };
-    selectedIds.value = []; 
+    
+    // Jangan mereset selectedIds saat silent refresh berjalan (agar checklist tidak hilang)
+    if (showLoading) selectedIds.value = []; 
   } catch (error) {
-    toast.error('Gagal memuat Data DPT');
+    if (showLoading) toast.error('Gagal memuat Data DPT');
   } finally {
-    isLoading.value = false;
+    if (showLoading) isLoading.value = false;
   }
 }
 
@@ -335,13 +429,16 @@ async function submitBulkDelete() {
     toast.success(res.data.message);
     fetchDpt(pagination.value.current_page);
   } catch (e) {
-    toast.error('Gagal menghapus data DPT');
+    toast.error(e.response?.data?.message || 'Gagal menghapus data DPT');
   }
 }
 
-async function submitSingleDelete(id, isSudahMemilih) {
+async function submitSingleDelete(id, isSudahMemilih, token) {
   if (isSudahMemilih) {
     return toast.error('Siswa ini sudah menggunakan hak pilihnya (Sudah Mencoblos). Tidak bisa dikeluarkan dari DPT!');
+  }
+  if (token) {
+    return toast.error('Siswa ini sudah memiliki token pemilihan. Silakan hubungi TPS terkait atau reset token terlebih dahulu.');
   }
   if (!confirm('Keluarkan siswa ini dari TPS?')) return;
 
@@ -352,7 +449,7 @@ async function submitSingleDelete(id, isSudahMemilih) {
     toast.success('Berhasil dikeluarkan dari DPT');
     fetchDpt(pagination.value.current_page);
   } catch (e) {
-    toast.error('Gagal menghapus');
+    toast.error(e.response?.data?.message || 'Gagal menghapus');
   }
 }
 </script>

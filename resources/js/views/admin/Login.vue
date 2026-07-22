@@ -121,7 +121,13 @@ async function handleLogin() {
     
     // Gunakan window.location untuk force redirect sekaligus me-refresh state router 
     // jika Vue Router (navigation guard) terkadang telat membaca perubahan localStorage
-    window.location.href = '/admin/dashboard';
+    if (auth.user && parseInt(auth.user.level) === 2) {
+      window.location.href = '/admin-sekolah/dashboard';
+    } else if (auth.user && parseInt(auth.user.level) === 3) {
+      window.location.href = '/admin-tps/dashboard';
+    } else {
+      window.location.href = '/admin/dashboard';
+    }
   } catch (e) {
     if (e.response?.status === 422 && e.response?.data?.errors?.captcha) {
       errorMsg.value = e.response.data.errors.captcha[0];

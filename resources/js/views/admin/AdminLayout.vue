@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-50 flex">
+  <div class="h-screen bg-gray-50 flex overflow-hidden">
     <!-- Sidebar -->
     <aside class="w-64 bg-white border-r border-gray-200 flex flex-col flex-shrink-0">
       <!-- Logo -->
@@ -104,6 +104,37 @@
             :class="$route.path.startsWith('/admin-sekolah/dokumentasi') ? 'bg-pink-50 text-pink-700' : 'text-gray-600 hover:bg-gray-100'">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
             Dokumentasi
+          </router-link>
+        </template>
+
+        <!-- Nav (Level 3: Admin TPS) -->
+        <template v-if="auth.user?.level === 3">
+          <router-link to="/admin-tps/dashboard" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+            :class="$route.path.startsWith('/admin-tps/dashboard') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-100'">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+            Dashboard
+          </router-link>
+
+          <router-link to="/admin-tps/dpt" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+            :class="$route.path.startsWith('/admin-tps/dpt') ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-100'">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+            Data DPT
+          </router-link>
+
+          <div class="px-3 pt-4 pb-2">
+            <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Laporan</span>
+          </div>
+
+          <router-link to="/admin-tps/laporan-c1" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+            :class="$route.path.startsWith('/admin-tps/laporan-c1') ? 'bg-emerald-50 text-emerald-700' : 'text-gray-600 hover:bg-gray-100'">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+            Laporan C1
+          </router-link>
+
+          <router-link to="/admin-tps/laporan-c2" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+            :class="$route.path.startsWith('/admin-tps/laporan-c2') ? 'bg-purple-50 text-purple-700' : 'text-gray-600 hover:bg-gray-100'">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+            Laporan C2
           </router-link>
         </template>
       </nav>
