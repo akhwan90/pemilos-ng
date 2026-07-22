@@ -131,15 +131,20 @@ class BilikController extends Controller
         $idSiswaTps = $request->id_siswa_tps;
         $idCalon = $request->id_calon;
 
-        // Validasi ekstra:
-        // 1. Pastikan siswa_tps ini memang berada di TPS yang me-request ini
-        // 2. Pastikan belum pernah milih sebelumnya (Double Vote Protection)
-        $dpt = DB::table('tb_siswa_tps')
+        // Cek apakah request ini berasal dari token sementara luar sekolah
+        $isLuarSekolahToken = $user->currentAccessToken()->can('submit-vote');
+
+        $dptQuery = DB::table('tb_siswa_tps')
             ->where('id', $idSiswaTps)
-            ->where('id_tps', $idTps)
             ->where('npsn', $npsn)
-            ->where('tahun', $tahun)
-            ->first();
+            ->where('tahun', $tahun);
+            
+        if (!$isLuarSekolahToken) {
+            // Untuk bilik reguler, pastikan id_tps cocok secara eksak dengan bilik login saat ini
+            $dptQuery->where('id_tps', $idTps);
+        }
+
+        $dpt = $dptQuery->first();
 
         if (!$dpt) {
             return response()->json(['success' => false, 'message' => 'Data Pemilih tidak sah.'], 400);
