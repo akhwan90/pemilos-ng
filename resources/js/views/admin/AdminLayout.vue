@@ -1,7 +1,7 @@
 <template>
   <div class="h-screen bg-gray-50 flex overflow-hidden">
     <!-- Sidebar -->
-    <aside class="w-64 bg-white border-r border-gray-200 flex flex-col flex-shrink-0">
+    <aside class="w-64 bg-white border-r border-gray-200 flex flex-col flex-shrink-0 print:hidden">
       <!-- Logo -->
       <div class="p-4 border-b border-gray-200">
         <router-link to="/admin/dashboard" class="flex items-center gap-3">
