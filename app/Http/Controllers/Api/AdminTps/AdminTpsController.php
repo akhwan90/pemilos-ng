@@ -418,7 +418,7 @@ class AdminTpsController extends Controller
         }
 
         // Ambil info nama kelas (TPS)
-        $namaKelas = DB::table('tb_kelas')->where('id', $tpsId)->value('nama_kelas');
+        $namaKelas = DB::table('tb_kelas')->where('kd_kelas', $tpsId)->value('nm_kelas');
 
         return response()->json([
             'success' => true,
