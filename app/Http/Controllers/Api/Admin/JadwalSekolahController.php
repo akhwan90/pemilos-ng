@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class JadwalSekolahController extends Controller
 {
-    // Daftar jenis setting yang wajib ada
+    // Daftar jenis setting yang wajib ada (fallback jika config tidak ada)
     private $jenisSettings = [
         'input_data_dps',
         'pengumuman_data_dps',
@@ -19,6 +19,26 @@ class JadwalSekolahController extends Controller
         'generate_token',
         'pemilihan'
     ];
+
+    // Mengambil daftar jenis setting beserta label & deskripsi dari config
+    private function getJenisSettings()
+    {
+        $config = config('pemilos.jenis_jadwal', []);
+        
+        // Fallback jika file config belum terload atau kosong
+        if (empty($config)) {
+            $fallback = [];
+            foreach ($this->jenisSettings as $jenis) {
+                $fallback[$jenis] = [
+                    'label' => ucwords(str_replace('_', ' ', $jenis)),
+                    'deskripsi' => ''
+                ];
+            }
+            return $fallback;
+        }
+        
+        return $config;
+    }
 
     public function index($npsn)
     {
@@ -42,15 +62,23 @@ class JadwalSekolahController extends Controller
             })
             ->keyBy('jenis');
 
+        $jenisConfig = $this->getJenisSettings();
+        $jenisKeys = array_keys($jenisConfig);
+
         $result = [];
-        foreach ($this->jenisSettings as $jenis) {
+        foreach ($jenisKeys as $jenis) {
             if ($existingData->has($jenis)) {
-                $result[] = $existingData[$jenis];
+                $item = $existingData[$jenis];
+                $item->label = $jenisConfig[$jenis]['label'] ?? $jenis;
+                $item->deskripsi = $jenisConfig[$jenis]['deskripsi'] ?? '';
+                $result[] = $item;
             } else {
                 // Return dummy empty structure kalau belum disetting
                 $result[] = [
                     'id' => null,
                     'jenis' => $jenis,
+                    'label' => $jenisConfig[$jenis]['label'] ?? $jenis,
+                    'deskripsi' => $jenisConfig[$jenis]['deskripsi'] ?? '',
                     'jenjang' => null, // akan diisi saat save
                     'waktu_mulai' => null,
                     'waktu_selesai' => null,
@@ -81,8 +109,10 @@ class JadwalSekolahController extends Controller
 
         DB::beginTransaction();
         try {
+            $jenisKeys = array_keys($this->getJenisSettings());
+            
             foreach ($settings as $item) {
-                if (!in_array($item['jenis'], $this->jenisSettings)) continue;
+                if (!in_array($item['jenis'], $jenisKeys)) continue;
 
                 // Cek apakah data sudah ada
                 $existing = DB::table('tb_setting_waktu_pemilihan')
