@@ -65,9 +65,9 @@ class GenerateTokenService
                     ]);
             }
 
-            // 3. Update status TPS (tb_kelas_generate_token)
+            // 3. Update status TPS (tb_tps_setting)
             // Cek apakah data generate token untuk kelas ini sudah ada
-            $cekKelas = DB::table('tb_kelas_generate_token')
+            $cekKelas = DB::table('tb_tps_setting')
                 ->where('id_kelas', $idTps)
                 ->where('npsn', $npsn)
                 ->where('tahun', $tahun)
@@ -77,7 +77,7 @@ class GenerateTokenService
 
             if ($cekKelas) {
                 // Update record yang sudah ada
-                DB::table('tb_kelas_generate_token')
+                DB::table('tb_tps_setting')
                     ->where('id_kelas', $idTps)
                     ->where('tahun', $tahun)
                     ->update([
@@ -86,7 +86,7 @@ class GenerateTokenService
                     ]);
             } else {
                 // Insert baru
-                DB::table('tb_kelas_generate_token')->insert([
+                DB::table('tb_tps_setting')->insert([
                     'id_kelas' => $idTps,
                     'npsn' => $npsn,
                     'tahun' => $tahun,
@@ -135,7 +135,7 @@ class GenerateTokenService
                 ]);
 
             // 2. Update status kelas/TPS menjadi belum generate token
-            DB::table('tb_kelas_generate_token')
+            DB::table('tb_tps_setting')
                 ->where('id_kelas', $idTps)
                 ->where('npsn', $npsn)
                 ->where('tahun', $tahun)
