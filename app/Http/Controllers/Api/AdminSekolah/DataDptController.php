@@ -8,14 +8,17 @@ use Illuminate\Support\Facades\DB;
 use Exception;
 
 use App\Services\GenerateTokenService;
+use App\Services\WaktuPemilihanService;
 
 class DataDptController extends Controller
 {
     protected $generateTokenService;
+    protected $waktuPemilihanService;
 
-    public function __construct(GenerateTokenService $generateTokenService)
+    public function __construct(GenerateTokenService $generateTokenService, WaktuPemilihanService $waktuPemilihanService)
     {
         $this->generateTokenService = $generateTokenService;
+        $this->waktuPemilihanService = $waktuPemilihanService;
     }
     // List DPT (tb_siswa_tps yang dijoin ke tb_siswa)
     public function index(Request $request)
@@ -143,6 +146,11 @@ class DataDptController extends Controller
     {
         $npsn = $request->user()->npsn;
         $tahun = env('TAHUN_AKTIF', date('Y'));
+        
+        $cek = $this->waktuPemilihanService->cekJadwalBuka('input_data_dpt', $tahun, $npsn);
+        if (!$cek['is_open']) {
+            return response()->json(['success' => false, 'message' => 'Penambahan DPT ditolak: ' . $cek['message']], 403);
+        }
 
         $request->validate([
             'id_tps' => 'required|integer',
@@ -196,6 +204,11 @@ class DataDptController extends Controller
     {
         $npsn = $request->user()->npsn;
         $tahun = env('TAHUN_AKTIF', date('Y'));
+        
+        $cek = $this->waktuPemilihanService->cekJadwalBuka('input_data_dpt', $tahun, $npsn);
+        if (!$cek['is_open']) {
+            return response()->json(['success' => false, 'message' => 'Penghapusan DPT ditolak: ' . $cek['message']], 403);
+        }
 
         $request->validate([
             'ids' => 'required|array|min:1' // Array dari id tb_siswa_tps
