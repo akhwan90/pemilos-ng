@@ -482,8 +482,10 @@ function formatDate(dateString) {
         year: "numeric",
         month: "long",
         day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
     };
-    return new Date(dateString).toLocaleDateString("id-ID", options);
+    return new Date(dateString).toLocaleDateString("id-ID", options).replace(/\./g, ':');
 }
 
 async function fetchDashboardInfo() {
