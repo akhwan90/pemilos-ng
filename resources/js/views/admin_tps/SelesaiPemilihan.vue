@@ -121,15 +121,11 @@
 import { ref, onMounted, computed } from 'vue';
 import api from '../../services/api';
 import { useAuthStore } from '../../stores/auth';
+import { useNotificationStore } from '../../stores/notification';
 import moment from 'moment';
 
 const authStore = useAuthStore();
-// notifStore diganti alert karena gesit pakai manual atau BaseModal (tapi alert cukup)
-const notifStore = {
-    showNotification: (msg, type) => {
-        alert((type === 'error' ? 'ERROR: ' : 'SUKSES: ') + msg);
-    }
-};
+const notifStore = useNotificationStore();
 
 const loading = ref(false);
 const showConfirmModal = ref(false);

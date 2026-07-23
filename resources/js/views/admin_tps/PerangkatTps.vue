@@ -132,13 +132,10 @@
 import { ref, onMounted } from 'vue';
 import api from '../../services/api';
 import { useAuthStore } from '../../stores/auth';
+import { useNotificationStore } from '../../stores/notification';
 
 const authStore = useAuthStore();
-const notifStore = {
-    showNotification: (msg, type) => {
-        alert((type === 'error' ? 'ERROR: ' : 'SUKSES: ') + msg);
-    }
-};
+const notifStore = useNotificationStore();
 
 const loading = ref(false);
 const tpsName = ref(authStore.user?.nama || 'TPS');
