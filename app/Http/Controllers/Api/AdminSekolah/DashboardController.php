@@ -34,7 +34,13 @@ class DashboardController extends Controller
         // Cek status aktif
         $now = Carbon::now()->startOfDay();
 
+        // Ambil label & deskripsi dari config
+        $jenisConfig = config('pemilos.jenis_jadwal', []);
+
         foreach ($jadwal as $j) {
+            $j->label = $jenisConfig[$j->jenis]['label'] ?? $j->jenis;
+            $j->deskripsi = $jenisConfig[$j->jenis]['deskripsi'] ?? '';
+
             $mulai = Carbon::parse($j->waktu_mulai)->startOfDay();
             $selesai = Carbon::parse($j->waktu_selesai)->endOfDay();
 
