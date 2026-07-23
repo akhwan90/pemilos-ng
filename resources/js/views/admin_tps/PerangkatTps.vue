@@ -1,0 +1,141 @@
+<template>
+    <div class="space-y-6">
+        <div class="flex items-center justify-between">
+            <h1 class="text-2xl font-bold text-gray-900">Perangkat TPS</h1>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 md:p-8">
+            <div class="max-w-3xl mx-auto">
+                <div class="mb-8">
+                    <p class="text-gray-500">
+                        Atur susunan petugas kepanitiaan (Perangkat TPS) yang bertugas di {{ tpsName }} pada periode ini. Data ini akan ditampilkan pada dokumen Berita Acara.
+                    </p>
+                </div>
+
+                <form @submit.prevent="savePerangkat" class="space-y-8">
+                    <!-- Ketua -->
+                    <div class="bg-indigo-50/50 border border-indigo-100 p-6 rounded-xl">
+                        <h3 class="text-lg font-bold text-indigo-900 mb-4 flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                            Ketua TPS
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
+                                <input type="text" v-model="form.ketua.nama" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Masukkan nama ketua">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">NIS / Identitas</label>
+                                <input type="text" v-model="form.ketua.identitas" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Masukkan NIS/NIK">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Anggota 1 -->
+                    <div class="bg-gray-50 border border-gray-200 p-6 rounded-xl">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                            Anggota TPS 1
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
+                                <input type="text" v-model="form.anggota_1.nama" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Masukkan nama anggota 1">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">NIS / Identitas</label>
+                                <input type="text" v-model="form.anggota_1.identitas" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Masukkan NIS/NIK">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Anggota 2 -->
+                    <div class="bg-gray-50 border border-gray-200 p-6 rounded-xl">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                            Anggota TPS 2
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
+                                <input type="text" v-model="form.anggota_2.nama" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Masukkan nama anggota 2">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">NIS / Identitas</label>
+                                <input type="text" v-model="form.anggota_2.identitas" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Masukkan NIS/NIK">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-4 border-t border-gray-200 flex justify-end">
+                        <button 
+                            type="submit" 
+                            :disabled="loading"
+                            class="inline-flex items-center gap-2 px-6 py-2.5 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                        >
+                            <svg v-if="loading" class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            Simpan Perangkat
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue';
+import api from '../../services/api';
+import { useAuthStore } from '../../stores/auth';
+
+const authStore = useAuthStore();
+const notifStore = {
+    showNotification: (msg, type) => {
+        alert((type === 'error' ? 'ERROR: ' : 'SUKSES: ') + msg);
+    }
+};
+
+const loading = ref(false);
+const tpsName = ref(authStore.user?.nama || 'TPS');
+
+const form = ref({
+    ketua: { nama: '', identitas: '' },
+    anggota_1: { nama: '', identitas: '' },
+    anggota_2: { nama: '', identitas: '' }
+});
+
+onMounted(() => {
+    fetchPerangkat();
+});
+
+async function fetchPerangkat() {
+    try {
+        const res = await api.get('/admin-tps/perangkat');
+        if (res.data.success && res.data.data) {
+            form.value = {
+                ketua: res.data.data.ketua || { nama: '', identitas: '' },
+                anggota_1: res.data.data.anggota_1 || { nama: '', identitas: '' },
+                anggota_2: res.data.data.anggota_2 || { nama: '', identitas: '' }
+            };
+        }
+    } catch (error) {
+        console.error('Gagal memuat perangkat TPS:', error);
+    }
+}
+
+async function savePerangkat() {
+    loading.value = true;
+    try {
+        const res = await api.post('/admin-tps/perangkat', form.value);
+        if (res.data.success) {
+            notifStore.showNotification('Data Perangkat TPS berhasil disimpan.', 'success');
+        }
+    } catch (error) {
+        console.error('Gagal menyimpan:', error);
+        notifStore.showNotification('Terjadi kesalahan saat menyimpan.', 'error');
+    } finally {
+        loading.value = false;
+    }
+}
+</script>

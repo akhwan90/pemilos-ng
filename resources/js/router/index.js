@@ -159,6 +159,11 @@ const routes = [
                 component: () => import('../views/admin_sekolah/Dashboard.vue'), // Placeholder
             },
             {
+                path: 'perangkat',
+                name: 'admin-tps-perangkat',
+                component: () => import('../views/admin_tps/PerangkatTps.vue'),
+            },
+            {
                 path: 'selesai',
                 name: 'admin-tps-selesai-pemilihan',
                 component: () => import('../views/admin_tps/SelesaiPemilihan.vue'),
