@@ -125,6 +125,33 @@ class DataSiswaController extends Controller
         ]);
     }
 
+    private function tryDeleteSiswa($id, $npsn, $user_id, $alasan_hapus)
+    {
+        $siswa = DB::table('tb_siswa')->where('id', $id)->where('npsn', $npsn)->first();
+        if (!$siswa) {
+            return false;
+        }
+
+        $tahunAktif = env('TAHUN_AKTIF', date('Y'));
+        $sudahMasukDpt = DB::table('tb_siswa_tps')
+            ->where('nisn', $siswa->nisn)
+            ->where('tahun', $tahunAktif)
+            ->exists();
+
+        if ($sudahMasukDpt) {
+            return false;
+        }
+
+        return DB::table('tb_siswa')
+            ->where('id', $id)
+            ->update([
+                'status' => $alasan_hapus,
+                'npsn' => null, // Lepas ikatan dengan sekolah
+                'hapus_time' => date('Y-m-d H:i:s'),
+                'hapus_user_id' => $user_id
+            ]) > 0;
+    }
+
     public function destroy(Request $request, $id)
     {
         $npsn = $request->user()->npsn;
@@ -134,18 +161,10 @@ class DataSiswaController extends Controller
             'alasan_hapus' => 'required|integer|in:2,3' // 2: Lulus, 3: Pindah
         ]);
 
-        $affected = DB::table('tb_siswa')
-            ->where('id', $id)
-            ->where('npsn', $npsn)
-            ->update([
-                'status' => $request->alasan_hapus,
-                'npsn' => null, // Lepas ikatan dengan sekolah
-                'hapus_time' => date('Y-m-d H:i:s'),
-                'hapus_user_id' => $user_id
-            ]);
+        $success = $this->tryDeleteSiswa($id, $npsn, $user_id, $request->alasan_hapus);
 
-        if ($affected === 0) {
-            return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
+        if (!$success) {
+            return response()->json(['success' => false, 'message' => 'Data tidak ditemukan atau siswa sudah masuk di TPS tahun aktif sehingga tidak bisa dihapus.'], 422);
         }
 
         return response()->json([
@@ -165,19 +184,25 @@ class DataSiswaController extends Controller
             'alasan_hapus' => 'required|integer|in:2,3' // 2: Lulus, 3: Pindah
         ]);
 
-        $affected = DB::table('tb_siswa')
-            ->whereIn('id', $request->ids)
-            ->where('npsn', $npsn)
-            ->update([
-                'status' => $request->alasan_hapus,
-                'npsn' => null, // Lepas dari ikatan sekolah
-                'hapus_time' => date('Y-m-d H:i:s'),
-                'hapus_user_id' => $user_id
-            ]);
+        $affected = 0;
+        $failed = 0;
+
+        foreach ($request->ids as $id) {
+            if ($this->tryDeleteSiswa($id, $npsn, $user_id, $request->alasan_hapus)) {
+                $affected++;
+            } else {
+                $failed++;
+            }
+        }
+
+        $msg = "{$affected} siswa berhasil dihapus.";
+        if ($failed > 0) {
+            $msg .= "\n"."{$failed} siswa gagal dihapus (mungkin sudah masuk di TPS tahun aktif).";
+        }
 
         return response()->json([
             'success' => true,
-            'message' => "Berhasil menghapus {$affected} siswa secara simultan"
-        ]);
+            'message' => $msg
+        ], ($failed > 0 ? 422 : 200));
     }
 }

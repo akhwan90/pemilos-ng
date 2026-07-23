@@ -64,7 +64,7 @@ class KandidatService
             'proker' => $data['proker'] ?? null,
             'pengalaman' => $data['pengalaman'] ?? null,
             'prestasi' => $data['prestasi'] ?? null,
-            'id_user' => $userId
+            // 'id_user' => $userId
         ];
 
         if ($file) {
@@ -99,7 +99,7 @@ class KandidatService
         if ($file) {
             $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('uploads/kandidat'), $filename);
-            
+
             if ($kandidat->photo && file_exists(public_path('uploads/kandidat/' . $kandidat->photo))) {
                 @unlink(public_path('uploads/kandidat/' . $kandidat->photo));
             }

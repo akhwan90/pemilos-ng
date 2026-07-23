@@ -8,29 +8,19 @@ const routes = [
         component: () => import('../views/public/LandingPage.vue'),
     },
     {
-        path: '/aduan-aspirasi',
-        name: 'aduan-aspirasi',
-        component: () => import('../views/public/AduanAspirasiForm.vue'),
+        path: '/sekolah',
+        name: 'daftar-sekolah',
+        component: () => import('../views/public/DaftarSekolah.vue'),
     },
     {
-        path: '/tamu-setwan',
-        name: 'tamu-setwan',
-        component: () => import('../views/public/TamuSetwanForm.vue'),
+        path: '/arsip',
+        name: 'arsip-sekolah',
+        component: () => import('../views/public/ArsipSekolah.vue'),
     },
     {
-        path: '/tamu-dprd',
-        name: 'tamu-dprd',
-        component: () => import('../views/public/TamuDprdForm.vue'),
-    },
-    {
-        path: '/permohonan-audiensi',
-        name: 'permohonan-audiensi',
-        component: () => import('../views/public/PermohonanAudiensiForm.vue'),
-    },
-    {
-        path: '/sukses',
-        name: 'success',
-        component: () => import('../views/public/SuccessPage.vue'),
+        path: '/detail-sekolah',
+        name: 'detail-sekolah',
+        component: () => import('../views/public/DetailSekolah.vue'),
     },
 
     // ===== ADMIN ROUTES =====

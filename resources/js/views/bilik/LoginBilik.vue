@@ -2,7 +2,7 @@
   <div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
       <div class="flex justify-center flex-col items-center">
-        <img src="/asset/KPU.png" alt="Logo" class="h-16 w-auto mb-4" />
+        <img src="/asset/img/kpu_logo.png" alt="Logo KPU" class="h-16 w-auto mb-4" />
         <h2 class="text-center text-3xl font-extrabold text-gray-900">
           Aktivasi Bilik TPS
         </h2>

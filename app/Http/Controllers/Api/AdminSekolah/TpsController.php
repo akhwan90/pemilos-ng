@@ -38,6 +38,7 @@ class TpsController extends Controller
             'npsn' => $npsn,
             'nm_kelas' => $request->nm_kelas,
             'is_tps_luar_sekolah' => $request->is_tps_luar_sekolah ? 1 : 0,
+            'is_generate_token'=>0,
             'is_hapus' => 0
         ]);
 
