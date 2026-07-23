@@ -154,6 +154,12 @@ const routes = [
                 component: () => import('../views/admin_tps/LaporanC1.vue'),
             },
             {
+                path: 'print-c1',
+                name: 'admin-tps-print-c1',
+                component: () => import('../views/admin_tps/PrintC1.vue'),
+                meta: { layout: 'none' } // Opsional: jika layout system mendukungnya
+            },
+            {
                 path: 'laporan-c2',
                 name: 'admin-tps-laporan-c2',
                 component: () => import('../views/admin_tps/LaporanC2.vue'),

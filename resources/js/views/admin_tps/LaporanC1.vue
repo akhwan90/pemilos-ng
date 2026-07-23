@@ -4,17 +4,10 @@
             <h1 class="text-2xl font-bold text-gray-900">Formulir Model C.Hasil (C1)</h1>
         </div>
 
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 md:p-8 print:shadow-none print:border-none print:p-0 print:m-0 w-full">
-            <div class="max-w-4xl mx-auto print:max-w-none print:w-full">
-                <!-- Header khusus untuk cetakan print -->
-                <div class="hidden print:block text-center mb-8 border-b-2 border-black pb-4">
-                    <h1 class="text-xl font-bold uppercase">MODEL C.HASIL - TPS</h1>
-                    <h2 class="text-lg font-bold uppercase">BERITA ACARA DAN SERTIFIKAT HASIL PENGHITUNGAN SUARA</h2>
-                    <p class="text-md mt-2">PEMILIHAN KETUA DAN WAKIL KETUA OSIS</p>
-                    <p class="text-md font-bold" v-if="hasilData">TPS: {{ hasilData.tps }}</p>
-                </div>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 md:p-8">
+            <div class="max-w-4xl mx-auto">
 
-                <div class="mb-6 border-b border-gray-100 pb-4 flex justify-between items-end print:hidden">
+                <div class="mb-6 border-b border-gray-100 pb-4 flex justify-between items-end">
                     <div>
                         <h2 class="text-lg font-bold text-gray-800">Berita Acara & Sertifikat Hasil</h2>
                         <p class="text-sm text-gray-500">Rekapitulasi perhitungan suara tingkat TPS.</p>
@@ -22,18 +15,18 @@
                     
                     <button v-if="hasilData" type="button" @click="cetakC1" class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-                        Cetak PDF
+                        Buka Mode Cetak (Print)
                     </button>
                 </div>
 
                 <!-- Skeleton Loader -->
-                <div v-if="loading" class="animate-pulse space-y-6 print:hidden">
+                <div v-if="loading" class="animate-pulse space-y-6">
                     <div class="h-40 bg-gray-100 rounded-lg"></div>
                     <div class="h-64 bg-gray-100 rounded-lg"></div>
                 </div>
 
                 <!-- Pesan Peringatan jika belum ditutup -->
-                <div v-else-if="errorMessage" class="bg-red-50 border border-red-200 p-8 rounded-xl text-center print:hidden">
+                <div v-else-if="errorMessage" class="bg-red-50 border border-red-200 p-8 rounded-xl text-center">
                     <div class="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                     </div>
@@ -116,7 +109,7 @@
                     </div>
 
                     <!-- Upload Scan (Opsional) -->
-                    <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg flex items-center justify-between print:hidden">
+                    <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg flex items-center justify-between">
                         <div>
                             <h4 class="font-bold text-gray-800 text-sm">Scan Dokumen Fisik</h4>
                             <p class="text-xs text-gray-500">Anda dapat mengunggah hasil scan/foto dokumen C1 yang telah ditandatangani.</p>
@@ -124,30 +117,6 @@
                         <button class="px-4 py-2 bg-white border border-gray-300 rounded shadow-sm text-sm font-medium hover:bg-gray-50 transition">
                             Upload File
                         </button>
-                    </div>
-
-                    <!-- Tempat Tanda Tangan untuk Cetak -->
-                    <div class="hidden print:block mt-16 pt-8 break-inside-avoid">
-                        <table class="w-full text-center text-sm border-collapse">
-                            <tbody>
-                                <tr>
-                                    <td colspan="3" class="pb-10 font-bold">KELOMPOK PENYELENGGARA PEMUNGUTAN SUARA (KPPS) / PERANGKAT TPS</td>
-                                </tr>
-                                <tr>
-                                    <td class="w-1/3 pb-24">(...................................................)<br>Ketua</td>
-                                    <td class="w-1/3 pb-24">(...................................................)<br>Anggota 1</td>
-                                    <td class="w-1/3 pb-24">(...................................................)<br>Anggota 2</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="3" class="pt-8 pb-10 font-bold">SAKSI PASANGAN CALON</td>
-                                </tr>
-                                <tr>
-                                    <td class="w-1/3 pb-24">(...................................................)<br>Saksi 1</td>
-                                    <td class="w-1/3 pb-24"></td>
-                                    <td class="w-1/3 pb-24">(...................................................)<br>Saksi 2</td>
-                                </tr>
-                            </tbody>
-                        </table>
                     </div>
 
                 </div>
@@ -189,10 +158,7 @@ async function fetchHasil() {
 }
 
 function cetakC1() {
-    toast.success('Mempersiapkan dokumen PDF...');
-    // TODO: Implementasi export ke PDF atau window.print()
-    setTimeout(() => {
-        window.print();
-    }, 500);
+    // Buka halaman print-c1 di tab baru
+    window.open('/admin-tps/print-c1', '_blank');
 }
 </script>
