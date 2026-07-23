@@ -69,47 +69,42 @@
 
                     <!-- Saksi Paslon -->
                     <div class="bg-gray-50 border border-gray-200 p-6 rounded-xl">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                            Saksi Pasangan Calon
-                        </h3>
-                        <p class="text-sm text-gray-500 mb-4">Tambahkan setidaknya 2 orang saksi jika diperlukan.</p>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                Saksi Pasangan Calon
+                            </h3>
+                            <button type="button" @click="tambahSaksi" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-300 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                Tambah Saksi
+                            </button>
+                        </div>
+                        <p class="text-sm text-gray-500 mb-4">Tambahkan saksi-saksi dari setiap utusan paslon jika diperlukan.</p>
                         
                         <div class="space-y-6">
-                            <!-- Saksi 1 -->
-                            <div class="p-4 border border-gray-200 rounded-lg bg-white">
-                                <h4 class="text-sm font-semibold text-gray-600 mb-3">Saksi 1</h4>
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
-                                        <input type="text" v-model="form.saksi[0].nama" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:text-sm" placeholder="Nama Saksi 1">
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">NIS / Identitas</label>
-                                        <input type="text" v-model="form.saksi[0].identitas" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:text-sm" placeholder="NIS/NIK">
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Utusan Paslon</label>
-                                        <input type="text" v-model="form.saksi[0].paslon" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:text-sm" placeholder="Cth: Paslon 1">
-                                    </div>
-                                </div>
+                            <div v-if="form.saksi.length === 0" class="text-center py-6 bg-white rounded-lg border border-gray-200 border-dashed">
+                                <p class="text-sm text-gray-500">Belum ada saksi yang ditambahkan.</p>
                             </div>
-                            
-                            <!-- Saksi 2 -->
-                            <div class="p-4 border border-gray-200 rounded-lg bg-white">
-                                <h4 class="text-sm font-semibold text-gray-600 mb-3">Saksi 2</h4>
+
+                            <div v-for="(saksiItem, index) in form.saksi" :key="index" class="p-4 border border-gray-200 rounded-lg bg-white relative">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h4 class="text-sm font-semibold text-gray-600">Saksi {{ index + 1 }}</h4>
+                                    <button type="button" @click="hapusSaksi(index)" class="text-gray-400 hover:text-red-600 focus:outline-none" title="Hapus Saksi">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    </button>
+                                </div>
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
-                                        <input type="text" v-model="form.saksi[1].nama" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:text-sm" placeholder="Nama Saksi 2">
+                                        <input type="text" v-model="saksiItem.nama" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:text-sm" placeholder="Nama Saksi">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-1">NIS / Identitas</label>
-                                        <input type="text" v-model="form.saksi[1].identitas" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:text-sm" placeholder="NIS/NIK">
+                                        <input type="text" v-model="saksiItem.identitas" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:text-sm" placeholder="NIS/NIK">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-1">Utusan Paslon</label>
-                                        <input type="text" v-model="form.saksi[1].paslon" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:text-sm" placeholder="Cth: Paslon 2">
+                                        <input type="text" v-model="saksiItem.paslon" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:text-sm" placeholder="Cth: Paslon 1">
                                     </div>
                                 </div>
                             </div>
@@ -193,6 +188,16 @@ async function savePerangkat() {
         notifStore.showNotification('Terjadi kesalahan saat menyimpan.', 'error');
     } finally {
         loading.value = false;
+    }
+}
+
+function tambahSaksi() {
+    form.value.saksi.push({ nama: '', identitas: '', paslon: '' });
+}
+
+function hapusSaksi(index) {
+    if (confirm('Hapus saksi ini?')) {
+        form.value.saksi.splice(index, 1);
     }
 }
 </script>

@@ -127,19 +127,13 @@ class AdminTpsController extends Controller
                 'ketua' => ['nama' => '', 'identitas' => ''],
                 'anggota_1' => ['nama' => '', 'identitas' => ''],
                 'anggota_2' => ['nama' => '', 'identitas' => ''],
-                'saksi' => [
-                    ['nama' => '', 'identitas' => '', 'paslon' => ''],
-                    ['nama' => '', 'identitas' => '', 'paslon' => '']
-                ]
+                'saksi' => []
             ];
         }
 
         // Backward compatibility if saksi missing from old saved JSON
-        if (!isset($perangkat['saksi'])) {
-            $perangkat['saksi'] = [
-                ['nama' => '', 'identitas' => '', 'paslon' => ''],
-                ['nama' => '', 'identitas' => '', 'paslon' => '']
-            ];
+        if (!isset($perangkat['saksi']) || !is_array($perangkat['saksi'])) {
+            $perangkat['saksi'] = [];
         }
 
         return response()->json([
@@ -165,8 +159,10 @@ class AdminTpsController extends Controller
             'anggota_1.identitas' => 'nullable|string|max:50',
             'anggota_2.nama' => 'nullable|string|max:150',
             'anggota_2.identitas' => 'nullable|string|max:50',
-            'saksi.0.nama' => 'nullable|string|max:150',
-            'saksi.1.nama' => 'nullable|string|max:150',
+            'saksi' => 'nullable|array',
+            'saksi.*.nama' => 'nullable|string|max:150',
+            'saksi.*.identitas' => 'nullable|string|max:50',
+            'saksi.*.paslon' => 'nullable|string|max:150',
         ]);
 
         $npsn = $user->npsn;
@@ -174,13 +170,10 @@ class AdminTpsController extends Controller
         $tahun = env('TAHUN_AKTIF', date('Y'));
         $now = date('Y-m-d H:i:s');
 
-        // Prepare the new Saksi structure. Ensure saksi is always an array of minimum length 2
+        // Prepare the dynamic Saksi structure
         $inputSaksi = $request->input('saksi', []);
-        if (empty($inputSaksi)) {
-            $inputSaksi = [
-                ['nama' => '', 'identitas' => '', 'paslon' => ''],
-                ['nama' => '', 'identitas' => '', 'paslon' => '']
-            ];
+        if (!is_array($inputSaksi)) {
+            $inputSaksi = [];
         }
 
         $perangkatData = [
