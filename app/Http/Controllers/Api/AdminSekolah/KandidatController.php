@@ -5,15 +5,18 @@ namespace App\Http\Controllers\Api\AdminSekolah;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\KandidatService;
+use App\Services\WaktuPemilihanService;
 use Exception;
 
 class KandidatController extends Controller
 {
     protected $kandidatService;
+    protected $waktuPemilihanService;
 
-    public function __construct(KandidatService $kandidatService)
+    public function __construct(KandidatService $kandidatService, WaktuPemilihanService $waktuPemilihanService)
     {
         $this->kandidatService = $kandidatService;
+        $this->waktuPemilihanService = $waktuPemilihanService;
     }
 
     public function index(Request $request)
@@ -33,6 +36,14 @@ class KandidatController extends Controller
 
     public function store(Request $request)
     {
+        $npsn = $request->user()->npsn;
+        $tahun = env('TAHUN_AKTIF', date('Y'));
+        
+        $cek = $this->waktuPemilihanService->cekJadwalBuka('input_data_calon', $tahun, $npsn);
+        if (!$cek['is_open']) {
+            return response()->json(['success' => false, 'message' => 'Penambahan ditolak: ' . $cek['message']], 403);
+        }
+
         $request->validate([
             'no' => 'required|integer',
             'nama' => 'required|string|max:100',
@@ -56,6 +67,14 @@ class KandidatController extends Controller
 
     public function update(Request $request, $id)
     {
+        $npsn = $request->user()->npsn;
+        $tahun = env('TAHUN_AKTIF', date('Y'));
+        
+        $cek = $this->waktuPemilihanService->cekJadwalBuka('input_data_calon', $tahun, $npsn);
+        if (!$cek['is_open']) {
+            return response()->json(['success' => false, 'message' => 'Pembaruan ditolak: ' . $cek['message']], 403);
+        }
+
         $request->validate([
             'no' => 'required|integer',
             'kampanye' => 'nullable|string|max:250',
@@ -79,6 +98,14 @@ class KandidatController extends Controller
 
     public function destroy(Request $request, $id)
     {
+        $npsn = $request->user()->npsn;
+        $tahun = env('TAHUN_AKTIF', date('Y'));
+        
+        $cek = $this->waktuPemilihanService->cekJadwalBuka('input_data_calon', $tahun, $npsn);
+        if (!$cek['is_open']) {
+            return response()->json(['success' => false, 'message' => 'Penghapusan ditolak: ' . $cek['message']], 403);
+        }
+
         try {
             $this->kandidatService->delete($request->user()->npsn, $id);
             return response()->json(['success' => true, 'message' => 'Kandidat berhasil dihapus']);
