@@ -32,7 +32,7 @@
       <!-- Konten Normal -->
       <div v-else>
         <!-- Card Info Sekolah -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-10 flex flex-col md:flex-row items-center p-8 gap-8">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-8 flex flex-col md:flex-row items-center p-8 gap-8">
           <div class="h-32 w-32 flex-shrink-0 rounded-full bg-gray-50 border border-gray-200 p-3 overflow-hidden flex justify-center items-center">
             <img 
               :src="resolvedLogo" 
@@ -55,8 +55,52 @@
           </div>
         </div>
 
-        <!-- Section Kandidat -->
-        <div>
+        <!-- Menu Tabs Navigation -->
+        <div class="border-b border-gray-200 mb-8 overflow-x-auto">
+            <nav class="-mb-px flex space-x-8 min-w-max" aria-label="Tabs">
+                <!-- Tab Calon -->
+                <button 
+                    @click="changeTab('calon')"
+                    :class="[
+                        currentTab === 'calon' 
+                            ? 'border-indigo-500 text-indigo-600 font-bold' 
+                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium',
+                        'whitespace-nowrap pb-4 px-1 border-b-2 text-sm transition-colors cursor-pointer'
+                    ]"
+                >
+                    Kandidat Paslon
+                </button>
+                
+                <!-- Tab DPS -->
+                <button 
+                    @click="changeTab('dps')"
+                    :class="[
+                        currentTab === 'dps' 
+                            ? 'border-indigo-500 text-indigo-600 font-bold' 
+                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium',
+                        'whitespace-nowrap pb-4 px-1 border-b-2 text-sm transition-colors cursor-pointer'
+                    ]"
+                >
+                    Data Pemilih Sementara (DPS)
+                </button>
+
+                <!-- Tab DPT -->
+                <button 
+                    @click="changeTab('dpt')"
+                    :class="[
+                        currentTab === 'dpt' 
+                            ? 'border-indigo-500 text-indigo-600 font-bold' 
+                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium',
+                        'whitespace-nowrap pb-4 px-1 border-b-2 text-sm transition-colors cursor-pointer'
+                    ]"
+                >
+                    Data Pemilih Tetap (DPT)
+                </button>
+            </nav>
+        </div>
+
+        <!-- Section: Kandidat -->
+        <div v-if="currentTab === 'calon'">
           <div class="flex items-center justify-between mb-6">
             <h3 class="text-2xl font-bold text-gray-900">Kandidat Terdaftar ({{ currentYear }})</h3>
             <span class="bg-emerald-100 text-emerald-800 text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wide">
@@ -98,6 +142,28 @@
           </div>
         </div>
 
+        <!-- Section: DPS -->
+        <div v-if="currentTab === 'dps'">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-2xl font-bold text-gray-900">Data Pemilih Sementara (DPS)</h3>
+            </div>
+            
+            <div class="text-center py-16 bg-white border border-gray-100 rounded-xl">
+                <p class="text-gray-500">Fitur daftar DPS sedang dalam pengembangan dan akan segera tersedia.</p>
+            </div>
+        </div>
+
+        <!-- Section: DPT -->
+        <div v-if="currentTab === 'dpt'">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-2xl font-bold text-gray-900">Data Pemilih Tetap (DPT)</h3>
+            </div>
+
+            <div class="text-center py-16 bg-white border border-gray-100 rounded-xl">
+                <p class="text-gray-500">Fitur daftar DPT sedang dalam pengembangan dan akan segera tersedia.</p>
+            </div>
+        </div>
+
       </div>
     </main>
 
@@ -107,17 +173,37 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { ref, onMounted, computed, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import PublicHeader from '../../components/public/PublicHeader.vue';
 import PublicFooter from '../../components/public/PublicFooter.vue';
 import api from '../../services/api';
 
 const route = useRoute();
+const router = useRouter();
 const currentYear = new Date().getFullYear();
 const loading = ref(true);
 const sekolahData = ref(null);
 const kandidatList = ref([]);
+const currentTab = ref(route.query.tab || 'calon');
+
+// Fungsi untuk mengganti tab sekaligus update parameter URL
+function changeTab(tabName) {
+    currentTab.value = tabName;
+    router.replace({
+        query: {
+            ...route.query,
+            tab: tabName
+        }
+    });
+}
+
+// Watcher untuk mendeteksi apabila parameter URL "tab" diganti (misal back button)
+watch(() => route.query.tab, (newTab) => {
+    if (newTab && ['calon', 'dps', 'dpt'].includes(newTab)) {
+        currentTab.value = newTab;
+    }
+});
 
 // Komputasi pemecah logo SIAP-PPDB (Eksternal) / Lokal
 const resolvedLogo = computed(() => {
