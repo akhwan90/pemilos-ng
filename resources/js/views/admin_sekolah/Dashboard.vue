@@ -316,7 +316,7 @@
                         d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                     ></path>
                 </svg>
-                Jadwal Pelaksanaan Pemilos
+                Timeline Pelaksanaan Pemilos
             </h2>
 
             <div
@@ -358,7 +358,7 @@
                 class="relative mt-8"
             >
                 <!-- Garis Vertikal Timeline -->
-                <div class="absolute left-4 md:left-8 top-0 bottom-0 w-1 bg-gray-200 rounded-full"></div>
+                <div class="absolute left-4 md:left-8 top-0 bottom-0 w-1 bg-gray-200 rounded-full z-8"></div>
 
                 <div class="space-y-8">
                     <div
@@ -368,7 +368,7 @@
                     >
                         <!-- Bulatan Status Timeline -->
                         <div
-                            class="absolute left-2.5 md:left-[1.875rem] top-4 w-4 h-4 rounded-full border-4 border-white shadow-sm z-10"
+                            class="absolute left-2.5 md:left-[1.376rem] top-4 w-6 h-6 rounded-full border-white shadow-sm z-10"
                             :class="{
                                 'bg-green-500 ring-2 ring-green-300': j.status === 'aktif',
                                 'bg-blue-500': j.status === 'belum_mulai',
@@ -386,10 +386,10 @@
                         >
                             <!-- Kiri: Judul dan Status Badge -->
                             <div class="mb-4 md:mb-0">
-                                <h3 class="font-bold text-gray-800 text-lg mb-2">
-                                    {{ j.jenis }}
+                                <h3 class="font-bold text-gray-800 text-lg mb-2 capitalize">
+                                    {{ formatJenis(j.jenis) }}
                                 </h3>
-                                
+
                                 <span
                                     v-if="j.status === 'aktif'"
                                     class="inline-block bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider"
@@ -486,6 +486,11 @@ function formatDate(dateString) {
         minute: "2-digit"
     };
     return new Date(dateString).toLocaleDateString("id-ID", options).replace(/\./g, ':');
+}
+
+function formatJenis(str) {
+    if (!str) return '';
+    return str.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 }
 
 async function fetchDashboardInfo() {
