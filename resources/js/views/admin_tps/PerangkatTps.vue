@@ -67,6 +67,55 @@
                         </div>
                     </div>
 
+                    <!-- Saksi Paslon -->
+                    <div class="bg-gray-50 border border-gray-200 p-6 rounded-xl">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                            Saksi Pasangan Calon
+                        </h3>
+                        <p class="text-sm text-gray-500 mb-4">Tambahkan setidaknya 2 orang saksi jika diperlukan.</p>
+                        
+                        <div class="space-y-6">
+                            <!-- Saksi 1 -->
+                            <div class="p-4 border border-gray-200 rounded-lg bg-white">
+                                <h4 class="text-sm font-semibold text-gray-600 mb-3">Saksi 1</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
+                                        <input type="text" v-model="form.saksi[0].nama" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:text-sm" placeholder="Nama Saksi 1">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">NIS / Identitas</label>
+                                        <input type="text" v-model="form.saksi[0].identitas" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:text-sm" placeholder="NIS/NIK">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Utusan Paslon</label>
+                                        <input type="text" v-model="form.saksi[0].paslon" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:text-sm" placeholder="Cth: Paslon 1">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Saksi 2 -->
+                            <div class="p-4 border border-gray-200 rounded-lg bg-white">
+                                <h4 class="text-sm font-semibold text-gray-600 mb-3">Saksi 2</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
+                                        <input type="text" v-model="form.saksi[1].nama" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:text-sm" placeholder="Nama Saksi 2">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">NIS / Identitas</label>
+                                        <input type="text" v-model="form.saksi[1].identitas" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:text-sm" placeholder="NIS/NIK">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Utusan Paslon</label>
+                                        <input type="text" v-model="form.saksi[1].paslon" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:text-sm" placeholder="Cth: Paslon 2">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="pt-4 border-t border-gray-200 flex justify-end">
                         <button 
                             type="submit" 
@@ -102,7 +151,11 @@ const tpsName = ref(authStore.user?.nama || 'TPS');
 const form = ref({
     ketua: { nama: '', identitas: '' },
     anggota_1: { nama: '', identitas: '' },
-    anggota_2: { nama: '', identitas: '' }
+    anggota_2: { nama: '', identitas: '' },
+    saksi: [
+        { nama: '', identitas: '', paslon: '' },
+        { nama: '', identitas: '', paslon: '' }
+    ]
 });
 
 onMounted(() => {
@@ -116,7 +169,11 @@ async function fetchPerangkat() {
             form.value = {
                 ketua: res.data.data.ketua || { nama: '', identitas: '' },
                 anggota_1: res.data.data.anggota_1 || { nama: '', identitas: '' },
-                anggota_2: res.data.data.anggota_2 || { nama: '', identitas: '' }
+                anggota_2: res.data.data.anggota_2 || { nama: '', identitas: '' },
+                saksi: res.data.data.saksi || [
+                    { nama: '', identitas: '', paslon: '' },
+                    { nama: '', identitas: '', paslon: '' }
+                ]
             };
         }
     } catch (error) {

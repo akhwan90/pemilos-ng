@@ -126,7 +126,19 @@ class AdminTpsController extends Controller
             $perangkat = [
                 'ketua' => ['nama' => '', 'identitas' => ''],
                 'anggota_1' => ['nama' => '', 'identitas' => ''],
-                'anggota_2' => ['nama' => '', 'identitas' => '']
+                'anggota_2' => ['nama' => '', 'identitas' => ''],
+                'saksi' => [
+                    ['nama' => '', 'identitas' => '', 'paslon' => ''],
+                    ['nama' => '', 'identitas' => '', 'paslon' => '']
+                ]
+            ];
+        }
+
+        // Backward compatibility if saksi missing from old saved JSON
+        if (!isset($perangkat['saksi'])) {
+            $perangkat['saksi'] = [
+                ['nama' => '', 'identitas' => '', 'paslon' => ''],
+                ['nama' => '', 'identitas' => '', 'paslon' => '']
             ];
         }
 
@@ -153,6 +165,8 @@ class AdminTpsController extends Controller
             'anggota_1.identitas' => 'nullable|string|max:50',
             'anggota_2.nama' => 'nullable|string|max:150',
             'anggota_2.identitas' => 'nullable|string|max:50',
+            'saksi.0.nama' => 'nullable|string|max:150',
+            'saksi.1.nama' => 'nullable|string|max:150',
         ]);
 
         $npsn = $user->npsn;
@@ -160,10 +174,20 @@ class AdminTpsController extends Controller
         $tahun = env('TAHUN_AKTIF', date('Y'));
         $now = date('Y-m-d H:i:s');
 
+        // Prepare the new Saksi structure. Ensure saksi is always an array of minimum length 2
+        $inputSaksi = $request->input('saksi', []);
+        if (empty($inputSaksi)) {
+            $inputSaksi = [
+                ['nama' => '', 'identitas' => '', 'paslon' => ''],
+                ['nama' => '', 'identitas' => '', 'paslon' => '']
+            ];
+        }
+
         $perangkatData = [
             'ketua' => $request->input('ketua', ['nama' => '', 'identitas' => '']),
             'anggota_1' => $request->input('anggota_1', ['nama' => '', 'identitas' => '']),
-            'anggota_2' => $request->input('anggota_2', ['nama' => '', 'identitas' => ''])
+            'anggota_2' => $request->input('anggota_2', ['nama' => '', 'identitas' => '']),
+            'saksi' => $inputSaksi
         ];
 
         $jsonPerangkat = json_encode($perangkatData);
