@@ -364,15 +364,15 @@ class AdminTpsController extends Controller
             // b. Hitung Suara Masuk & DPT
             $totalDpt = DB::table('tb_siswa_tps')
                 ->where('npsn', $npsn)
-                ->where('id_kelas', $tpsId)
+                ->where('id_tps', $tpsId)
                 ->where('tahun', $tahun)
                 ->count();
 
             $suaraMasuk = DB::table('tb_siswa_tps')
                 ->where('npsn', $npsn)
-                ->where('id_kelas', $tpsId)
+                ->where('id_tps', $tpsId)
                 ->where('tahun', $tahun)
-                ->where('is_memilih', 1)
+                ->whereNotNull('waktu_pilih')
                 ->count();
 
             // c. Hitung perolehan masing-masing paslon
@@ -380,10 +380,9 @@ class AdminTpsController extends Controller
             foreach ($kandidatList as $kand) {
                 $jumlahSuara = DB::table('tb_siswa_tps')
                     ->where('npsn', $npsn)
-                    ->where('id_kelas', $tpsId)
+                    ->where('id_tps', $tpsId)
                     ->where('tahun', $tahun)
-                    ->where('is_memilih', 1)
-                    ->where('pilihan_id', $kand->id)
+                    ->where('pilihan', $kand->id)
                     ->count();
 
                 $perolehanPaslon[] = [
