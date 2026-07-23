@@ -6,3 +6,7 @@
 Thumbs.db
 *.log
 .env
+/public/build/
+/public/hot
+/public/uploads/
+/public/asset/
