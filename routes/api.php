@@ -15,12 +15,16 @@ use App\Http\Controllers\Api\AdminSekolah\DataDptController;
 use App\Http\Controllers\Api\AdminSekolah\DokumentasiController;
 use App\Http\Controllers\Api\AdminSekolah\DashboardController;
 use App\Http\Controllers\Api\Bilik\BilikController;
+use App\Http\Controllers\Api\PublicController;
 
 // ========== PUBLIC API (No Auth Required) ==========
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:6,1');
 Route::post('/bilik-luar-sekolah/verify', [BilikController::class, 'verifyLuarSekolah'])->middleware('throttle:10,1');
-Route::get('/public/sekolah', [\App\Http\Controllers\Api\PublicController::class, 'sekolah']);
-Route::get('/public/sekolah/{npsn}', [\App\Http\Controllers\Api\PublicController::class, 'detailSekolah']);
+Route::get('/public/sekolah', [PublicController::class, 'sekolah']);
+Route::get('/public/sekolah/{npsn}', [PublicController::class, 'detailSekolah']);
+Route::get('/public/sekolah/{npsn}/dps', [PublicController::class, 'dataDps']);
+Route::get('/public/sekolah/{npsn}/dpt', [PublicController::class, 'dataDpt']);
+Route::get('/public/sekolah/{npsn}/tps', [PublicController::class, 'listTps']);
 
 // ========== ADMIN API (Sanctum Auth Required) ==========
 Route::middleware('auth:sanctum')->group(function () {
