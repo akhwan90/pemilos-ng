@@ -368,10 +368,10 @@
                     >
                         <!-- Bulatan Status Timeline -->
                         <div
-                            class="absolute left-2.5 md:left-[1.376rem] top-4 w-6 h-6 rounded-full border-white shadow-sm z-10"
+                            class="absolute left-2.5 md:left-[1.376rem] top-4 w-6 h-6 rounded-full shadow-sm z-10"
                             :class="{
                                 'bg-green-500 ring-2 ring-green-300': j.status === 'aktif',
-                                'bg-blue-500': j.status === 'belum_mulai',
+                                'bg-blue-500': j.status === 'akan_datang',
                                 'bg-gray-400': j.status === 'selesai'
                             }"
                         ></div>
@@ -414,7 +414,7 @@
                             <div class="space-y-3 flex-shrink-0 md:text-right">
                                 <div class="flex items-center md:justify-end gap-3">
                                     <div class="md:hidden mt-0.5 bg-gray-100 p-1.5 rounded text-gray-500">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 11V9a2 2 0 00-2-2m2 4v4a2 2 0 104 0v-1m-4-3H9m2 0h4m6 1a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                     </div>
                                     <div class="flex flex-col md:items-end">
                                         <p class="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">
@@ -425,13 +425,13 @@
                                         </p>
                                     </div>
                                     <div class="hidden md:block mt-0.5 bg-gray-100 p-1.5 rounded text-gray-500">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 11V9a2 2 0 00-2-2m2 4v4a2 2 0 104 0v-1m-4-3H9m2 0h4m6 1a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                     </div>
                                 </div>
 
                                 <div class="flex items-center md:justify-end gap-3">
                                     <div class="md:hidden mt-0.5 bg-gray-100 p-1.5 rounded text-gray-500">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"></path></svg>
                                     </div>
                                     <div class="flex flex-col md:items-end">
                                         <p class="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">
@@ -442,7 +442,7 @@
                                         </p>
                                     </div>
                                     <div class="hidden md:block mt-0.5 bg-gray-100 p-1.5 rounded text-gray-500">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"></path></svg>
                                     </div>
                                 </div>
                             </div>
