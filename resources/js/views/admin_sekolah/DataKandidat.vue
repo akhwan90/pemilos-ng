@@ -1,150 +1,358 @@
 <template>
-  <div class="space-y-6">
-    <div class="flex items-center justify-between mb-4">
-      <div>
-        <h2 class="text-xl font-bold text-gray-800">Data Calon Kandidat</h2>
-        <p class="text-sm text-gray-500">Kelola informasi, visi misi, dan foto calon ketua (Kandidat).</p>
-      </div>
-      <BaseButton v-if="!isEditing" variant="primary" @click="addKandidat">Tambah Kandidat Baru</BaseButton>
+    <div class="space-y-6">
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <h2 class="text-xl font-bold text-gray-800">
+                    Data Calon Kandidat
+                </h2>
+                <p class="text-sm text-gray-500">
+                    Kelola informasi, visi misi, dan foto calon ketua
+                    (Kandidat).
+                </p>
+            </div>
+            <BaseButton v-if="!isEditing" variant="primary" @click="addKandidat"
+                >Tambah Kandidat Baru</BaseButton
+            >
+        </div>
+
+        <!-- Tabel List Kandidat (View Mode) -->
+        <BaseCard v-if="!isEditing" class="!p-0">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left">
+                    <thead
+                        class="text-xs text-gray-700 uppercase bg-gray-100 border-b"
+                    >
+                        <tr>
+                            <th class="px-4 py-3 w-16 text-center">No Urut</th>
+                            <th class="px-4 py-3 w-24">Photo</th>
+                            <th class="px-4 py-3">
+                                Nama Lengkap &amp; Link Kampanye
+                            </th>
+                            <th class="px-4 py-3 w-32 text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-if="isLoading" class="bg-white">
+                            <td
+                                colspan="4"
+                                class="px-4 py-8 text-center text-gray-500"
+                            >
+                                Memuat data kandidat...
+                            </td>
+                        </tr>
+                        <tr
+                            v-else-if="kandidatList.length === 0"
+                            class="bg-white"
+                        >
+                            <td
+                                colspan="4"
+                                class="px-4 py-8 text-center text-gray-500"
+                            >
+                                Belum ada kandidat. (Hubungi Super Admin jika
+                                ingin menambah kandidat baru)
+                            </td>
+                        </tr>
+                        <tr
+                            v-else
+                            v-for="k in kandidatList"
+                            :key="k.id"
+                            class="bg-white border-b hover:bg-gray-50"
+                        >
+                            <td
+                                class="px-4 py-3 text-center text-xl font-black text-gray-400"
+                            >
+                                {{ k.no }}
+                            </td>
+                            <td class="px-4 py-3">
+                                <img
+                                    v-if="k.photo_url"
+                                    :src="k.photo_url"
+                                    alt="Foto"
+                                    class="w-16 h-20 object-cover rounded shadow border"
+                                />
+                                <div
+                                    v-else
+                                    class="w-16 h-20 bg-gray-200 rounded flex items-center justify-center text-xs text-gray-400"
+                                >
+                                    No Pic
+                                </div>
+                            </td>
+                            <td class="px-4 py-3">
+                                <div class="font-bold text-lg text-indigo-700">
+                                    {{ k.nama }}
+                                </div>
+                                <div class="text-xs text-gray-500 mb-2">
+                                    NISN: {{ k.nisn }}
+                                </div>
+                                <div v-if="k.kampanye" class="text-xs">
+                                    <a
+                                        :href="k.kampanye"
+                                        target="_blank"
+                                        class="text-red-600 hover:underline flex items-center gap-1"
+                                    >
+                                        <svg
+                                            class="w-4 h-4"
+                                            fill="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"
+                                            />
+                                        </svg>
+                                        Lihat Video YouTube
+                                    </a>
+                                </div>
+                            </td>
+                            <td class="px-4 py-3 text-center align-middle">
+                                <div
+                                    class="flex flex-col gap-2 justify-center items-center"
+                                >
+                                    <BaseButton
+                                        @click="editKandidat(k)"
+                                        variant="primary"
+                                        class="!py-1 !px-3 text-xs w-20"
+                                        >Edit</BaseButton
+                                    >
+                                    <BaseButton
+                                        @click="deleteKandidat(k.id)"
+                                        variant="danger"
+                                        class="!py-1 !px-3 text-xs w-20"
+                                        >Hapus</BaseButton
+                                    >
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </BaseCard>
+
+        <!-- Form Edit Kandidat -->
+        <BaseCard v-else class="!p-0 border-indigo-200 shadow-md">
+            <div
+                class="bg-indigo-50 border-b border-indigo-100 p-4 flex justify-between items-center"
+            >
+                <h3 class="font-bold text-indigo-800 flex items-center gap-2">
+                    <span
+                        v-if="form.no"
+                        class="bg-indigo-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
+                        >{{ form.no }}</span
+                    >
+                    {{
+                        form.id ? "Edit Data Kandidat" : "Tambah Data Kandidat"
+                    }}
+                </h3>
+                <button
+                    @click="cancelEdit"
+                    class="text-sm font-semibold text-gray-500 hover:text-gray-800 bg-white px-3 py-1 rounded border shadow-sm"
+                >
+                    Batal / Kembali
+                </button>
+            </div>
+
+            <form @submit.prevent="submitForm" class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Kolom Kiri -->
+                    <div class="space-y-4">
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-gray-700 mb-1"
+                                >Nomor Urut</label
+                            >
+                            <input
+                                v-model="form.no"
+                                type="number"
+                                required
+                                placeholder="Cth: 1"
+                                class="w-24 px-3 py-2 border rounded-lg text-sm focus:ring-indigo-500 text-center font-bold"
+                            />
+                        </div>
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-gray-700 mb-1"
+                                >Nama Lengkap</label
+                            >
+                            <input
+                                v-model="form.nama"
+                                type="text"
+                                required
+                                class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-indigo-500"
+                            />
+                        </div>
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-gray-700 mb-1"
+                                >NISN</label
+                            >
+                            <input
+                                v-model="form.nisn"
+                                type="text"
+                                required
+                                class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-indigo-500"
+                            />
+                        </div>
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-gray-700 mb-1"
+                                >Link YouTube Kampanye</label
+                            >
+                            <input
+                                v-model="form.kampanye"
+                                type="text"
+                                placeholder="Cth: https://youtube.com/watch?v=..."
+                                class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-indigo-500"
+                            />
+                        </div>
+
+                        <div class="pt-2 border-t mt-4">
+                            <label
+                                class="block text-sm font-medium text-gray-700 mb-2"
+                                >Upload Foto Kandidat Baru</label
+                            >
+                            <input
+                                type="file"
+                                ref="photoInput"
+                                @change="handlePhotoChange"
+                                accept="image/jpeg,image/png,image/jpg"
+                                class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 mb-2"
+                            />
+                            
+                            <!-- Area Cropping (Muncul Jika Ada File Terpilih & Belum Dicrop) -->
+                            <div v-if="rawPhotoUrl && !croppedPhotoBlob" class="mt-4 mb-4">
+                                <p class="text-xs text-gray-500 mb-2 font-semibold text-center">Sesuaikan Crop Foto (Rasio 1:1)</p>
+                                <div class="w-full max-w-sm mx-auto h-64 bg-gray-100 border rounded overflow-hidden">
+                                    <vue-cropper
+                                        ref="cropperRef"
+                                        :src="rawPhotoUrl"
+                                        :aspect-ratio="1 / 1"
+                                        :view-mode="1"
+                                        :drag-mode="'move'"
+                                        :background="true"
+                                        :auto-crop-area="0.8"
+                                    ></vue-cropper>
+                                </div>
+                                <div class="mt-3 flex justify-center gap-2">
+                                    <BaseButton type="button" variant="secondary" @click="cancelCrop" class="!py-1.5 !px-3 text-xs">Batal</BaseButton>
+                                    <BaseButton type="button" variant="primary" @click="applyCrop" class="!py-1.5 !px-3 text-xs">Terapkan Crop</BaseButton>
+                                </div>
+                            </div>
+
+                            <!-- Preview Hasil Akhir -->
+                            <div v-if="photoPreview && !rawPhotoUrl" class="mt-2">
+                                <p class="text-xs text-gray-500 mb-1">
+                                    Preview Foto Baru:
+                                </p>
+                                <img
+                                    :src="photoPreview"
+                                    class="w-32 h-32 object-cover rounded border border-gray-300 shadow-sm mx-auto md:mx-0"
+                                />
+                            </div>
+                            <div
+                                v-else-if="form.existing_photo_url && !rawPhotoUrl && !photoPreview"
+                                class="mt-2"
+                            >
+                                <p class="text-xs text-gray-500 mb-1">
+                                    Foto Saat Ini:
+                                </p>
+                                <img
+                                    :src="form.existing_photo_url"
+                                    class="w-32 h-32 object-cover rounded border border-gray-300 shadow-sm mx-auto md:mx-0"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Kolom Kanan (Textareas) -->
+                    <div class="space-y-4">
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-gray-700 mb-1"
+                                >Visi</label
+                            >
+                            <textarea
+                                v-model="form.visi"
+                                rows="2"
+                                class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-indigo-500"
+                            ></textarea>
+                        </div>
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-gray-700 mb-1"
+                                >Misi</label
+                            >
+                            <textarea
+                                v-model="form.misi"
+                                rows="3"
+                                class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-indigo-500"
+                            ></textarea>
+                        </div>
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-gray-700 mb-1"
+                                >Program Kerja</label
+                            >
+                            <textarea
+                                v-model="form.proker"
+                                rows="2"
+                                class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-indigo-500"
+                            ></textarea>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label
+                                    class="block text-sm font-medium text-gray-700 mb-1"
+                                    >Pengalaman</label
+                                >
+                                <textarea
+                                    v-model="form.pengalaman"
+                                    rows="2"
+                                    class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-indigo-500"
+                                ></textarea>
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-sm font-medium text-gray-700 mb-1"
+                                    >Prestasi</label
+                                >
+                                <textarea
+                                    v-model="form.prestasi"
+                                    rows="2"
+                                    class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-indigo-500"
+                                ></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    class="mt-8 flex justify-end gap-3 border-t border-gray-200 pt-4 bg-gray-50 -mx-6 -mb-6 p-4 rounded-b-lg"
+                >
+                    <BaseButton
+                        type="button"
+                        variant="secondary"
+                        @click="cancelEdit"
+                        >Batalkan</BaseButton
+                    >
+                    <BaseButton
+                        type="submit"
+                        variant="primary"
+                        :loading="isSubmitting"
+                        >Simpan Profil Kandidat</BaseButton
+                    >
+                </div>
+            </form>
+        </BaseCard>
     </div>
-
-    <!-- Tabel List Kandidat (View Mode) -->
-    <BaseCard v-if="!isEditing" class="!p-0">
-      <div class="overflow-x-auto">
-        <table class="w-full text-sm text-left">
-          <thead class="text-xs text-gray-700 uppercase bg-gray-100 border-b">
-            <tr>
-              <th class="px-4 py-3 w-16 text-center">No Urut</th>
-              <th class="px-4 py-3 w-24">Photo</th>
-              <th class="px-4 py-3">Nama Lengkap &amp; Link Kampanye</th>
-              <th class="px-4 py-3 w-32 text-center">Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-if="isLoading" class="bg-white">
-              <td colspan="4" class="px-4 py-8 text-center text-gray-500">Memuat data kandidat...</td>
-            </tr>
-            <tr v-else-if="kandidatList.length === 0" class="bg-white">
-              <td colspan="4" class="px-4 py-8 text-center text-gray-500">Belum ada kandidat. (Hubungi Super Admin jika ingin menambah kandidat baru)</td>
-            </tr>
-            <tr v-else v-for="k in kandidatList" :key="k.id" class="bg-white border-b hover:bg-gray-50">
-              <td class="px-4 py-3 text-center text-xl font-black text-gray-400">{{ k.no }}</td>
-              <td class="px-4 py-3">
-                <img v-if="k.photo_url" :src="k.photo_url" alt="Foto" class="w-16 h-20 object-cover rounded shadow border" />
-                <div v-else class="w-16 h-20 bg-gray-200 rounded flex items-center justify-center text-xs text-gray-400">No Pic</div>
-              </td>
-              <td class="px-4 py-3">
-                <div class="font-bold text-lg text-indigo-700">{{ k.nama }}</div>
-                <div class="text-xs text-gray-500 mb-2">NISN: {{ k.nisn }}</div>
-                <div v-if="k.kampanye" class="text-xs">
-                  <a :href="k.kampanye" target="_blank" class="text-red-600 hover:underline flex items-center gap-1">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
-                    Lihat Video YouTube
-                  </a>
-                </div>
-              </td>
-              <td class="px-4 py-3 text-center align-middle">
-                <div class="flex flex-col gap-2 justify-center items-center">
-                  <BaseButton @click="editKandidat(k)" variant="primary" class="!py-1 !px-3 text-xs w-20">Edit</BaseButton>
-                  <BaseButton @click="deleteKandidat(k.id)" variant="danger" class="!py-1 !px-3 text-xs w-20">Hapus</BaseButton>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </BaseCard>
-
-    <!-- Form Edit Kandidat -->
-    <BaseCard v-else class="!p-0 border-indigo-200 shadow-md">
-      <div class="bg-indigo-50 border-b border-indigo-100 p-4 flex justify-between items-center">
-        <h3 class="font-bold text-indigo-800 flex items-center gap-2">
-          <span v-if="form.no" class="bg-indigo-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">{{ form.no }}</span> 
-          {{ form.id ? 'Edit Data Kandidat' : 'Tambah Data Kandidat' }}
-        </h3>
-        <button @click="cancelEdit" class="text-sm font-semibold text-gray-500 hover:text-gray-800 bg-white px-3 py-1 rounded border shadow-sm">Batal / Kembali</button>
-      </div>
-
-      <form @submit.prevent="submitForm" class="p-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-          
-          <!-- Kolom Kiri -->
-          <div class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Nomor Urut</label>
-              <input v-model="form.no" type="number" required placeholder="Cth: 1" class="w-24 px-3 py-2 border rounded-lg text-sm focus:ring-indigo-500 text-center font-bold">
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
-              <input v-model="form.nama" type="text" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-indigo-500">
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">NISN</label>
-              <input v-model="form.nisn" type="text" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-indigo-500">
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Link YouTube Kampanye</label>
-              <input v-model="form.kampanye" type="text" placeholder="Cth: https://youtube.com/watch?v=..." class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-indigo-500">
-            </div>
-            
-            <div class="pt-2 border-t mt-4">
-              <label class="block text-sm font-medium text-gray-700 mb-2">Upload Foto Kandidat Baru</label>
-              <input type="file" ref="photoInput" @change="handlePhotoChange" accept="image/jpeg,image/png,image/jpg" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 mb-2">
-              <div v-if="photoPreview" class="mt-2">
-                <p class="text-xs text-gray-500 mb-1">Preview Foto Baru:</p>
-                <img :src="photoPreview" class="w-32 h-40 object-cover rounded border border-gray-300 shadow-sm" />
-              </div>
-              <div v-else-if="form.existing_photo_url" class="mt-2">
-                <p class="text-xs text-gray-500 mb-1">Foto Saat Ini:</p>
-                <img :src="form.existing_photo_url" class="w-32 h-40 object-cover rounded border border-gray-300 shadow-sm" />
-              </div>
-            </div>
-          </div>
-
-          <!-- Kolom Kanan (Textareas) -->
-          <div class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Visi</label>
-              <textarea v-model="form.visi" rows="2" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-indigo-500"></textarea>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Misi</label>
-              <textarea v-model="form.misi" rows="3" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-indigo-500"></textarea>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Program Kerja</label>
-              <textarea v-model="form.proker" rows="2" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-indigo-500"></textarea>
-            </div>
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Pengalaman</label>
-                <textarea v-model="form.pengalaman" rows="2" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-indigo-500"></textarea>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Prestasi</label>
-                <textarea v-model="form.prestasi" rows="2" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-indigo-500"></textarea>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        <div class="mt-8 flex justify-end gap-3 border-t border-gray-200 pt-4 bg-gray-50 -mx-6 -mb-6 p-4 rounded-b-lg">
-          <BaseButton type="button" variant="secondary" @click="cancelEdit">Batalkan</BaseButton>
-          <BaseButton type="submit" variant="primary" :loading="isSubmitting">Simpan Profil Kandidat</BaseButton>
-        </div>
-      </form>
-    </BaseCard>
-
-  </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import BaseCard from '../../components/BaseCard.vue';
-import BaseButton from '../../components/BaseButton.vue';
-import api from '../../services/api';
-import { useToast } from '../../composables/useToast';
+import { ref, onMounted } from "vue";
+import BaseCard from "../../components/BaseCard.vue";
+import BaseButton from "../../components/BaseButton.vue";
+import api from "../../services/api";
+import { useToast } from "../../composables/useToast";
+import VueCropper from 'vue-cropperjs';
+import 'cropperjs/dist/cropper.css';
 
 const toast = useToast();
 
@@ -157,163 +365,202 @@ const photoInput = ref(null);
 const photoPreview = ref(null);
 const fileToUpload = ref(null);
 
+const rawPhotoUrl = ref(null);
+const croppedPhotoBlob = ref(null);
+const cropperRef = ref(null);
+
 const form = ref({
-  id: null,
-  no: null,
-  nama: '',
-  nisn: '',
-  kampanye: '',
-  visi: '',
-  misi: '',
-  proker: '',
-  pengalaman: '',
-  prestasi: '',
-  existing_photo_url: null
+    id: null,
+    no: null,
+    nama: "",
+    nisn: "",
+    kampanye: "",
+    visi: "",
+    misi: "",
+    proker: "",
+    pengalaman: "",
+    prestasi: "",
+    existing_photo_url: null,
 });
 
 onMounted(() => {
-  fetchKandidat();
+    fetchKandidat();
 });
 
 async function fetchKandidat() {
-  isLoading.value = true;
-  try {
-    const res = await api.get(`/admin-sekolah/kandidat`);
-    kandidatList.value = res.data.data;
-  } catch (error) {
-    toast.error('Gagal mengambil data kandidat');
-  } finally {
-    isLoading.value = false;
-  }
+    isLoading.value = true;
+    try {
+        const res = await api.get(`/admin-sekolah/kandidat`);
+        kandidatList.value = res.data.data;
+    } catch (error) {
+        toast.error("Gagal mengambil data kandidat");
+    } finally {
+        isLoading.value = false;
+    }
 }
 
 function handlePhotoChange(event) {
-  const file = event.target.files[0];
-  if (!file) {
-    fileToUpload.value = null;
-    photoPreview.value = null;
-    return;
-  }
-  
-  if (file.size > 2 * 1024 * 1024) {
-    toast.error('Ukuran file foto maksimal 2MB');
-    event.target.value = '';
-    return;
-  }
-  
-  fileToUpload.value = file;
-  photoPreview.value = URL.createObjectURL(file);
+    const file = event.target.files[0];
+    if (!file) {
+        fileToUpload.value = null;
+        photoPreview.value = null;
+        rawPhotoUrl.value = null;
+        croppedPhotoBlob.value = null;
+        return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+        toast.error("Ukuran file foto maksimal 2MB");
+        event.target.value = "";
+        return;
+    }
+
+    rawPhotoUrl.value = URL.createObjectURL(file);
+    croppedPhotoBlob.value = null;
+}
+
+function cancelCrop() {
+    rawPhotoUrl.value = null;
+    croppedPhotoBlob.value = null;
+    if (photoInput.value) {
+        photoInput.value.value = "";
+    }
+}
+
+function applyCrop() {
+    if (cropperRef.value) {
+        cropperRef.value.getCroppedCanvas({
+            width: 500,
+            height: 500
+        }).toBlob((blob) => {
+            if (!blob) {
+                toast.error('Gagal crop gambar');
+                return;
+            }
+            croppedPhotoBlob.value = blob;
+            fileToUpload.value = new File([blob], "photo_cropped.jpg", { type: "image/jpeg" });
+            photoPreview.value = URL.createObjectURL(blob);
+            
+            // Sembunyikan area cropper
+            rawPhotoUrl.value = null;
+        }, 'image/jpeg', 0.9);
+    }
 }
 
 async function editKandidat(k) {
-  isEditing.value = true;
-  photoPreview.value = null;
-  fileToUpload.value = null;
-  
-  // Ambil detail kandidat (karena list mungkin tidak menarik visi misi yg panjang)
-  try {
-    const res = await api.get(`/admin-sekolah/kandidat/${k.id}`);
-    const data = res.data.data;
-    
-    form.value = {
-      id: data.id,
-      no: data.no,
-      nama: data.nama || '',
-      nisn: data.nisn || '',
-      kampanye: data.kampanye || '',
-      visi: data.visi || '',
-      misi: data.misi || '',
-      proker: data.proker || '',
-      pengalaman: data.pengalaman || '',
-      prestasi: data.prestasi || '',
-      existing_photo_url: data.photo_url || null
-    };
-  } catch (e) {
-    toast.error('Gagal mengambil detail kandidat');
-    cancelEdit();
-  }
+    isEditing.value = true;
+    photoPreview.value = null;
+    fileToUpload.value = null;
+
+    // Ambil detail kandidat (karena list mungkin tidak menarik visi misi yg panjang)
+    try {
+        const res = await api.get(`/admin-sekolah/kandidat/${k.id}`);
+        const data = res.data.data;
+
+        form.value = {
+            id: data.id,
+            no: data.no,
+            nama: data.nama || "",
+            nisn: data.nisn || "",
+            kampanye: data.kampanye || "",
+            visi: data.visi || "",
+            misi: data.misi || "",
+            proker: data.proker || "",
+            pengalaman: data.pengalaman || "",
+            prestasi: data.prestasi || "",
+            existing_photo_url: data.photo_url || null,
+        };
+    } catch (e) {
+        toast.error("Gagal mengambil detail kandidat");
+        cancelEdit();
+    }
 }
 
 function cancelEdit() {
-  isEditing.value = false;
-  if (photoInput.value) {
-    photoInput.value.value = '';
-  }
-  photoPreview.value = null;
-  fileToUpload.value = null;
+    isEditing.value = false;
+    if (photoInput.value) {
+        photoInput.value.value = "";
+    }
+    photoPreview.value = null;
+    fileToUpload.value = null;
+    rawPhotoUrl.value = null;
+    croppedPhotoBlob.value = null;
 }
 
 function addKandidat() {
-  isEditing.value = true;
-  form.value = {
-    id: null,
-    no: null,
-    nama: '',
-    nisn: '',
-    kampanye: '',
-    visi: '',
-    misi: '',
-    proker: '',
-    pengalaman: '',
-    prestasi: '',
-    existing_photo_url: null
-  };
-  photoPreview.value = null;
-  fileToUpload.value = null;
+    isEditing.value = true;
+    form.value = {
+        id: null,
+        no: null,
+        nama: "",
+        nisn: "",
+        kampanye: "",
+        visi: "",
+        misi: "",
+        proker: "",
+        pengalaman: "",
+        prestasi: "",
+        existing_photo_url: null,
+    };
+    photoPreview.value = null;
+    fileToUpload.value = null;
+    rawPhotoUrl.value = null;
+    croppedPhotoBlob.value = null;
 }
 
 async function submitForm() {
-  isSubmitting.value = true;
-  
-  const formData = new FormData();
-  formData.append('no', form.value.no);
-  formData.append('nama', form.value.nama);
-  formData.append('nisn', form.value.nisn);
-  formData.append('kampanye', form.value.kampanye);
-  formData.append('visi', form.value.visi);
-  formData.append('misi', form.value.misi);
-  formData.append('proker', form.value.proker);
-  formData.append('pengalaman', form.value.pengalaman);
-  formData.append('prestasi', form.value.prestasi);
-  
-  if (fileToUpload.value) {
-    formData.append('photo', fileToUpload.value);
-  }
+    isSubmitting.value = true;
 
-  try {
-    if (form.value.id) {
-      await api.post(`/admin-sekolah/kandidat/${form.value.id}`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-      toast.success(`Kandidat No ${form.value.no} berhasil diperbarui`);
-    } else {
-      await api.post(`/admin-sekolah/kandidat`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-      toast.success(`Kandidat baru berhasil ditambahkan`);
+    const formData = new FormData();
+    formData.append("no", form.value.no);
+    formData.append("nama", form.value.nama);
+    formData.append("nisn", form.value.nisn);
+    formData.append("kampanye", form.value.kampanye);
+    formData.append("visi", form.value.visi);
+    formData.append("misi", form.value.misi);
+    formData.append("proker", form.value.proker);
+    formData.append("pengalaman", form.value.pengalaman);
+    formData.append("prestasi", form.value.prestasi);
+
+    if (fileToUpload.value) {
+        formData.append("photo", fileToUpload.value);
     }
-    
-    isEditing.value = false;
-    fetchKandidat();
-  } catch (error) {
-    if (error.response?.data?.message) {
-      toast.error(error.response.data.message);
-    } else {
-      toast.error('Gagal menyimpan kandidat');
+
+    try {
+        if (form.value.id) {
+            await api.post(
+                `/admin-sekolah/kandidat/${form.value.id}`,
+                formData,
+                {
+                    headers: { "Content-Type": "multipart/form-data" },
+                },
+            );
+            toast.success(`Kandidat No ${form.value.no} berhasil diperbarui`);
+        } else {
+            await api.post(`/admin-sekolah/kandidat`, formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
+            toast.success(`Kandidat baru berhasil ditambahkan`);
+        }
+
+        isEditing.value = false;
+        fetchKandidat();
+    } catch (error) {
+        toast.error(error.response?.data?.message || "Gagal menyimpan kandidat");
+    } finally {
+        isSubmitting.value = false;
     }
-  } finally {
-    isSubmitting.value = false;
-  }
 }
 
 async function deleteKandidat(id) {
-  if (!confirm('Anda yakin ingin menghapus kandidat ini secara permanen?')) return;
-  try {
-    await api.delete(`/admin-sekolah/kandidat/${id}`);
-    toast.success('Kandidat berhasil dihapus');
-    fetchKandidat();
-  } catch (error) {
-    toast.error('Gagal menghapus kandidat');
-  }
+    if (!confirm("Anda yakin ingin menghapus kandidat ini secara permanen?"))
+        return;
+    try {
+        await api.delete(`/admin-sekolah/kandidat/${id}`);
+        toast.success("Kandidat berhasil dihapus");
+        fetchKandidat();
+    } catch (error) {
+        toast.error(error.response?.data?.message || "Gagal menghapus kandidat")
+    }
 }
 </script>

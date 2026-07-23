@@ -16,10 +16,10 @@ class WaktuPemilihanService
      * @param string $npsn NPSN Sekolah
      * @return array Array berisi boolean 'is_open' dan pesan status 'message'
      */
-    public function cekJadwalBuka($jenis, $tahun, $npsn)
+    public function cekJadwalBuka($jenisReadable, $tahun, $npsn)
     {
         $setting = DB::table('tb_setting_waktu_pemilihan')
-            ->where('jenis', $jenis)
+            ->where('jenis', $jenisReadable)
             ->where('tahun', $tahun)
             ->where('npsn', $npsn)
             ->first();
@@ -36,11 +36,12 @@ class WaktuPemilihanService
         $mulai = Carbon::parse($setting->waktu_mulai);
         $selesai = Carbon::parse($setting->waktu_selesai);
 
+        $jenisReadable = str_replace('_', ' ', $jenisReadable);
         // Jika waktu_mulai dan waktu_selesai bukan NULL, Carbon::parse sudah akan membaca jam/menitnya
         if ($now->lt($mulai)) {
             return [
                 'is_open' => false,
-                'message' => 'Waktu pemilihan belum dimulai.',
+                'message' => 'Waktu ' . $jenisReadable . ' belum dimulai.',
                 'setting' => $setting
             ];
         }
@@ -48,14 +49,14 @@ class WaktuPemilihanService
         if ($now->gt($selesai)) {
             return [
                 'is_open' => false,
-                'message' => 'Waktu pemilihan sudah berakhir.',
+                'message' => 'Waktu ' . $jenisReadable .  ' sudah berakhir.',
                 'setting' => $setting
             ];
         }
 
         return [
             'is_open' => true,
-            'message' => 'Waktu pemilihan sedang berlangsung.',
+            'message' => 'Waktu ' . $jenisReadable . ' sedang berlangsung.',
             'setting' => $setting
         ];
     }
