@@ -22,11 +22,11 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
-                                <input type="text" v-model="form.ketua.nama" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Masukkan nama ketua">
+                                <input type="text" v-model="form.ketua.nama" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:text-sm" placeholder="Masukkan nama ketua">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">NIS / Identitas</label>
-                                <input type="text" v-model="form.ketua.identitas" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Masukkan NIS/NIK">
+                                <input type="text" v-model="form.ketua.identitas" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:text-sm" placeholder="Masukkan NIS/NIK">
                             </div>
                         </div>
                     </div>
@@ -40,11 +40,11 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
-                                <input type="text" v-model="form.anggota_1.nama" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Masukkan nama anggota 1">
+                                <input type="text" v-model="form.anggota_1.nama" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:text-sm" placeholder="Masukkan nama anggota 1">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">NIS / Identitas</label>
-                                <input type="text" v-model="form.anggota_1.identitas" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Masukkan NIS/NIK">
+                                <input type="text" v-model="form.anggota_1.identitas" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:text-sm" placeholder="Masukkan NIS/NIK">
                             </div>
                         </div>
                     </div>
@@ -58,11 +58,11 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
-                                <input type="text" v-model="form.anggota_2.nama" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Masukkan nama anggota 2">
+                                <input type="text" v-model="form.anggota_2.nama" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:text-sm" placeholder="Masukkan nama anggota 2">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">NIS / Identitas</label>
-                                <input type="text" v-model="form.anggota_2.identitas" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Masukkan NIS/NIK">
+                                <input type="text" v-model="form.anggota_2.identitas" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:text-sm" placeholder="Masukkan NIS/NIK">
                             </div>
                         </div>
                     </div>
