@@ -36,7 +36,6 @@
                                 </td>
                                 <td class="px-4 py-3">
                                     <div class="font-bold text-gray-800 capitalize">{{ item.label || formatJenis(item.jenis) }}</div>
-                                    <div v-if="item.deskripsi" class="text-xs text-gray-500 mt-1">{{ item.deskripsi }}</div>
                                 </td>
                                 <td class="px-4 py-3">
                                     <input

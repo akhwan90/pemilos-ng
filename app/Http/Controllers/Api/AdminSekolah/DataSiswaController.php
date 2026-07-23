@@ -5,9 +5,17 @@ namespace App\Http\Controllers\Api\AdminSekolah;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Services\WaktuPemilihanService;
 
 class DataSiswaController extends Controller
 {
+    protected $waktuPemilihanService;
+
+    public function __construct(WaktuPemilihanService $waktuPemilihanService)
+    {
+        $this->waktuPemilihanService = $waktuPemilihanService;
+    }
+
     public function index(Request $request)
     {
         $npsn = $request->user()->npsn;
@@ -64,6 +72,14 @@ class DataSiswaController extends Controller
 
     public function store(Request $request)
     {
+        $npsn = $request->user()->npsn;
+        $tahun = env('TAHUN_AKTIF', date('Y'));
+        
+        $cek = $this->waktuPemilihanService->cekJadwalBuka('input_data_dps', $tahun, $npsn);
+        if (!$cek['is_open']) {
+            return response()->json(['success' => false, 'message' => 'Penambahan ditolak: ' . $cek['message']], 403);
+        }
+
         $request->validate([
             'nisn' => 'required|string|max:100|unique:tb_siswa,nisn',
             'nm_siswa' => 'required|string|max:200',
@@ -71,8 +87,6 @@ class DataSiswaController extends Controller
             'kelas' => 'required|string|max:50',
             'difabel' => 'required|integer'
         ]);
-
-        $npsn = $request->user()->npsn;
 
         DB::table('tb_siswa')->insert([
             'nisn' => $request->nisn,
@@ -95,6 +109,12 @@ class DataSiswaController extends Controller
     public function update(Request $request, $id)
     {
         $npsn = $request->user()->npsn;
+        $tahun = env('TAHUN_AKTIF', date('Y'));
+        
+        $cek = $this->waktuPemilihanService->cekJadwalBuka('input_data_dps', $tahun, $npsn);
+        if (!$cek['is_open']) {
+            return response()->json(['success' => false, 'message' => 'Pembaruan ditolak: ' . $cek['message']], 403);
+        }
 
         $request->validate([
             'nisn' => 'required|string|max:100|unique:tb_siswa,nisn,' . $id,
@@ -155,7 +175,13 @@ class DataSiswaController extends Controller
     public function destroy(Request $request, $id)
     {
         $npsn = $request->user()->npsn;
+        $tahun = env('TAHUN_AKTIF', date('Y'));
         $user_id = $request->user()->id; // id admin login
+        
+        $cek = $this->waktuPemilihanService->cekJadwalBuka('input_data_dps', $tahun, $npsn);
+        if (!$cek['is_open']) {
+            return response()->json(['success' => false, 'message' => 'Penghapusan ditolak: ' . $cek['message']], 403);
+        }
 
         $request->validate([
             'alasan_hapus' => 'required|integer|in:2,3' // 2: Lulus, 3: Pindah
@@ -176,7 +202,13 @@ class DataSiswaController extends Controller
     public function bulkDestroy(Request $request)
     {
         $npsn = $request->user()->npsn;
+        $tahun = env('TAHUN_AKTIF', date('Y'));
         $user_id = $request->user()->id;
+        
+        $cek = $this->waktuPemilihanService->cekJadwalBuka('input_data_dps', $tahun, $npsn);
+        if (!$cek['is_open']) {
+            return response()->json(['success' => false, 'message' => 'Penghapusan ditolak: ' . $cek['message']], 403);
+        }
 
         $request->validate([
             'ids' => 'required|array',

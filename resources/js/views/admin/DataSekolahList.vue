@@ -209,7 +209,7 @@
                                                 openModal('user', item.npsn)
                                             "
                                             class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                            >Buat User (Level 2)</a
+                                            >User Sekolah</a
                                         >
                                         <a
                                             href="#"
@@ -217,7 +217,7 @@
                                                 openModal('jadwal', item.npsn)
                                             "
                                             class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                            >Setting Jadwal Pemilihan</a
+                                            >Jadwal Pemilihan</a
                                         >
                                         <div
                                             class="border-t border-gray-100 my-1"
@@ -228,7 +228,7 @@
                                                 openModal('kandidat', item.npsn)
                                             "
                                             class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                            >Data Kandidat</a
+                                            >Kandidat</a
                                         >
                                         <a
                                             href="#"
@@ -236,7 +236,7 @@
                                                 openModal('tps', item.npsn)
                                             "
                                             class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                            >Data TPS</a
+                                            >TPS</a
                                         >
                                         <a
                                             href="#"
@@ -244,7 +244,7 @@
                                                 openModal('siswa', item.npsn)
                                             "
                                             class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                            >Data DPT (Siswa)</a
+                                            >DPT</a
                                         >
                                         <div
                                             class="border-t border-gray-100 my-1"
