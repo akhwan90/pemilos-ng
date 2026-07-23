@@ -132,10 +132,10 @@
 import { ref, onMounted } from 'vue';
 import api from '../../services/api';
 import { useAuthStore } from '../../stores/auth';
-import { useNotificationStore } from '../../stores/notification';
+import { useToast } from '../../composables/useToast';
 
 const authStore = useAuthStore();
-const notifStore = useNotificationStore();
+const toast = useToast();
 
 const loading = ref(false);
 const tpsName = ref(authStore.user?.nama || 'TPS');
@@ -178,11 +178,11 @@ async function savePerangkat() {
     try {
         const res = await api.post('/admin-tps/perangkat', form.value);
         if (res.data.success) {
-            notifStore.showNotification('Data Perangkat TPS berhasil disimpan.', 'success');
+            toast.success('Data Perangkat TPS berhasil disimpan.');
         }
     } catch (error) {
         console.error('Gagal menyimpan:', error);
-        notifStore.showNotification('Terjadi kesalahan saat menyimpan.', 'error');
+        toast.error('Terjadi kesalahan saat menyimpan.');
     } finally {
         loading.value = false;
     }

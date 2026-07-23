@@ -121,11 +121,11 @@
 import { ref, onMounted, computed } from 'vue';
 import api from '../../services/api';
 import { useAuthStore } from '../../stores/auth';
-import { useNotificationStore } from '../../stores/notification';
+import { useToast } from '../../composables/useToast';
 import moment from 'moment';
 
 const authStore = useAuthStore();
-const notifStore = useNotificationStore();
+const toast = useToast();
 
 const loading = ref(false);
 const showConfirmModal = ref(false);
@@ -158,14 +158,14 @@ async function submitSelesai() {
     try {
         const res = await api.post('/admin-tps/akhiri-pemilihan');
         if (res.data.success) {
-            notifStore.showNotification('Pemilihan berhasil diakhiri!', 'success');
+            toast.success('Pemilihan berhasil diakhiri!');
             isSelesai.value = true;
             selesaiWaktu.value = res.data.selesai_time || new Date().toISOString();
             showConfirmModal.value = false;
         }
     } catch (error) {
         console.error('Gagal mengakhiri pemilihan', error);
-        notifStore.showNotification('Terjadi kesalahan sistem saat mencoba menutup TPS.', 'error');
+        toast.error('Terjadi kesalahan sistem saat mencoba menutup TPS.');
     } finally {
         loading.value = false;
     }
