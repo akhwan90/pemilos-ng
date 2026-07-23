@@ -7,9 +7,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Jobs\ImportSiswaJob;
 use Illuminate\Support\Str;
+use App\Services\WaktuPemilihanService;
 
 class UploadSiswaController extends Controller
 {
+    protected $waktuPemilihanService;
+
+    public function __construct(WaktuPemilihanService $waktuPemilihanService)
+    {
+        $this->waktuPemilihanService = $waktuPemilihanService;
+    }
+
     public function history(Request $request)
     {
         $username = $request->user()->username;
@@ -29,11 +37,17 @@ class UploadSiswaController extends Controller
 
     public function upload(Request $request)
     {
+        $user = $request->user();
+        $tahun = env('TAHUN_AKTIF', date('Y'));
+        
+        $cek = $this->waktuPemilihanService->cekJadwalBuka('input_data_dps', $tahun, $user->npsn);
+        if (!$cek['is_open']) {
+            return response()->json(['success' => false, 'message' => 'Upload ditolak: ' . $cek['message']], 403);
+        }
+
         $request->validate([
             'file_excel' => 'required|file|mimes:xlsx|max:2048'
         ]);
-
-        $user = $request->user();
 
         // Cek apakah sekolah sudah mulai memilih (dari tb_siswa_tps)
         $cekSudahMemilih = DB::table('tb_siswa_tps')

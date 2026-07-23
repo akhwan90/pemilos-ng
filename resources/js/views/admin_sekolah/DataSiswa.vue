@@ -549,6 +549,8 @@ async function submitForm() {
     } catch (error) {
         if (error.response?.data?.errors?.nisn) {
             toast.error("Gagal: NISN sudah terdaftar di database.");
+        } else if (error.response?.data?.message) {
+            toast.error(error.response.data.message);
         } else {
             toast.error("Terjadi kesalahan saat menyimpan data.");
         }
