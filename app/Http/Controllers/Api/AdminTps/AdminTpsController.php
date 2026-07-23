@@ -213,4 +213,110 @@ class AdminTpsController extends Controller
             'data' => $perangkatData
         ]);
     }
+
+    /**
+    * Dapatkan config laporan C2 TPS
+    */
+    public function getC2(Request $request)
+    {
+        $user = $request->user();
+        if ($user->level != 3) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized.'], 403);
+        }
+
+        $tpsSetting = DB::table('tb_tps_setting')
+            ->where('npsn', $user->npsn)
+            ->where('tahun', env('TAHUN_AKTIF', date('Y')))
+            ->where('id_kelas', $user->id_tps)
+            ->first();
+
+        $c2Config = null;
+        if ($tpsSetting && $tpsSetting->form_c2_config) {
+            $c2Config = json_decode($tpsSetting->form_c2_config, true);
+        }
+
+        if (!$c2Config) {
+            $c2Config = [
+                'ada_kejadian' => false,
+                'kejadian' => []
+            ];
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $c2Config
+        ]);
+    }
+
+    /**
+     * Simpan config laporan C2 TPS
+     */
+    public function saveC2(Request $request)
+    {
+        $user = $request->user();
+        if ($user->level != 3) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized.'], 403);
+        }
+
+        $request->validate([
+            'ada_kejadian' => 'required|boolean',
+            'kejadian' => 'nullable|array',
+            'kejadian.*.waktu' => 'nullable|string|max:10',
+            'kejadian.*.pelapor' => 'nullable|string|max:150',
+            'kejadian.*.uraian' => 'nullable|string'
+        ]);
+
+        $npsn = $user->npsn;
+        $tpsId = $user->id_tps;
+        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $now = date('Y-m-d H:i:s');
+
+        // Prepare the config data
+        $adaKejadian = filter_var($request->input('ada_kejadian'), FILTER_VALIDATE_BOOLEAN);
+        $kejadian = $request->input('kejadian', []);
+        
+        if (!is_array($kejadian)) {
+            $kejadian = [];
+        }
+
+        // If not ada_kejadian, force clear the list
+        if (!$adaKejadian) {
+            $kejadian = [];
+        }
+
+        $c2Data = [
+            'ada_kejadian' => $adaKejadian,
+            'kejadian' => $kejadian
+        ];
+
+        $jsonC2 = json_encode($c2Data);
+
+        $tpsSetting = DB::table('tb_tps_setting')
+            ->where('npsn', $npsn)
+            ->where('tahun', $tahun)
+            ->where('id_kelas', $tpsId)
+            ->first();
+
+        if ($tpsSetting) {
+            DB::table('tb_tps_setting')
+                ->where('id', $tpsSetting->id)
+                ->update(['form_c2_config' => $jsonC2]);
+        } else {
+            DB::table('tb_tps_setting')->insert([
+                'npsn' => $npsn,
+                'tahun' => $tahun,
+                'id_kelas' => $tpsId,
+                'is_generate_token' => 0,
+                'is_cetak_ba' => 0,
+                'form_c2_config' => $jsonC2,
+                'created_at' => $now
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data laporan C2 berhasil disimpan.',
+            'data' => $c2Data
+        ]);
+    }
 }
