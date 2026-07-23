@@ -151,7 +151,7 @@ const routes = [
             {
                 path: 'laporan-c1',
                 name: 'admin-tps-laporan-c1',
-                component: () => import('../views/admin_sekolah/Dashboard.vue'), // Placeholder
+                component: () => import('../views/admin_tps/LaporanC1.vue'),
             },
             {
                 path: 'laporan-c2',

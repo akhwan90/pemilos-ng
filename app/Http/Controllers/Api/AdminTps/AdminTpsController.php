@@ -319,4 +319,118 @@ class AdminTpsController extends Controller
             'data' => $c2Data
         ]);
     }
+
+    /**
+     * Dapatkan Laporan Hasil C1 (Hanya bisa diakses jika pemilihan telah diakhiri)
+     */
+    public function getHasilC1(Request $request)
+    {
+        $user = $request->user();
+        if ($user->level != 3) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized.'], 403);
+        }
+
+        $npsn = $user->npsn;
+        $tpsId = $user->id_tps;
+        $tahun = env('TAHUN_AKTIF', date('Y'));
+
+        $tpsSetting = DB::table('tb_tps_setting')
+            ->where('npsn', $npsn)
+            ->where('tahun', $tahun)
+            ->where('id_kelas', $tpsId)
+            ->first();
+
+        // 1. Pastikan pemilihan sudah selesai
+        if (!$tpsSetting || !$tpsSetting->selesai_pemilihan_time) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Laporan Hasil C1 belum tersedia. Anda harus mengakhiri pemilihan terlebih dahulu pada menu Selesai Pemilihan.'
+            ], 400);
+        }
+
+        // 2. Jika hasil sudah tersimpan di JSON, langsung gunakan itu
+        if ($tpsSetting->hasil) {
+            $hasilLengkap = json_decode($tpsSetting->hasil, true);
+        } else {
+            // 3. Jika belum di-generate (pertama kali buka setelah klik Selesai Pemilihan), hitung dan simpan
+            
+            // a. Ambil Paslon/Kandidat
+            $kandidatList = DB::table('tb_pilihan')
+                ->where('npsn', $npsn)
+                ->where('tahun', $tahun)
+                ->orderBy('no', 'asc')
+                ->get();
+
+            // b. Hitung Suara Masuk & DPT
+            $totalDpt = DB::table('tb_siswa_tps')
+                ->where('npsn', $npsn)
+                ->where('id_kelas', $tpsId)
+                ->where('tahun', $tahun)
+                ->count();
+
+            $suaraMasuk = DB::table('tb_siswa_tps')
+                ->where('npsn', $npsn)
+                ->where('id_kelas', $tpsId)
+                ->where('tahun', $tahun)
+                ->where('is_memilih', 1)
+                ->count();
+
+            // c. Hitung perolehan masing-masing paslon
+            $perolehanPaslon = [];
+            foreach ($kandidatList as $kand) {
+                $jumlahSuara = DB::table('tb_siswa_tps')
+                    ->where('npsn', $npsn)
+                    ->where('id_kelas', $tpsId)
+                    ->where('tahun', $tahun)
+                    ->where('is_memilih', 1)
+                    ->where('pilihan_id', $kand->id)
+                    ->count();
+
+                $perolehanPaslon[] = [
+                    'id_calon' => $kand->id,
+                    'no_urut' => $kand->no,
+                    'nama_ketua' => current(explode('<br>', $kand->nama)), // Ambil baris pertama jika ada tag <br>
+                    'nama_lengkap' => $kand->nama,
+                    'jumlah_suara' => $jumlahSuara
+                ];
+            }
+
+            // Validasi suara tidak sah (kalau is_memilih=1 tapi pilihan_id null atau tidak cocok)
+            // Di sistem e-voting standar ini jarang terjadi, tapi jaga-jaga
+            $totalSuaraSah = array_sum(array_column($perolehanPaslon, 'jumlah_suara'));
+            $suaraTidakSah = $suaraMasuk - $totalSuaraSah;
+
+            $hasilLengkap = [
+                'statistik' => [
+                    'total_dpt' => $totalDpt,
+                    'suara_masuk' => $suaraMasuk,
+                    'suara_sah' => $totalSuaraSah,
+                    'suara_tidak_sah' => $suaraTidakSah < 0 ? 0 : $suaraTidakSah,
+                    'tidak_memilih' => $totalDpt - $suaraMasuk
+                ],
+                'perolehan' => $perolehanPaslon,
+                'generated_at' => date('Y-m-d H:i:s')
+            ];
+
+            // Simpan snapshot hasil JSON secara permanen agar nilainya terkunci saat pemilihan selesai
+            DB::table('tb_tps_setting')
+                ->where('id', $tpsSetting->id)
+                ->update(['hasil' => json_encode($hasilLengkap)]);
+        }
+
+        // Ambil info nama kelas (TPS)
+        $namaKelas = DB::table('tb_kelas')->where('id', $tpsId)->value('nama_kelas');
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'tps' => $namaKelas,
+                'waktu_selesai' => $tpsSetting->selesai_pemilihan_time,
+                'hasil' => $hasilLengkap,
+                // Kita tambahkan URL file scan (jika sudah di-upload)
+                'file_c1_url' => $tpsSetting->form_c1_file ? asset('uploads/c1/' . $tpsSetting->form_c1_file) : null,
+                'file_c1_time' => $tpsSetting->form_c1_upload_time,
+            ]
+        ]);
+    }
 }
