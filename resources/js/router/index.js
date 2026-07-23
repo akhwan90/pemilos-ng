@@ -22,6 +22,11 @@ const routes = [
         name: 'detail-sekolah',
         component: () => import('../views/public/DetailSekolah.vue'),
     },
+    {
+        path: '/bantuan',
+        name: 'bantuan',
+        component: () => import('../views/public/Bantuan.vue'),
+    },
 
     // ===== ADMIN ROUTES =====
     {
