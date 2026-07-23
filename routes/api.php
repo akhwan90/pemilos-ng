@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\AdminSekolah\KandidatController;
 use App\Http\Controllers\Api\AdminSekolah\DataDptController;
 use App\Http\Controllers\Api\AdminSekolah\DokumentasiController;
 use App\Http\Controllers\Api\AdminSekolah\DashboardController;
+use App\Http\Controllers\Api\AdminTps\AdminTpsController;
 use App\Http\Controllers\Api\Bilik\BilikController;
 use App\Http\Controllers\Api\PublicController;
 
@@ -128,6 +129,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Dashboard Info
     Route::get('/admin-sekolah/dashboard', [DashboardController::class, 'index']);
+
+    // ==========================================
+    // LEVEL 3: ADMIN TPS API
+    // ==========================================
+    Route::get('/admin-tps/status-pemilihan', [AdminTpsController::class, 'getStatus']);
+    Route::post('/admin-tps/akhiri-pemilihan', [AdminTpsController::class, 'akhiriPemilihan']);
 
     // Bilik Suara API (Khusus Level 3)
     Route::post('/bilik/verify-token', [BilikController::class, 'verifyToken']);

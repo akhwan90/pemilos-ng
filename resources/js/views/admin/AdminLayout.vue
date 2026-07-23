@@ -136,6 +136,12 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
             Laporan C2
           </router-link>
+
+          <router-link to="/admin-tps/selesai" class="flex items-center gap-3 px-3 py-2 mt-4 rounded-lg text-sm font-bold transition-colors"
+            :class="$route.path.startsWith('/admin-tps/selesai') ? 'bg-red-50 text-red-700' : 'bg-red-600 text-white hover:bg-red-700'">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            Selesai Pemilihan
+          </router-link>
         </template>
       </nav>
 
