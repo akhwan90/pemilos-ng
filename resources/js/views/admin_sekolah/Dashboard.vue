@@ -386,9 +386,13 @@
                         >
                             <!-- Kiri: Judul dan Status Badge -->
                             <div class="mb-4 md:mb-0">
-                                <h3 class="font-bold text-gray-800 text-lg mb-2 capitalize">
-                                    {{ formatJenis(j.jenis) }}
+                                <h3 class="font-bold text-gray-800 text-lg mb-1 capitalize">
+                                    {{ j.label || formatJenis(j.jenis) }}
                                 </h3>
+                                
+                                <p v-if="j.deskripsi" class="text-sm text-gray-500 mb-3 max-w-md">
+                                    {{ j.deskripsi }}
+                                </p>
 
                                 <span
                                     v-if="j.status === 'aktif'"
