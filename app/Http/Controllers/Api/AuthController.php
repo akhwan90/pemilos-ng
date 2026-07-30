@@ -21,6 +21,9 @@ class AuthController extends Controller
         $request->validate([
             'username' => 'required|string',
             'password' => 'required|string',
+            'captcha' => 'required|captcha_api:' . $request->input('captcha_key') . ',math'
+        ], [
+            'captcha.captcha_api' => 'Captcha yang Anda masukkan salah.'
         ]);
 
         // Cek admin by username

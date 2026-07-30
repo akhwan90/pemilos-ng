@@ -15,10 +15,10 @@
 				</div>
 				<form @submit.prevent="handleLogin">
 					<div class="mb-4">
-						<label class="block text-sm font-medium text-gray-700 mb-1">Username (Admin/NPSN)</label>
+						<label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
 						<input v-model="username" type="text" required autocomplete="username" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" />
 					</div>
-					<div class="mb-6">
+					<div class="mb-4">
 						<label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
 						<div class="relative">
 							<input
@@ -42,6 +42,22 @@
 									/>
 								</svg>
 							</button>
+						</div>
+					</div>
+
+					<div class="mb-6">
+						<label class="block text-sm font-medium text-gray-700 mb-1">Captcha</label>
+						<div class="flex items-center gap-3">
+							<div class="bg-gray-100 p-1 rounded border min-h-[40px] min-w-[120px] flex items-center justify-center cursor-pointer flex-shrink-0" @click="refreshCaptcha" title="Klik untuk refresh captcha">
+								<img v-if="captchaImage" :src="captchaImage" alt="captcha" class="max-h-full" />
+								<span v-else class="text-xs text-gray-400">Loading...</span>
+							</div>
+							<button type="button" @click="refreshCaptcha" class="text-sm text-indigo-600 hover:text-indigo-800 p-2 flex-shrink-0">
+								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+								</svg>
+							</button>
+							<input v-model="captchaValue" type="text" required placeholder="Hasil" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm uppercase" />
 						</div>
 					</div>
 
@@ -70,6 +86,7 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../../stores/auth';
 import api from '../../services/api';
+import axios from 'axios';
 
 const router = useRouter();
 const auth = useAuthStore();
@@ -83,17 +100,24 @@ const loading = ref(false);
 const errorMsg = ref('');
 
 async function refreshCaptcha() {
-	/*
-  try {
-    const res = await api.get('/captcha');
-    console.log(res.data);
-    captchaImage.value = res.data.img;
-    captchaKey.value = res.data.key;
-    captchaValue.value = '';
-  } catch (e) {
-    console.error('Gagal memuat captcha:', e);
-  }
-  */
+	try {
+		// Gunakan axios langsung agar tidak terkena prefix baseURL '/api'
+		const res = await axios.get('/captcha/api/math');
+		if (res.data && res.data.img) {
+			// Periksa apakah res.data.img berupa object atau string (base64)
+			if (typeof res.data.img === 'string') {
+				captchaImage.value = res.data.img.startsWith('data:image')
+					? res.data.img
+					: 'data:image/jpeg;base64,' + res.data.img;
+			} else {
+				captchaImage.value = '';
+			}
+		}
+		captchaKey.value = res.data.key;
+		captchaValue.value = '';
+	} catch (e) {
+		console.error('Gagal memuat captcha:', e);
+	}
 }
 
 onMounted(() => {
@@ -108,6 +132,8 @@ async function handleLogin() {
 		const res = await api.post('/login', {
 			username: username.value,
 			password: password.value,
+			captcha: captchaValue.value,
+			captcha_key: captchaKey.value,
 		});
 
 		// Set data auth secara manual jika sukses login

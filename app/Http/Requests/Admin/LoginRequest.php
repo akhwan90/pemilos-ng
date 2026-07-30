@@ -16,7 +16,7 @@ class LoginRequest extends FormRequest
         return [
             'username' => ['required', 'string'],
             'password' => ['required', 'string'],
-            'captcha' => ['required', 'captcha_api:' . request('key') . ',default'],
+            'captcha' => ['required', 'captcha_api:' . request('captcha_key') . ',math'],
         ];
     }
 
