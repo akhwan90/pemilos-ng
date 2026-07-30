@@ -5,68 +5,105 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use App\Models\Admin;
 
 class DataUserController extends Controller
 {
     public function index(Request $request)
     {
-        // Hanya boleh diakses Super Admin (Level 1)
-        if ($request->user()->level != 1) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
-
-        $search = $request->query('cari');
-        $filterLevel = $request->query('level');
-
         $query = DB::table('tb_admin')
-        ->leftJoin('tb_sekolah', 'tb_admin.npsn', '=', 'tb_sekolah.npsn')
-        ->leftJoin('tb_kelas', 'tb_admin.id_tps', '=', 'tb_kelas.kd_kelas')
-        ->select(
-            'tb_admin.id',
-            'tb_admin.username',
-            'tb_admin.level',
-            'tb_admin.npsn',
-            'tb_admin.id_tps',
-            'tb_admin.level_4_kewenangan',
-            'tb_sekolah.nama_sekolah',
-            'tb_kelas.nm_kelas',
-            DB::raw("IF(LEFT(password, 1) = '$', 1, 0) AS status_password")
-        )
-        ;
+            ->leftJoin('tb_sekolah', 'tb_admin.npsn', '=', 'tb_sekolah.npsn')
+            ->leftJoin('tb_kelas', 'tb_admin.id_tps', '=', 'tb_kelas.kd_kelas')
+            ->select(
+                'tb_admin.id',
+                'tb_admin.username',
+                'tb_admin.level',
+                'tb_admin.password',
+                'tb_sekolah.nama_sekolah',
+                'tb_kelas.nm_kelas'
+            );
 
-        if (!empty($search)) {
-            $query->where(function($q) use ($search) {
-                $q->where('tb_admin.username', 'like', "%{$search}%")
-                ;
-            });
+        if ($request->has('cari') && !empty($request->cari)) {
+            $query->where('tb_admin.username', 'like', '%' . $request->cari . '%');
         }
 
-        if (!empty($filterLevel)) {
-            $query->where('tb_admin.level', intval($filterLevel));
+        if ($request->has('level') && !empty($request->level)) {
+            $query->where('tb_admin.level', $request->level);
         }
 
-        $siswa = $query->orderBy('tb_admin.npsn', 'asc')
-                      ->orderBy('tb_admin.level', 'asc')
-                      ->orderBy('tb_admin.username', 'asc')
-                      ->paginate(100)
-                      ;
+        $query->where('tb_admin.id', '!=', $request->user()->id);
 
-        return response()->json($siswa);
+        $users = $query->orderBy('tb_admin.level', 'asc')
+                       ->orderBy('tb_admin.username', 'asc')
+                       ->paginate(100);
+
+        $users->getCollection()->transform(function ($item) {
+            $isBcrypt = str_starts_with($item->password, '$2y$');
+            return [
+                'id' => $item->id,
+                'username' => $item->username,
+                'level' => $item->level,
+                'nama_sekolah' => $item->nama_sekolah ?? '-',
+                'nm_kelas' => $item->nm_kelas ?? '-',
+                'status_password' => $isBcrypt ? 'Sudah (Bcrypt)' : 'Belum (MD5/Plain)',
+                'level_4_kewenangan' => $item->level == 4 ? 'Semua Sekolah' : null
+            ];
+        });
+
+        return response()->json($users);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'password' => 'nullable|string|min:6',
+        ]);
+
+        $admin = Admin::find($id);
+
+        if (!$admin) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data user tidak ditemukan.',
+            ], 404);
+        }
+
+        if ($request->filled('password')) {
+            $admin->password = Hash::make($request->password);
+            $admin->save();
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data user berhasil diperbarui.',
+        ]);
     }
 
     public function destroy(Request $request, $id)
     {
-        // Hanya boleh diakses Super Admin (Level 1)
-        if ($request->user()->level != 1) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+        $admin = Admin::find($id);
+
+        if (!$admin) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data user tidak ditemukan.',
+            ], 404);
         }
 
-        $deleted = DB::table('tb_siswa')->where('id', $id)->delete();
-
-        if ($deleted) {
-            return response()->json(['message' => 'Data siswa berhasil dihapus secara permanen.']);
+        if ($admin->id === $request->user()->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Anda tidak bisa menghapus akun Anda sendiri.',
+            ], 400);
         }
 
-        return response()->json(['message' => 'Data siswa tidak ditemukan.'], 404);
+        $admin->tokens()->delete();
+        $admin->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'User berhasil dihapus.',
+        ]);
     }
 }

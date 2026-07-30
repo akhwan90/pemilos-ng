@@ -78,7 +78,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::prefix('admin/data-user')->group(function() {
         Route::get('/', [App\Http\Controllers\Api\Admin\DataUserController::class, 'index']);
+        Route::put('/{id}', [App\Http\Controllers\Api\Admin\DataUserController::class, 'update']);
+        Route::delete('/{id}', [App\Http\Controllers\Api\Admin\DataUserController::class, 'destroy']);
     });
+    
+    // Log Approval Pindah Sekolah
+    Route::get('/admin/log-approval', [App\Http\Controllers\Api\Admin\LogApprovalController::class, 'index']);
 
 
     // ==========================================
