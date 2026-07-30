@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\Admin\JadwalSekolahController;
 use App\Http\Controllers\Api\Admin\KandidatSekolahController;
 use App\Http\Controllers\Api\Admin\TpsSekolahController;
 use App\Http\Controllers\Api\Admin\DataSiswaGlobalController;
+use App\Http\Controllers\Api\Admin\AktivitasController;
 use App\Http\Controllers\Api\AdminSekolah\IdentitasSekolahController;
 use App\Http\Controllers\Api\AdminSekolah\DataSiswaController;
 use App\Http\Controllers\Api\AdminSekolah\UploadSiswaController;
@@ -71,6 +72,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // Data Siswa Global
     Route::get('/admin/data-siswa-global', [DataSiswaGlobalController::class, 'index']);
     Route::delete('/admin/data-siswa-global/{id}', [DataSiswaGlobalController::class, 'destroy']);
+
+    // Data Aktivitas
+    Route::get('/admin/aktivitas', [AktivitasController::class, 'index']);
 
     Route::prefix('admin/data-user')->group(function() {
         Route::get('/', [App\Http\Controllers\Api\Admin\DataUserController::class, 'index']);
