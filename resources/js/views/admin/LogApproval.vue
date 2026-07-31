@@ -26,17 +26,20 @@
 							<th class="px-6 py-4 font-medium">No</th>
 							<th class="px-6 py-4 font-medium">NPSN Pemohon</th>
 							<th class="px-6 py-4 font-medium">NISN</th>
-							<th class="px-6 py-4 font-medium">NPSN Tujuan</th>
+							<th class="px-6 py-4 font-medium">Terdaftar Di</th>
 							<th class="px-6 py-4 font-medium">Nama Siswa Baru</th>
 							<th class="px-6 py-4 font-medium">Gender</th>
 							<th class="px-6 py-4 font-medium">Kelas Baru</th>
 							<th class="px-6 py-4 font-medium">Status</th>
 							<th class="px-6 py-4 font-medium">Tanggal Dibuat</th>
+							<th class="px-6 py-4 font-medium">Tanggal Approve</th>
+							<th class="px-6 py-4 font-medium">User Approve</th>
+							<th class="px-6 py-4 font-medium">Aksi</th>
 						</tr>
 					</thead>
 					<tbody class="divide-y divide-gray-200 text-sm">
 						<tr v-if="loading">
-							<td colspan="9" class="px-6 py-12 text-center text-gray-500">
+							<td colspan="12" class="px-6 py-12 text-center text-gray-500">
 								<div class="flex justify-center items-center gap-2">
 									<svg class="animate-spin h-5 w-5 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
 										<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -47,7 +50,7 @@
 							</td>
 						</tr>
 						<tr v-else-if="logs.length === 0">
-							<td colspan="9" class="px-6 py-12 text-center text-gray-500">
+							<td colspan="12" class="px-6 py-12 text-center text-gray-500">
 								<div class="flex flex-col items-center justify-center">
 									<svg class="w-12 h-12 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -81,10 +84,32 @@
 								{{ item.kelas_baru || '-' }}
 							</td>
 							<td class="px-6 py-4 whitespace-nowrap">
-								<StatusBadge :status="item.status" />
+								<StatusBadge 
+									:status="Number(item.status) === 1 ? 'disetujui' : (Number(item.status) === 2 ? 'ditolak' : 'baru')" 
+									:label="Number(item.status) === 1 ? 'Sudah Diapprove' : (Number(item.status) === 2 ? 'Ditolak' : 'Belum Diapprove')" 
+								/>
 							</td>
 							<td class="px-6 py-4 whitespace-nowrap text-gray-500">
 								{{ formatDate(item.created_at) }}
+							</td>
+							<td class="px-6 py-4 whitespace-nowrap text-gray-500">
+								{{ Number(item.status) === 1 ? formatDate(item.disetujui_at) : '-' }}
+							</td>
+							<td class="px-6 py-4 whitespace-nowrap text-gray-700">
+								{{ Number(item.status) === 1 ? (item.user_pengapprove || '-') : '-' }}
+							</td>
+							<td class="px-6 py-4 whitespace-nowrap text-center">
+								<BaseButton 
+									v-if="Number(item.status) === 0"
+									variant="success"
+									@click="approvePermohonan(item)" 
+									:disabled="isProcessing"
+									:loading="isProcessing"
+									class="inline-flex items-center gap-1.5 !px-3 !py-1.5 !text-xs"
+								>
+									<svg v-if="!isProcessing" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+									Approve
+								</BaseButton>
 							</td>
 						</tr>
 					</tbody>
@@ -127,13 +152,17 @@
 import { ref, onMounted, watch } from 'vue';
 import api from '../../services/api';
 import BaseCard from '../../components/BaseCard.vue';
+import BaseButton from '../../components/BaseButton.vue';
 import StatusBadge from '../../components/StatusBadge.vue';
+import { useToast } from '../../composables/useToast';
 import moment from 'moment';
 import 'moment/dist/locale/id';
 
 moment.locale('id');
 
+const toast = useToast();
 const loading = ref(false);
+const isProcessing = ref(false);
 const logs = ref([]);
 const search = ref('');
 const pagination = ref({
@@ -169,6 +198,27 @@ const fetchLogs = async (page = 1) => {
 		console.error('Error fetching logs:', error);
 	} finally {
 		loading.value = false;
+	}
+};
+
+const approvePermohonan = async (item) => {
+	if (!confirm(`Apakah Anda yakin ingin menyetujui kepindahan siswa dengan NISN ${item.nisn}?`)) {
+		return;
+	}
+
+	try {
+		isProcessing.value = true;
+		const response = await api.post(`/admin/log-approval/${item.id}/approve`);
+
+		if (response.data.status === 'success') {
+			fetchLogs(pagination.value.current_page);
+			toast.success('Berhasil menyetujui permohonan pindah sekolah.');
+		}
+	} catch (error) {
+		console.error('Error approving data:', error);
+		toast.error(error.response?.data?.message || 'Terjadi kesalahan saat memproses data.');
+	} finally {
+		isProcessing.value = false;
 	}
 };
 

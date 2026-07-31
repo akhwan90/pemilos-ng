@@ -97,6 +97,11 @@ const routes = [
                 component: () => import('../views/admin_sekolah/Dashboard.vue'),
             },
             {
+                path: 'approval-pindah',
+                name: 'admin-sekolah-approval-pindah',
+                component: () => import('../views/admin_sekolah/ApprovalPindah.vue'),
+            },
+            {
                 path: 'identitas',
                 name: 'admin-sekolah-identitas',
                 component: () => import('../views/admin_sekolah/IdentitasSekolah.vue'),

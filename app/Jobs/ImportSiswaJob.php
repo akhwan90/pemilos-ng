@@ -64,6 +64,7 @@ class ImportSiswaJob implements ShouldQueue
                         // Mapping struktur sesuai template excel lama CI3
                         // Asumsi kolom: A: NISN, B: NIK, C: Nama, D: JK(L/P), E: Kelas, F: Difabel, G: WA, H: Email
                         $nisn = trim($row[0] ?? '');
+                        $nisn = str_replace(['.', '-', '\'', '`', '‘'], '', $nisn);
                         $nama = trim($row[1] ?? '');
                         $jk_str = trim(strtolower($row[2] ?? ''));
                         $kelas = trim($row[3] ?? '');
@@ -139,7 +140,7 @@ class ImportSiswaJob implements ShouldQueue
                                 if ($cek_nisn->npsn == $this->npsn) {
                                     // Update jika NPSN sama
                                     DB::table('tb_siswa')->where('id', $cek_nisn->id)->update([
-                                        'nik' => $nik,
+                                        // 'nik' => $nik,
                                         'nm_siswa' => $nama,
                                         'jk' => $jk,
                                         'kelas' => $kelas,
@@ -163,7 +164,6 @@ class ImportSiswaJob implements ShouldQueue
                                             'npsn' => $cek_nisn->npsn,
                                             'status' => 0,
                                             'created_at' => date('Y-m-d H:i:s'),
-                                            'nik_baru' => $nik,
                                             'nama_baru' => $nama,
                                             'jk_baru' => $jk,
                                             'kelas_baru' => $kelas,

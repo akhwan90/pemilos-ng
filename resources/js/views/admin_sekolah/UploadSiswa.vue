@@ -13,15 +13,19 @@
 
     <!-- Peringatan -->
     <div class="bg-blue-50 border-l-4 border-blue-400 p-4">
-      <div class="flex">
-        <div class="flex-shrink-0">
+      <div class="flex items-start">
+        <div class="flex-shrink-0 mt-0.5">
           <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" /></svg>
         </div>
-        <div class="ml-3">
+        <div class="ml-3 flex-1 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <p class="text-sm text-blue-700">
             Pastikan format file Excel Anda mengikuti template standar. Baris pertama (header) akan diabaikan. Urutan kolom wajib:
             <strong>NISN | Nama Siswa | JK (1/2) | Kelas | Difabel (0/1/2/3)</strong>.
           </p>
+          <a href="/format_upload.xlsx" download="format_upload.xlsx" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-100 rounded-lg hover:bg-blue-200 transition-colors whitespace-nowrap">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+            Download Template
+          </a>
         </div>
       </div>
     </div>

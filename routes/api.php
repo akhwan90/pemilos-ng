@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\AdminSekolah\KandidatController;
 use App\Http\Controllers\Api\AdminSekolah\DataDptController;
 use App\Http\Controllers\Api\AdminSekolah\DokumentasiController;
 use App\Http\Controllers\Api\AdminSekolah\DashboardController;
+use App\Http\Controllers\Api\AdminSekolah\ApprovalPindahController;
 use App\Http\Controllers\Api\AdminTps\AdminTpsController;
 use App\Http\Controllers\Api\Bilik\BilikController;
 use App\Http\Controllers\Api\PublicController;
@@ -84,6 +85,7 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // Log Approval Pindah Sekolah
     Route::get('/admin/log-approval', [App\Http\Controllers\Api\Admin\LogApprovalController::class, 'index']);
+    Route::post('/admin/log-approval/{id}/approve', [App\Http\Controllers\Api\Admin\LogApprovalController::class, 'approve']);
 
 
     // ==========================================
@@ -135,6 +137,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/admin-sekolah/dokumentasi', [DokumentasiController::class, 'index']);
     Route::post('/admin-sekolah/dokumentasi', [DokumentasiController::class, 'store']); // Create / Upload Foto
     Route::delete('/admin-sekolah/dokumentasi/{id}', [DokumentasiController::class, 'destroy']);
+    
+    // Approval Pindah Sekolah
+    Route::get('/admin-sekolah/approval-pindah', [ApprovalPindahController::class, 'index']);
+    Route::post('/admin-sekolah/approval-pindah/{id}/approve', [ApprovalPindahController::class, 'approve']);
 
     // Dashboard Info
     Route::get('/admin-sekolah/dashboard', [DashboardController::class, 'index']);

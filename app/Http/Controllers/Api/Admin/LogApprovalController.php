@@ -28,7 +28,8 @@ class LogApprovalController extends Controller
                 'aproval_pindah_sekolah.kelas_baru',
                 'aproval_pindah_sekolah.status',
                 'aproval_pindah_sekolah.created_at',
-                'aproval_pindah_sekolah.disetujui_at'
+                'aproval_pindah_sekolah.disetujui_at',
+                'aproval_pindah_sekolah.user_pengapprove'
             )
             ->whereYear('aproval_pindah_sekolah.created_at', date('Y'));
 
@@ -49,5 +50,62 @@ class LogApprovalController extends Controller
         $logs = $query->orderBy('aproval_pindah_sekolah.created_at', 'desc')->paginate(15);
 
         return response()->json($logs);
+    }
+
+    public function approve(Request $request, $id)
+    {
+        $user = auth()->user();
+
+        // Ensure the approval record exists
+        $approval = DB::table('aproval_pindah_sekolah')
+            ->where('id', $id)
+            ->where('status', 0) // only allow pending approvals
+            ->first();
+
+        if (!$approval) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Data permohonan tidak ditemukan atau sudah diproses.'
+            ], 404);
+        }
+
+        DB::beginTransaction();
+        try {
+            // Update the approval record
+            DB::table('aproval_pindah_sekolah')
+                ->where('id', $id)
+                ->update([
+                    'status' => 1,
+                    'disetujui_at' => now(),
+                    'user_pengapprove' => $user->username
+                ]);
+
+            // Update the student record
+            DB::table('tb_siswa')
+                ->where('nisn', $approval->nisn)
+                ->update([
+                    'npsn' => $approval->user_pemohon_npsn,
+                    'kelas' => $approval->kelas_baru,
+                    'nm_siswa' => $approval->nama_baru,
+                    'jk' => $approval->jk_baru,
+                    'difabel' => $approval->difabel_baru,
+                    'no_wa' => $approval->nomor_wa_baru,
+                    'email' => $approval->email_baru
+                ]);
+
+            DB::commit();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Permohonan pindah sekolah berhasil disetujui.'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Terjadi kesalahan pada server saat memproses persetujuan.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }
