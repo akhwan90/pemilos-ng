@@ -61,7 +61,7 @@ class PublicController extends Controller
 
         $kandidat = [];
         $cekKampanye = $this->waktuPemilihanService->cekJadwalBuka('kampanye', $tahun, $npsn);
-        
+
         if ($cekKampanye['is_open'] || strpos($cekKampanye['message'], 'berakhir') !== false) {
             $kandidat = DB::table('tb_pilihan')
                 ->select('id', 'npsn', 'nama', 'no', 'photo', 'photo_wakil')
@@ -80,16 +80,16 @@ class PublicController extends Controller
             ]
         ]);
     }
-    
+
     /**
     * API Pendukung: Data DPS Sekolah
     */
     public function dataDps(Request $request, $npsn)
     {
         $tahun = env('TAHUN_AKTIF', date('Y'));
-        
+
         $cek = $this->waktuPemilihanService->cekJadwalBuka('pengumuman_data_dps', $tahun, $npsn);
-        
+
         // Membaca statusnya: Jika status belum open tapi juga bukan 'berakhir' (alias: belum diset atau belum masuk waktu mulai)
         if (!$cek['is_open'] && strpos($cek['message'], 'berakhir') === false) {
             return response()->json([
@@ -128,9 +128,9 @@ class PublicController extends Controller
     public function dataDpt(Request $request, $npsn)
     {
         $tahun = env('TAHUN_AKTIF', date('Y'));
-        
+
         $cek = $this->waktuPemilihanService->cekJadwalBuka('pengumuman_data_dpt', $tahun, $npsn);
-        
+
         if (!$cek['is_open'] && strpos($cek['message'], 'berakhir') === false) {
             return response()->json([
                 'success' => false,
@@ -155,7 +155,7 @@ class PublicController extends Controller
                   ->orWhere('st.nisn', 'like', "%{$search}%");
             });
         }
-        
+
         if (!empty($tpsId)) {
             $query->where('st.id_tps', $tpsId);
         }
@@ -193,7 +193,7 @@ class PublicController extends Controller
     public function arsipTahun($tahun)
     {
         if ($tahun >= 2022) {
-            $rawQuery = "SELECT 
+            $rawQuery = "SELECT
             tb_sekolah.npsn,
             tb_sekolah.nama_sekolah,
             tb_sekolah.jenjang,
@@ -207,14 +207,14 @@ class PublicController extends Controller
             ";
 
             $data = DB::select($rawQuery, [$tahun, $tahun, $tahun, $tahun, $tahun]);
-            
+
             foreach($data as &$item) {
                 if($item->persentase !== null) {
                     if($item->persentase !== null && $item->persentase <= 1.01) { $item->persentase = ((float)$item->persentase) * 100; }
                 }
             }
         } else {
-            $rawQuery = "SELECT 
+            $rawQuery = "SELECT
             a.npsn,
             a.nama_sekolah,
             a.jenjang,
@@ -226,21 +226,21 @@ class PublicController extends Controller
             WHERE a.is_delete = 0
             ORDER BY persentase DESC, jml_dpt DESC
             ";
-            
+
             $data = DB::select($rawQuery, [$tahun, $tahun, $tahun, $tahun, $tahun]);
-            
+
             foreach($data as &$item) {
                 if($item->persentase !== null) {
                     if($item->persentase !== null && $item->persentase <= 1.01) { $item->persentase = ((float)$item->persentase) * 100; }
                 }
             }
         }
-        
+
         // Pagination manual
         $page = request()->get('page', 1);
         $perPage = request()->get('per_page', 50);
         $offset = ($page - 1) * $perPage;
-        
+
         $total = count($data);
         $items = array_slice($data, $offset, $perPage);
 
@@ -259,7 +259,7 @@ class PublicController extends Controller
     public function arsipHasil($tahun, $npsn)
     {
         $sekolah = DB::table('tb_sekolah')->where('npsn', $npsn)->first();
-        
+
         if (!$sekolah) {
             return response()->json([
                 'success' => false,
@@ -268,13 +268,13 @@ class PublicController extends Controller
         }
 
         if ($tahun >= 2022) {
-            $rawQuery = "SELECT 
+            $rawQuery = "SELECT
             tb_pilihan.no,
             tb_pilihan.nama,
             tb_pilihan.photo,
             (SELECT COUNT(id) FROM tb_siswa_tps WHERE pilihan = tb_pilihan.id) AS jml_pemilih
             FROM tb_pilihan
-            WHERE tahun = ? AND npsn = ? 
+            WHERE tahun = ? AND npsn = ?
             ORDER BY jml_pemilih DESC
             ";
             $hasil = DB::select($rawQuery, [$tahun, $npsn]);
@@ -283,13 +283,13 @@ class PublicController extends Controller
         } else {
             $getJumlahDpt = "SELECT jml_dpt AS jml_dpt FROM rekap_per_sekolah WHERE id_sekolah = ? AND tahun = ?";
             $queryGetJumlahDpt = DB::selectOne($getJumlahDpt, [$npsn, $tahun]);
-            $rawQuery = "SELECT 
+            $rawQuery = "SELECT
             tb_pilihan.no,
             tb_pilihan.nama,
             tb_pilihan.photo,
             (SELECT jumlah_total_suara FROM rekap_hasil WHERE id_pilihan = tb_pilihan.id) AS jml_pemilih
             FROM tb_pilihan
-            WHERE tahun = ? AND npsn = ? 
+            WHERE tahun = ? AND npsn = ?
             ORDER BY jml_pemilih DESC
             ";
             $hasil = DB::select($rawQuery, [$tahun, $npsn]);
@@ -303,6 +303,22 @@ class PublicController extends Controller
                 'sekolah' => $sekolah,
                 'hasil' => $hasil,
                 'jumlahDpt' => $queryGetJumlahDpt
+            ]
+        ]);
+    }
+
+    public function stats(Request $request)
+    {
+        $jml_sekolah = DB::table('tb_sekolah')->where('is_delete', 0)->count();
+        $jml_pilihan = DB::table('tb_pilihan')->where('tahun', date('Y'))->count();
+        $jml_tps = DB::table('tb_kelas')->where('is_hapus', 0)->count();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'jml_sekolah' => $jml_sekolah,
+                'jml_pilihan' => $jml_pilihan,
+                'jml_tps' => $jml_tps,
             ]
         ]);
     }

@@ -30,6 +30,7 @@ Route::get('/public/sekolah/{npsn}/dpt', [PublicController::class, 'dataDpt']);
 Route::get('/public/sekolah/{npsn}/tps', [PublicController::class, 'listTps']);
 Route::get('/public/arsip/{tahun}', [PublicController::class, 'arsipTahun']);
 Route::get('/public/arsip/{tahun}/{npsn}', [PublicController::class, 'arsipHasil']);
+Route::get('/public/stats', [PublicController::class, 'stats']);
 
 // ========== ADMIN API (Sanctum Auth Required) ==========
 Route::middleware('auth:sanctum')->group(function () {
@@ -84,7 +85,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/{id}', [App\Http\Controllers\Api\Admin\DataUserController::class, 'update']);
         Route::delete('/{id}', [App\Http\Controllers\Api\Admin\DataUserController::class, 'destroy']);
     });
-    
+
     // Log Approval Pindah Sekolah
     Route::get('/admin/log-approval', [App\Http\Controllers\Api\Admin\LogApprovalController::class, 'index']);
     Route::post('/admin/log-approval/{id}/approve', [App\Http\Controllers\Api\Admin\LogApprovalController::class, 'approve']);
@@ -139,7 +140,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/admin-sekolah/dokumentasi', [DokumentasiController::class, 'index']);
     Route::post('/admin-sekolah/dokumentasi', [DokumentasiController::class, 'store']); // Create / Upload Foto
     Route::delete('/admin-sekolah/dokumentasi/{id}', [DokumentasiController::class, 'destroy']);
-    
+
     // Approval Pindah Sekolah
     Route::get('/admin-sekolah/approval-pindah', [ApprovalPindahController::class, 'index']);
     Route::post('/admin-sekolah/approval-pindah/{id}/approve', [ApprovalPindahController::class, 'approve']);

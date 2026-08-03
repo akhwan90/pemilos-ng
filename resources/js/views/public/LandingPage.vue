@@ -215,7 +215,7 @@
 					<div class="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-amber-600 mb-2">
 						{{ jml_tps }}
 					</div>
-					<div class="text-sm font-bold uppercase tracking-widest text-gray-500">Bilik Suara (TPS)</div>
+					<div class="text-sm font-bold uppercase tracking-widest text-gray-500">TPS</div>
 				</div>
 			</div>
 		</section>
@@ -329,6 +329,7 @@
 import { ref, computed, onMounted } from 'vue';
 import PublicHeader from '../../components/public/PublicHeader.vue';
 import PublicFooter from '../../components/public/PublicFooter.vue';
+import api from '../../services/api';
 
 const currentYear = computed(() => new Date().getFullYear());
 
@@ -354,6 +355,19 @@ const closePopup = () => {
 	}
 };
 
+const fetchStatistik = async () => {
+	try {
+		const response = await api.get(`/public/stats`);
+		if (response.data?.data) {
+			jml_sekolah.value = response.data.data.jml_sekolah;
+			jml_pilihan.value = response.data.data.jml_pilihan;
+			jml_tps.value = response.data.data.jml_tps;
+		}
+	} catch (error) {
+		console.error('Gagal memuat statistik:', error);
+	}
+};
+
 // Data dummy untuk statistik (bisa diubah agar me-load dari API Backend)
 const jml_sekolah = ref(0);
 const jml_pilihan = ref(0);
@@ -361,10 +375,7 @@ const jml_tps = ref(0);
 
 // Simulasi load data statistik (opsional)
 onMounted(() => {
-	// Ganti dengan axios/fetch call Anda nantinya
-	jml_sekolah.value = 45;
-	jml_pilihan.value = 112;
-	jml_tps.value = 248;
+	fetchStatistik();
 });
 
 const handleImageError = (e) => {
