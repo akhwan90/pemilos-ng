@@ -65,6 +65,10 @@ RUN chown -R www-data:www-data /var/www/html \
     && mkdir -p /var/www/html/storage/framework/{sessions,views,cache} \
     && chmod -R 775 /var/www/html/storage/framework
 
+# Tambahkan entrypoint script untuk memperbaiki permission binding volumes saat container start
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+
 # Expose web server port
 EXPOSE 80
 

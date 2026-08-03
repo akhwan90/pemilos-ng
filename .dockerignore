@@ -7,7 +7,7 @@ vendor
 .env.backup
 phpunit.xml
 tests
-docker
+# docker
 docker-compose.yml
 Dockerfile
 Penetration_Testing_Spec.md
