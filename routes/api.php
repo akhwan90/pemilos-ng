@@ -28,6 +28,8 @@ Route::get('/public/sekolah/{npsn}', [PublicController::class, 'detailSekolah'])
 Route::get('/public/sekolah/{npsn}/dps', [PublicController::class, 'dataDps']);
 Route::get('/public/sekolah/{npsn}/dpt', [PublicController::class, 'dataDpt']);
 Route::get('/public/sekolah/{npsn}/tps', [PublicController::class, 'listTps']);
+Route::get('/public/arsip/{tahun}', [PublicController::class, 'arsipTahun']);
+Route::get('/public/arsip/{tahun}/{npsn}', [PublicController::class, 'arsipHasil']);
 
 // ========== ADMIN API (Sanctum Auth Required) ==========
 Route::middleware('auth:sanctum')->group(function () {

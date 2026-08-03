@@ -186,4 +186,124 @@ class PublicController extends Controller
             'data' => $tps
         ]);
     }
+
+    /**
+     * Get data arsip berdasarkan tahun (Sama dengan Arsip.php -> tahun() di CodeIgniter)
+     */
+    public function arsipTahun($tahun)
+    {
+        if ($tahun >= 2022) {
+            $rawQuery = "SELECT 
+            tb_sekolah.npsn,
+            tb_sekolah.nama_sekolah,
+            tb_sekolah.jenjang,
+            (SELECT COUNT(id) FROM tb_siswa_tps WHERE npsn = tb_sekolah.npsn AND tahun = ?) AS jml_dpt,
+            (SELECT COUNT(id) FROM tb_siswa_tps WHERE npsn = tb_sekolah.npsn AND tahun = ? AND pilihan IS NOT NULL) AS jml_dpt_memilih,
+            ((SELECT COUNT(id) FROM tb_siswa_tps WHERE npsn = tb_sekolah.npsn AND tahun = ? AND pilihan IS NOT NULL)/(SELECT COUNT(id) FROM tb_siswa_tps WHERE npsn = tb_sekolah.npsn AND tahun = ?)) * 100 AS persentase,
+            (SELECT COUNT(id) FROM tb_pilihan WHERE npsn = tb_sekolah.npsn AND tahun = ?) AS jml_calon
+            FROM tb_sekolah
+            WHERE tb_sekolah.is_delete = 0
+            ORDER BY persentase DESC, jml_dpt DESC
+            ";
+
+            $data = DB::select($rawQuery, [$tahun, $tahun, $tahun, $tahun, $tahun]);
+            
+            foreach($data as &$item) {
+                if($item->persentase !== null) {
+                    if($item->persentase !== null && $item->persentase <= 1.01) { $item->persentase = ((float)$item->persentase) * 100; }
+                }
+            }
+        } else {
+            $rawQuery = "SELECT 
+            a.npsn,
+            a.nama_sekolah,
+            a.jenjang,
+            (SELECT jml_dpt FROM rekap_per_sekolah WHERE id_sekolah = a.npsn AND tahun = ?) AS jml_dpt,
+            (SELECT SUM(jumlah_total_suara) FROM rekap_hasil WHERE id_sekolah = a.npsn AND tahun = ? GROUP BY id_sekolah) AS jml_dpt_memilih,
+            (SELECT SUM(jml_calon) FROM rekap_per_sekolah WHERE id_sekolah = a.npsn AND tahun = ? GROUP BY id_sekolah) AS jml_calon,
+            ((SELECT SUM(jumlah_total_suara) FROM rekap_hasil WHERE id_sekolah = a.npsn AND tahun = ? GROUP BY id_sekolah)/(SELECT jml_dpt FROM rekap_per_sekolah WHERE id_sekolah = a.npsn AND tahun = ?)) AS persentase
+            FROM tb_sekolah a
+            WHERE a.is_delete = 0
+            ORDER BY persentase DESC, jml_dpt DESC
+            ";
+            
+            $data = DB::select($rawQuery, [$tahun, $tahun, $tahun, $tahun, $tahun]);
+            
+            foreach($data as &$item) {
+                if($item->persentase !== null) {
+                    if($item->persentase !== null && $item->persentase <= 1.01) { $item->persentase = ((float)$item->persentase) * 100; }
+                }
+            }
+        }
+        
+        // Pagination manual
+        $page = request()->get('page', 1);
+        $perPage = request()->get('per_page', 50);
+        $offset = ($page - 1) * $perPage;
+        
+        $total = count($data);
+        $items = array_slice($data, $offset, $perPage);
+
+        return response()->json([
+            'success' => true,
+            'data' => $items,
+            'total' => $total,
+            'current_page' => (int)$page,
+            'per_page' => (int)$perPage
+        ]);
+    }
+
+    /**
+     * Get hasil arsip berdasarkan tahun dan npsn (Sama dengan Arsip.php -> hasil() di CodeIgniter)
+     */
+    public function arsipHasil($tahun, $npsn)
+    {
+        $sekolah = DB::table('tb_sekolah')->where('npsn', $npsn)->first();
+        
+        if (!$sekolah) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Sekolah tidak ditemukan'
+            ], 404);
+        }
+
+        if ($tahun >= 2022) {
+            $rawQuery = "SELECT 
+            tb_pilihan.no,
+            tb_pilihan.nama,
+            tb_pilihan.photo,
+            (SELECT COUNT(id) FROM tb_siswa_tps WHERE pilihan = tb_pilihan.id) AS jml_pemilih
+            FROM tb_pilihan
+            WHERE tahun = ? AND npsn = ? 
+            ORDER BY jml_pemilih DESC
+            ";
+            $hasil = DB::select($rawQuery, [$tahun, $npsn]);
+            $getJumlahDpt = "SELECT COUNT(id) AS jml_dpt FROM tb_siswa_tps WHERE npsn = ? AND tahun = ?";
+            $queryGetJumlahDpt = DB::selectOne($getJumlahDpt, [$npsn, $tahun]);
+        } else {
+            $getJumlahDpt = "SELECT jml_dpt AS jml_dpt FROM rekap_per_sekolah WHERE id_sekolah = ? AND tahun = ?";
+            $queryGetJumlahDpt = DB::selectOne($getJumlahDpt, [$npsn, $tahun]);
+            $rawQuery = "SELECT 
+            tb_pilihan.no,
+            tb_pilihan.nama,
+            tb_pilihan.photo,
+            (SELECT jumlah_total_suara FROM rekap_hasil WHERE id_pilihan = tb_pilihan.id) AS jml_pemilih
+            FROM tb_pilihan
+            WHERE tahun = ? AND npsn = ? 
+            ORDER BY jml_pemilih DESC
+            ";
+            $hasil = DB::select($rawQuery, [$tahun, $npsn]);
+            $getJumlahDpt = "SELECT jml_dpt AS jml_dpt FROM rekap_per_sekolah WHERE id_sekolah = ? AND tahun = ?";
+            $queryGetJumlahDpt = DB::selectOne($getJumlahDpt, [$npsn, $tahun]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'sekolah' => $sekolah,
+                'hasil' => $hasil,
+                'jumlahDpt' => $queryGetJumlahDpt
+            ]
+        ]);
+    }
 }
