@@ -10,9 +10,10 @@ Route::get('/', function () {
     return view('app');
 });
 
-// Route::get('/{any}', function () {
-//     return view('app');
-// })->where('any', '^(?!api|storage|captcha).*$');
 Route::get('/{any}', function () {
     return view('app');
-})->where('any', '^(?!(api|storage|captcha)).*$(?<!\.(png|jpg|jpeg|gif|svg|ico|css|js|webp))');
+})->where('any', '^(?!api|storage|captcha|asset).*$');
+
+Route::fallback(function () {
+    return view('app');
+});
