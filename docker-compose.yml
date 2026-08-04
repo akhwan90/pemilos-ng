@@ -14,8 +14,8 @@ services:
       # Koneksi Database
       # DB_HOST disetel dengan IP host docker bawaan (host.docker.internal / 172.17.0.1)
       # atau bisa disesuaikan jika pemilos-db punya network bridge khusus.
-      DB_HOST: 172.17.0.1
-      DB_PORT: 3307
+      DB_HOST: ${DB_HOST:-172.17.0.1}
+      DB_PORT: ${DB_PORT:-3307}
       DB_DATABASE: ${DB_DATABASE:-pemilos}
       DB_USERNAME: ${DB_USERNAME:-root}
       DB_PASSWORD: ${DB_PASSWORD:-root}
