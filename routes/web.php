@@ -13,7 +13,3 @@ Route::get('/', function () {
 Route::get('/{any}', function () {
     return view('app');
 })->where('any', '^(?!api|storage|captcha|asset).*$');
-
-Route::fallback(function () {
-    return view('app');
-});
