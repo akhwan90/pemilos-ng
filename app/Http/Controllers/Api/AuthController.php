@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use App\Models\Sekolah;
+use App\Services\ActivityService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -16,7 +17,7 @@ class AuthController extends Controller
     /**
      * Handle Admin/Sekolah Login API (Sanctum)
      */
-    public function login(Request $request)
+    public function login(Request $request, ActivityService $activityService)
     {
         $request->validate([
             'username' => 'required|string',
@@ -31,6 +32,7 @@ class AuthController extends Controller
 
         // Verifikasi password (Mendukung legacy MD5 dari CI3 dan bcrypt baru)
         if (!$admin) {
+            $activityService->logActivity($request->username, '2');
             throw ValidationException::withMessages([
                 'username' => ['Username atau password salah.'],
             ]);
@@ -38,31 +40,32 @@ class AuthController extends Controller
 
         $passwordRaw = $request->password;
         $legacyMd5 = md5($passwordRaw);
-        
+
         $isValidPassword = false;
-        
+
         // Kondisi 1: Hash bawaan Laravel (bcrypt)
         if (Hash::check($passwordRaw, $admin->password)) {
             $isValidPassword = true;
-        } 
+        }
         // Kondisi 2: Legacy MD5 langsung
         else if ($admin->password === $legacyMd5) {
             $isValidPassword = true;
         }
 
         if (!$isValidPassword) {
+            $activityService->logActivity($request->username, '3');
             throw ValidationException::withMessages([
                 'username' => ['Username atau password salah.'],
             ]);
         }
-        
+
         // Cek jika ini level 2 (Admin Sekolah), pastikan sekolahnya tidak dihapus
         $sekolahInfo = null;
         if ((int) $admin->level === 2) {
             $sekolahInfo = Sekolah::where('npsn', $admin->npsn)
                                   ->where('is_delete', 0)
                                   ->first();
-                                  
+
             if (!$sekolahInfo) {
                 throw ValidationException::withMessages([
                     'username' => ['Sekolah tidak ditemukan atau sudah dihapus.'],
@@ -72,8 +75,11 @@ class AuthController extends Controller
 
         // Buat token baru via Sanctum
         $token = $admin->createToken('admin-token')->plainTextToken;
-        
-        Log::info('Login API berhasil: ' . $admin->username);
+
+
+        $activityService->logActivity($request->username, '1', 'Login berhasil.');
+
+        // Log::info('Login API berhasil: ' . $admin->username);
 
         // Jika dia Admin TPS (Level 3), ambil info tambahan apakah ini TPS Luar Sekolah
         $isTpsLuarSekolah = 0;
@@ -101,7 +107,7 @@ class AuthController extends Controller
             ]
         ]);
     }
-    
+
     /**
      * Get Current Logged In Admin Profile
      */
@@ -109,11 +115,11 @@ class AuthController extends Controller
     {
         $admin = $request->user();
         $sekolahInfo = null;
-        
+
         if ((int) $admin->level === 2) {
             $sekolahInfo = Sekolah::where('npsn', $admin->npsn)->first();
         }
-        
+
         return response()->json([
             'success' => true,
             'data' => [
@@ -126,10 +132,13 @@ class AuthController extends Controller
     /**
      * Handle Logout API (Revoke Token)
      */
-    public function logout(Request $request)
+    public function logout(Request $request, ActivityService $activityService)
     {
+        $user = $request->user();
+        $activityService->logActivity($user->username, '4');
+
         // Revoke token yang sedang dipakai ini
-        $request->user()->currentAccessToken()->delete();
+        $user->currentAccessToken()->delete();
 
         return response()->json([
             'success' => true,

@@ -29,9 +29,15 @@ class AktivitasController extends Controller
             });
         }
 
-        $siswa = $query->orderBy('activity.id', 'desc')
+        $aktivitas = $query->orderBy('activity.id', 'desc')
                       ->paginate(100);
 
-        return response()->json($siswa);
+        // Map data untuk menyisipkan teks aktivitas dari config
+        $aktivitas->getCollection()->transform(function ($item) {
+            $item->nama_aktifitas = config("aktivitas.{$item->id_aktifitas}", 'Unknown (' . $item->id_aktifitas . ')');
+            return $item;
+        });
+
+        return response()->json($aktivitas);
     }
 }

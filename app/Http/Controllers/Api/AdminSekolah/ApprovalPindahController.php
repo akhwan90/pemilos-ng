@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\AdminSekolah;
 
 use App\Http\Controllers\Controller;
+use App\Services\ActivityService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\ApprovalPindahSekolah; // Assuming this model exists, if not we use DB facade
@@ -29,7 +30,7 @@ class ApprovalPindahController extends Controller
         ]);
     }
 
-    public function approve(Request $request, $id)
+    public function approve(Request $request, $id, ActivityService $activityService)
     {
         $user = auth()->user();
         $npsn = $user->npsn;
@@ -73,6 +74,12 @@ class ApprovalPindahController extends Controller
                 ]);
 
             DB::commit();
+
+            $activityService->logActivity($user->username, 24, json_encode([
+                'nisn' => $approval->nisn,
+                'npsn_sekolah_asal' => $npsn,
+                'npsn_sekolah_baru' => $approval->user_pemohon_npsn
+            ]));
 
             return response()->json([
                 'status' => 'success',

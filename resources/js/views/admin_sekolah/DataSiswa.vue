@@ -187,14 +187,13 @@
                                 >
                             </td>
                             <td class="px-4 py-3 text-center">
-                                <span
-                                    v-if="item.difabel == 1"
-                                    class="px-2 py-1 text-xs font-semibold rounded bg-amber-100 text-amber-800"
-                                    >Difabel</span
-                                >
-                                <span v-else class="text-gray-400 text-xs"
-                                    >-</span
-                                >
+                                <span v-if="item.difabel == 1" class="px-2 py-1 text-xs font-semibold rounded bg-amber-100 text-amber-800">Disabilitas Fisik</span>
+                                <span v-else-if="item.difabel == 2" class="px-2 py-1 text-xs font-semibold rounded bg-amber-100 text-amber-800">Disabilitas Intelektual</span>
+                                <span v-else-if="item.difabel == 3" class="px-2 py-1 text-xs font-semibold rounded bg-amber-100 text-amber-800">Disabilitas Mental</span>
+                                <span v-else-if="item.difabel == 4" class="px-2 py-1 text-xs font-semibold rounded bg-amber-100 text-amber-800">Disabilitas Sensorik Wicara</span>
+                                <span v-else-if="item.difabel == 5" class="px-2 py-1 text-xs font-semibold rounded bg-amber-100 text-amber-800">Disabilitas Sensorik Rungu</span>
+                                <span v-else-if="item.difabel == 6" class="px-2 py-1 text-xs font-semibold rounded bg-amber-100 text-amber-800">Disabilitas Sensorik Netra</span>
+                                <span v-else class="text-gray-400 text-xs">-</span>
                             </td>
                             <td class="px-4 py-3 text-center">
                                 <div class="flex gap-2 justify-center">
@@ -326,7 +325,12 @@
                         class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-indigo-500"
                     >
                         <option value="0">Tidak Difabel</option>
-                        <option value="1">Penyandang Disabilitas</option>
+                        <option value="1">Disabilitas Fisik</option>
+                        <option value="2">Disabilitas Intelektual</option>
+                        <option value="3">Disabilitas Mental</option>
+                        <option value="4">Disabilitas Sensorik Wicara</option>
+                        <option value="5">Disabilitas Sensorik Rungu</option>
+                        <option value="6">Disabilitas Sensorik Netra</option>
                     </select>
                 </div>
                 <div class="mt-6 flex justify-end gap-3 border-t pt-4">

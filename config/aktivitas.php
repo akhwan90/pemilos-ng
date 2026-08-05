@@ -1,0 +1,27 @@
+<?php
+
+return [
+    '1' => 'Login sukses',
+    '2' => 'Login username salah',
+    '3' => 'Login password salah',
+    '4' => 'Logout',
+    '5' => 'Reset password',
+    '6' => 'Login TPS',
+    '7' => 'Update identitas sekolah',
+    '8' => 'Hapus siswa',
+    '9' => 'Upload data siswa',
+    '10' => 'Tambah TPS',
+    '11' => 'Update TPS',
+    '12' => 'Hapus TPS',
+    '13' => 'Tambah Calon',
+    '14' => 'Update Calon',
+    '15' => 'Hapus Calon',
+    '16' => 'Generate token',
+    '17' => 'Batalkan generate token',
+    '18' => 'Hapus DPT banyak',
+    '19' => 'Logout komputer TPS',
+    '20' => 'Hapus Admin',
+    '21' => 'Ubah data sekolah',
+    '22' => 'Hapus data sekolah',
+    '23' => 'Tambah Admin sekolah',
+];

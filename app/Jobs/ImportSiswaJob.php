@@ -30,6 +30,11 @@ class ImportSiswaJob implements ShouldQueue
     public function handle()
     {
         $path = public_path('uploads/xlsx_temp/' . $this->filename);
+        $activityService = new \App\Services\ActivityService();
+        $activityService->logActivity($this->username, 9, json_encode([
+            'npsn' => $this->npsn,
+            'filename' => $this->filename
+        ]));
 
         if (!file_exists($path)) {
             Log::error("ImportSiswaJob: File excel tidak ditemukan di {$path}");
@@ -82,10 +87,6 @@ class ImportSiswaJob implements ShouldQueue
                         $difabel = null;
                         if (is_numeric($difabel_str)) {
                             $difabel = (int)$difabel_str;
-                        } elseif (in_array($difabel_str, ['ya', 'yes', 'true'])) {
-                            $difabel = 1;
-                        } elseif (empty($difabel_str) || in_array($difabel_str, ['tidak', 'no', 'false', '-'])) {
-                            $difabel = 0;
                         }
 
                         if (!empty($nisn) && !empty($nama)) {
@@ -149,27 +150,33 @@ class ImportSiswaJob implements ShouldQueue
                                     ]);
                                     $this->logToDb("Berhasil update {$nama} (NISN: {$nisn})", 1, $nisn);
                                 } else {
-                                    // Beda sekolah (Pindah Sekolah)
-                                    $sekolah_lama = DB::table('tb_sekolah')->where('npsn', $cek_nisn->npsn)->first();
-                                    $nama_sekolah_lama = $sekolah_lama ? $sekolah_lama->nama_sekolah : $cek_nisn->npsn;
+                                    if ($cek_nisn->npsn == null) {
+                                        // jika npsn null, maka update npsn menjadi npsn sekolah yang import
+                                        DB::table('tb_siswa')->where('nisn', $nisn)->update(['npsn' => $this->npsn]);
+                                        $this->logToDb("Berhasil update {$nama} (NISN: {$nisn}). NPSN sebelumnya NULL", 1, $nisn);
+                                    } else {
+                                        // Beda sekolah (Pindah Sekolah)
+                                        $sekolah_lama = DB::table('tb_sekolah')->where('npsn', $cek_nisn->npsn)->first();
+                                        $nama_sekolah_lama = $sekolah_lama ? $sekolah_lama->nama_sekolah : $cek_nisn->npsn;
 
-                                    $this->logToDb("NISN: {$nisn} terdaftar di {$nama_sekolah_lama}. Menunggu persetujuan pindah sekolah.", 0, $nisn, $cek_nisn->npsn);
+                                        $this->logToDb("NISN: {$nisn} terdaftar di {$nama_sekolah_lama}. Menunggu persetujuan pindah sekolah.", 0, $nisn, $cek_nisn->npsn);
 
-                                    // Masukkan ke tabel aproval_pindah_sekolah
-                                    DB::table('aproval_pindah_sekolah')->updateOrInsert(
-                                        ['nisn' => $nisn],
-                                        [
-                                            'user_pemohon' => $this->username,
-                                            'user_pemohon_npsn' => $this->npsn,
-                                            'npsn' => $cek_nisn->npsn,
-                                            'status' => 0,
-                                            'created_at' => date('Y-m-d H:i:s'),
-                                            'nama_baru' => $nama,
-                                            'jk_baru' => $jk,
-                                            'kelas_baru' => $kelas,
-                                            'difabel_baru' => $difabel
-                                        ]
-                                    );
+                                        // Masukkan ke tabel aproval_pindah_sekolah
+                                        DB::table('aproval_pindah_sekolah')->updateOrInsert(
+                                            ['nisn' => $nisn],
+                                            [
+                                                'user_pemohon' => $this->username,
+                                                'user_pemohon_npsn' => $this->npsn,
+                                                'npsn' => $cek_nisn->npsn,
+                                                'status' => 0,
+                                                'created_at' => date('Y-m-d H:i:s'),
+                                                'nama_baru' => $nama,
+                                                'jk_baru' => $jk,
+                                                'kelas_baru' => $kelas,
+                                                'difabel_baru' => $difabel
+                                            ]
+                                        );
+                                    }
                                 }
                             }
                         }

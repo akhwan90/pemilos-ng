@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\AdminSekolah;
 
 use App\Http\Controllers\Controller;
+use App\Services\ActivityService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -16,6 +17,7 @@ class TpsController extends Controller
 
         $tps = DB::table('tb_kelas')
             ->where('npsn', $npsn)
+            ->where('is_hapus', 0)
             ->get();
 
         return response()->json([
@@ -25,7 +27,7 @@ class TpsController extends Controller
     }
 
     // Menambah TPS Baru
-    public function store(Request $request)
+    public function store(Request $request, ActivityService $activityService)
     {
         $npsn = $request->user()->npsn;
 
@@ -42,6 +44,12 @@ class TpsController extends Controller
             'is_hapus' => 0
         ]);
 
+        $activityService->logActivity($request->user()->username, 10, json_encode([
+            'kd_kelas' => $id,
+            'nm_kelas' => $request->nm_kelas,
+            'is_tps_luar_sekolah' => $request->is_tps_luar_sekolah ? 1 : 0
+        ]));
+
         return response()->json([
             'success' => true,
             'message' => 'TPS berhasil ditambahkan',
@@ -50,7 +58,7 @@ class TpsController extends Controller
     }
 
     // Update Data TPS
-    public function update(Request $request, $kd_kelas)
+    public function update(Request $request, $kd_kelas, ActivityService $activityService)
     {
         $npsn = $request->user()->npsn;
 
@@ -59,6 +67,11 @@ class TpsController extends Controller
             'is_tps_luar_sekolah' => 'required|boolean',
             'is_hapus' => 'required|boolean'
         ]);
+
+        $dataTpsAwal = DB::table('tb_kelas')
+            ->where('kd_kelas', $kd_kelas)
+            ->where('npsn', $npsn)
+            ->first();
 
         $affected = DB::table('tb_kelas')
             ->where('kd_kelas', $kd_kelas)
@@ -70,6 +83,11 @@ class TpsController extends Controller
             ]);
 
         if ($affected) {
+            $activityService->logActivity($request->user()->username, 11, json_encode([
+                'nm_kelas' => $dataTpsAwal->nm_kelas,
+                'is_tps_luar_sekolah' => $dataTpsAwal->is_tps_luar_sekolah,
+            ]));
+
             return response()->json([
                 'success' => true,
                 'message' => 'Data TPS berhasil diperbarui'
@@ -80,7 +98,7 @@ class TpsController extends Controller
     }
 
     // Menghapus TPS (Soft Delete / Hapus Permanen tergantung kebutuhan, saat ini diset soft delete is_hapus=1)
-    public function destroy(Request $request, $kd_kelas)
+    public function destroy(Request $request, $kd_kelas, ActivityService $activityService)
     {
         $npsn = $request->user()->npsn;
 
@@ -92,6 +110,16 @@ class TpsController extends Controller
             ]);
 
         if ($affected) {
+            $dataTpsAwal = DB::table('tb_kelas')
+                ->where('kd_kelas', $kd_kelas)
+                ->where('npsn', $npsn)
+                ->first();
+
+            $activityService->logActivity($request->user()->username, 12, json_encode([
+                'kd_kelas' => $kd_kelas,
+                'npsn' => $npsn,
+            ]));
+
             return response()->json([
                 'success' => true,
                 'message' => 'TPS berhasil dihapus'

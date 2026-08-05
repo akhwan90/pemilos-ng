@@ -34,10 +34,9 @@
 							<th class="px-6 py-4 font-medium" width="10%">No</th>
 							<th class="px-6 py-4 font-medium" width="10%">Username</th>
 							<th class="px-6 py-4 font-medium" width="15%">Waktu</th>
-							<th class="px-6 py-4 font-medium" width="40%">Keterangan</th>
+							<th class="px-6 py-4 font-medium" width="45%">Aktivitas & Keterangan</th>
 							<th class="px-6 py-4 font-medium" width="10%">IP</th>
-							<th class="px-6 py-4 font-medium" width="13%">Browser</th>
-							<th class="px-6 py-4 font-medium" width="12%">OS</th>
+							<th class="px-6 py-4 font-medium" width="10%">OS</th>
 						</tr>
 					</thead>
 					<tbody class="divide-y divide-gray-200 text-sm">
@@ -62,7 +61,7 @@
 								</div>
 							</td>
 						</tr>
-						<tr v-else v-for="(item, index) in dataAktivitas.data" :key="item.id_siswa" class="hover:bg-gray-50 transition-colors">
+						<tr v-else v-for="(item, index) in dataAktivitas.data" :key="item.id" class="hover:bg-gray-50 transition-colors">
 						    <td class="px-6 py-4">
 								{{ dataAktivitas.from + index}}
 							</td>
@@ -71,13 +70,32 @@
 							</td>
 							<td class="px-6 py-4 text-sm">{{ item.waktu }}</td>
 							<td class="px-6 py-4">
-							    <div class="w-128 truncate">
-							        {{ item.keterangan }}
+							    <div class="w-full">
+							        <div class="text-sm font-semibold text-indigo-600 mb-1">
+                                        {{ item.nama_aktifitas }}
+                                    </div>
+                                    <div class="text-sm text-gray-600 w-full" style="word-break: break-word;">
+                                        <template v-if="item.keterangan && item.keterangan.length > 100">
+                                            <span v-if="!expandedItems.includes(item.id)">
+                                                {{ item.keterangan.substring(0, 100) }}...
+                                                <button @click.prevent="toggleExpand(item.id)" class="text-indigo-500 hover:text-indigo-700 ml-1 text-xs font-medium cursor-pointer focus:outline-none">Lebih banyak</button>
+                                            </span>
+                                            <span v-else>
+                                                {{ item.keterangan }}
+                                                <button @click.prevent="toggleExpand(item.id)" class="text-indigo-500 hover:text-indigo-700 ml-1 text-xs font-medium cursor-pointer focus:outline-none">Lebih sedikit</button>
+                                            </span>
+                                        </template>
+                                        <template v-else>
+                                            {{ item.keterangan }}
+                                        </template>
+                                    </div>
 								</div>
 							</td>
 							<td class="px-6 py-4">{{ item.ip }}</td>
-							<td class="px-6 py-4">{{ item.browser }}</td>
-							<td class="px-6 py-4">{{ item.os }}</td>
+							<td class="px-6 py-4 text-xs">
+								<div>{{ item.os }}</div>
+								<div class="text-gray-400 mt-1">{{ item.browser }}</div>
+							</td>
 						</tr>
 					</tbody>
 				</table>
@@ -117,7 +135,7 @@ import BaseCard from '../../components/BaseCard.vue';
 import ToastNotification from '../../components/ToastNotification.vue';
 
 const loading = ref(false);
-const siswa = ref([]);
+const expandedItems = ref([]);
 const dataAktivitas = ref({
     data: [],
     total: 0,
@@ -126,6 +144,15 @@ const dataAktivitas = ref({
 });
 const filterNpsn = ref('');
 const search = ref('');
+
+const toggleExpand = (id) => {
+    const index = expandedItems.value.indexOf(id);
+    if (index === -1) {
+        expandedItems.value.push(id);
+    } else {
+        expandedItems.value.splice(index, 1);
+    }
+};
 
 // Use the Toast Component logically assuming it's globally registered or imported
 const toast = ref({ show: false, message: '', type: 'success' });

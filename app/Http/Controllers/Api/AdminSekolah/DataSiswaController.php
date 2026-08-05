@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\AdminSekolah;
 
 use App\Http\Controllers\Controller;
+use App\Services\ActivityService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Services\WaktuPemilihanService;
@@ -70,11 +71,11 @@ class DataSiswaController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request, ActivityService $activityService)
     {
         $npsn = $request->user()->npsn;
         $tahun = env('TAHUN_AKTIF', date('Y'));
-        
+
         $cek = $this->waktuPemilihanService->cekJadwalBuka('input_data_dps', $tahun, $npsn);
         if (!$cek['is_open']) {
             return response()->json(['success' => false, 'message' => 'Penambahan ditolak: ' . $cek['message']], 403);
@@ -100,17 +101,25 @@ class DataSiswaController extends Controller
             'create_at' => date('Y-m-d H:i:s')
         ]);
 
+        $activityService->logActivity($request->user()->username, 25, json_encode([
+            'nisn' => $request->nisn,
+            'nm_siswa' => $request->nm_siswa,
+            'jk' => $request->jk,
+            'kelas' => $request->kelas,
+            'difabel' => $request->difabel,
+        ]));
+
         return response()->json([
             'success' => true,
             'message' => 'Data Siswa berhasil ditambahkan'
         ]);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, ActivityService $activityService)
     {
         $npsn = $request->user()->npsn;
         $tahun = env('TAHUN_AKTIF', date('Y'));
-        
+
         $cek = $this->waktuPemilihanService->cekJadwalBuka('input_data_dps', $tahun, $npsn);
         if (!$cek['is_open']) {
             return response()->json(['success' => false, 'message' => 'Pembaruan ditolak: ' . $cek['message']], 403);
@@ -139,6 +148,14 @@ class DataSiswaController extends Controller
             return response()->json(['success' => false, 'message' => 'Data tidak ditemukan atau tidak ada perubahan'], 404);
         }
 
+        $activityService->logActivity($request->user()->username, 26, json_encode([
+            'nisn' => $request->nisn,
+            'nm_siswa' => $request->nm_siswa,
+            'jk' => $request->jk,
+            'kelas' => $request->kelas,
+            'difabel' => $request->difabel,
+        ]));
+
         return response()->json([
             'success' => true,
             'message' => 'Data Siswa berhasil diperbarui'
@@ -162,7 +179,7 @@ class DataSiswaController extends Controller
             return false;
         }
 
-        return DB::table('tb_siswa')
+        $ret = DB::table('tb_siswa')
             ->where('id', $id)
             ->update([
                 'status' => $alasan_hapus,
@@ -170,6 +187,21 @@ class DataSiswaController extends Controller
                 'hapus_time' => date('Y-m-d H:i:s'),
                 'hapus_user_id' => $user_id
             ]) > 0;
+
+        if ($ret) {
+            $activityService = new \App\Services\ActivityService();
+
+            $username = DB::table('tb_admin')->where('id', $user_id)->first()->username;
+
+            $activityService->logActivity($username, 27, json_encode([
+                'nisn' => $siswa->nisn,
+                'nm_siswa' => $siswa->nm_siswa,
+                'jk' => $siswa->jk,
+                'alasan_hapus' => $alasan_hapus,
+            ]));
+        }
+
+        return $ret;
     }
 
     public function destroy(Request $request, $id)
@@ -177,7 +209,7 @@ class DataSiswaController extends Controller
         $npsn = $request->user()->npsn;
         $tahun = env('TAHUN_AKTIF', date('Y'));
         $user_id = $request->user()->id; // id admin login
-        
+
         $cek = $this->waktuPemilihanService->cekJadwalBuka('input_data_dps', $tahun, $npsn);
         if (!$cek['is_open']) {
             return response()->json(['success' => false, 'message' => 'Penghapusan ditolak: ' . $cek['message']], 403);
@@ -204,7 +236,7 @@ class DataSiswaController extends Controller
         $npsn = $request->user()->npsn;
         $tahun = env('TAHUN_AKTIF', date('Y'));
         $user_id = $request->user()->id;
-        
+
         $cek = $this->waktuPemilihanService->cekJadwalBuka('input_data_dps', $tahun, $npsn);
         if (!$cek['is_open']) {
             return response()->json(['success' => false, 'message' => 'Penghapusan ditolak: ' . $cek['message']], 403);

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\AdminSekolah;
 
 use App\Http\Controllers\Controller;
+use App\Services\ActivityService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -30,7 +31,7 @@ class IdentitasSekolahController extends Controller
         ]);
     }
 
-    public function update(Request $request)
+    public function update(Request $request, ActivityService $activityService)
     {
         // Ambil NPSN dari token Sanctum user yang sedang login
         $npsn = $request->user()->npsn;
@@ -56,7 +57,7 @@ class IdentitasSekolahController extends Controller
             $file = $request->file('logo');
             $filename = time() . '_' . \Illuminate\Support\Str::random(10) . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('uploads/logo_sekolah'), $filename);
-            
+
             if ($sekolah->logo && file_exists(public_path('uploads/logo_sekolah/' . $sekolah->logo))) {
                 @unlink(public_path('uploads/logo_sekolah/' . $sekolah->logo));
             }
@@ -64,6 +65,14 @@ class IdentitasSekolahController extends Controller
         }
 
         DB::table('tb_sekolah')->where('npsn', $npsn)->update($dataUpdate);
+
+        $activityService->logActivity($request->user()->username, 21, json_encode([
+            'nama_sekolah_lama' => $sekolah->nama_sekolah,
+            'kepala_sekolah_lama' => $sekolah->kepala_sekolah,
+            'alamat_sekolah_lama' => $sekolah->alamat_sekolah,
+            'kecamatan_lama' => $sekolah->kecamatan,
+            'desa_lama' => $sekolah->desa,
+        ]));
 
         return response()->json([
             'success' => true,
