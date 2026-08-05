@@ -38,7 +38,7 @@ class KandidatController extends Controller
     {
         $npsn = $request->user()->npsn;
         $tahun = env('TAHUN_AKTIF', date('Y'));
-        
+
         $cek = $this->waktuPemilihanService->cekJadwalBuka('input_data_calon', $tahun, $npsn);
         if (!$cek['is_open']) {
             return response()->json(['success' => false, 'message' => 'Penambahan ditolak: ' . $cek['message']], 403);
@@ -58,7 +58,7 @@ class KandidatController extends Controller
         ]);
 
         try {
-            $this->kandidatService->create($request->user()->npsn, $request->all(), $request->file('photo'), $request->user()->id);
+            $this->kandidatService->create($request->user(), $request->all(), $request->file('photo'), $request->user()->id);
             return response()->json(['success' => true, 'message' => 'Kandidat baru berhasil ditambahkan']);
         } catch (Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
@@ -69,7 +69,7 @@ class KandidatController extends Controller
     {
         $npsn = $request->user()->npsn;
         $tahun = env('TAHUN_AKTIF', date('Y'));
-        
+
         $cek = $this->waktuPemilihanService->cekJadwalBuka('input_data_calon', $tahun, $npsn);
         if (!$cek['is_open']) {
             return response()->json(['success' => false, 'message' => 'Pembaruan ditolak: ' . $cek['message']], 403);
@@ -89,7 +89,7 @@ class KandidatController extends Controller
         ]);
 
         try {
-            $this->kandidatService->update($request->user()->npsn, $id, $request->all(), $request->file('photo'));
+            $this->kandidatService->update($request->user(), $id, $request->all(), $request->file('photo'));
             return response()->json(['success' => true, 'message' => 'Data kandidat berhasil diperbarui']);
         } catch (Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 404);
@@ -100,14 +100,14 @@ class KandidatController extends Controller
     {
         $npsn = $request->user()->npsn;
         $tahun = env('TAHUN_AKTIF', date('Y'));
-        
+
         $cek = $this->waktuPemilihanService->cekJadwalBuka('input_data_calon', $tahun, $npsn);
         if (!$cek['is_open']) {
             return response()->json(['success' => false, 'message' => 'Penghapusan ditolak: ' . $cek['message']], 403);
         }
 
         try {
-            $this->kandidatService->delete($request->user()->npsn, $id);
+            $this->kandidatService->delete($request->user(), $id);
             return response()->json(['success' => true, 'message' => 'Kandidat berhasil dihapus']);
         } catch (Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 404);

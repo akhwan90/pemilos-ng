@@ -33,7 +33,7 @@ class DataDptController extends Controller
         $rekapQuery = DB::table('tb_siswa_tps')
             ->where('npsn', $npsn)
             ->where('tahun', $tahun);
-        
+
         if ($request->user()->level == 3) {
             $rekapQuery->where('id_tps', $request->user()->id_tps);
         } else if ($filterTps) {
@@ -63,12 +63,12 @@ class DataDptController extends Controller
         }
 
         $query->select(
-                'st.id', 
-                'st.nisn', 
-                's.nm_siswa', 
-                's.jk', 
-                's.kelas as nama_kelas_asal', 
-                'st.id_tps', 
+                'st.id',
+                'st.nisn',
+                's.nm_siswa',
+                's.jk',
+                's.kelas as nama_kelas_asal',
+                'st.id_tps',
                 'k.nm_kelas as nama_tps',
                 'st.token',
                 'st.pilihan',
@@ -100,7 +100,7 @@ class DataDptController extends Controller
     {
         $npsn = $request->user()->npsn;
         $tahun = env('TAHUN_AKTIF', date('Y'));
-        
+
         // Ambil NISN yang SUDAH masuk DPT pada tahun ini
         $nisnSudahDpt = DB::table('tb_siswa_tps')
             ->where('npsn', $npsn)
@@ -127,7 +127,7 @@ class DataDptController extends Controller
     public function listTpsAktif(Request $request)
     {
         $npsn = $request->user()->npsn;
-        
+
         $tps = DB::table('tb_kelas')
             ->where('npsn', $npsn)
             ->where('is_hapus', 0)
@@ -146,7 +146,7 @@ class DataDptController extends Controller
     {
         $npsn = $request->user()->npsn;
         $tahun = env('TAHUN_AKTIF', date('Y'));
-        
+
         $cek = $this->waktuPemilihanService->cekJadwalBuka('input_data_dpt', $tahun, $npsn);
         if (!$cek['is_open']) {
             return response()->json(['success' => false, 'message' => 'Penambahan DPT ditolak: ' . $cek['message']], 403);
@@ -169,10 +169,11 @@ class DataDptController extends Controller
             ->toArray();
 
         $dataInsert = [];
+        $nisnOk = [];
         foreach ($nisnList as $nisn) {
             // Skip yang sudah masuk dpt
             if (in_array($nisn, $nisnSudahDpt)) continue;
-            
+
             // Perlu JK karena tb_siswa_tps punya field jk yg not null
             $siswa = DB::table('tb_siswa')->where('npsn', $npsn)->where('nisn', $nisn)->first();
             if (!$siswa) continue;
@@ -187,10 +188,19 @@ class DataDptController extends Controller
                 'pilihan' => null,
                 'waktu_pilih' => null
             ];
+
+            $nisnOk[] = $nisn;
         }
 
         if (count($dataInsert) > 0) {
             DB::table('tb_siswa_tps')->insert($dataInsert);
+
+            $activityService = new \App\Services\ActivityService();
+            $activityService->logActivity($request->user()->username, 28, json_encode([
+                'tps' => $id_tps,
+                'jumlah' => count($dataInsert),
+                'nisn' => $nisnOk,
+            ]));
         }
 
         return response()->json([
@@ -198,13 +208,13 @@ class DataDptController extends Controller
             'message' => count($dataInsert) . ' siswa berhasil ditambahkan ke dalam DPT TPS.'
         ]);
     }
-    
+
     // Hapus dari DPT (Satuan/Bulk)
     public function destroyBulk(Request $request)
     {
         $npsn = $request->user()->npsn;
         $tahun = env('TAHUN_AKTIF', date('Y'));
-        
+
         $cek = $this->waktuPemilihanService->cekJadwalBuka('input_data_dpt', $tahun, $npsn);
         if (!$cek['is_open']) {
             return response()->json(['success' => false, 'message' => 'Penghapusan DPT ditolak: ' . $cek['message']], 403);
@@ -234,6 +244,13 @@ class DataDptController extends Controller
             ->where('tahun', $tahun)
             ->whereIn('id', $request->ids)
             ->delete();
+
+
+        $activityService = new \App\Services\ActivityService();
+        $activityService->logActivity($request->user()->username, 18, json_encode([
+            'jumlah' => count($request->ids),
+            'nisn' => $request->ids
+        ]));
 
         return response()->json([
             'success' => true,
@@ -296,7 +313,7 @@ class DataDptController extends Controller
             ->where('tahun', $tahun)
             ->whereNotNull('pilihan')
             ->exists();
-            
+
         if ($hasVoted) {
             return response()->json([
                 'success' => false,

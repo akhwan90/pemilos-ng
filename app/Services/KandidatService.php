@@ -43,7 +43,7 @@ class KandidatService
         $tahun = env('TAHUN_AKTIF', date('Y'));
 
         $exists = DB::table('tb_pilihan')
-            ->where('npsn', $npsn)
+            ->where('npsn', $npsn->npsn)
             ->where('tahun', $tahun)
             ->where('no', $data['no'])
             ->exists();
@@ -53,7 +53,7 @@ class KandidatService
         }
 
         $dataInsert = [
-            'npsn' => $npsn,
+            'npsn' => $npsn->npsn,
             'tahun' => $tahun,
             'no' => $data['no'],
             'nama' => $data['nama'],
@@ -74,11 +74,13 @@ class KandidatService
         }
 
         DB::table('tb_pilihan')->insert($dataInsert);
+        $activityService = new \App\Services\ActivityService();
+        $activityService->logActivity($npsn->username, 13, json_encode($dataInsert));
     }
 
     public function update($npsn, $id, $data, $file)
     {
-        $kandidat = DB::table('tb_pilihan')->where('id', $id)->where('npsn', $npsn)->first();
+        $kandidat = DB::table('tb_pilihan')->where('id', $id)->where('npsn', $npsn->npsn)->first();
 
         if (!$kandidat) {
             throw new Exception('Kandidat tidak ditemukan');
@@ -108,11 +110,13 @@ class KandidatService
         }
 
         DB::table('tb_pilihan')->where('id', $id)->update($dataUpdate);
+        $activityService = new \App\Services\ActivityService();
+        $activityService->logActivity($npsn->username, 14, json_encode($dataUpdate));
     }
 
     public function delete($npsn, $id)
     {
-        $kandidat = DB::table('tb_pilihan')->where('id', $id)->where('npsn', $npsn)->first();
+        $kandidat = DB::table('tb_pilihan')->where('id', $id)->where('npsn', $npsn->npsn)->first();
 
         if (!$kandidat) {
             throw new Exception('Kandidat tidak ditemukan');
@@ -123,5 +127,7 @@ class KandidatService
         }
 
         DB::table('tb_pilihan')->where('id', $id)->delete();
+        $activityService = new \App\Services\ActivityService();
+        $activityService->logActivity($npsn->username, 15, json_encode($kandidat));
     }
 }

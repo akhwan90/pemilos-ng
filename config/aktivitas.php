@@ -24,4 +24,9 @@ return [
     '21' => 'Ubah data sekolah',
     '22' => 'Hapus data sekolah',
     '23' => 'Tambah Admin sekolah',
+    '24' => 'Approve pindah sekolah',
+    '25' => 'Insert data siswa',
+    '26' => 'Update data siswa',
+    '27' => 'Hapus data siswa',
+    '28' => 'Tambah DPT Banyak',
 ];
