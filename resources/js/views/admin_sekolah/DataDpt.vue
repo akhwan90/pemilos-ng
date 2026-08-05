@@ -45,9 +45,7 @@
 
         <!-- Toolbar Atas -->
         <BaseCard class="p-0">
-            <div
-                class="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 flex-wrap gap-4"
-            >
+            <div class="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 flex-wrap gap-4" >
                 <!-- Kolom Kiri: Filter -->
                 <div class="flex gap-2 items-center flex-wrap">
                     <div class="relative w-48">
@@ -133,7 +131,7 @@
 
                     <!-- Tombol Hapus Bulk Terpilih -->
                     <BaseButton
-                        v-if="selectedIds.length > 0"
+                        v-if="selectedIds.length > 0 && auth.user?.level === 2"
                         variant="danger"
                         @click="submitBulkDelete"
                         class="!py-2 text-sm shadow-sm flex gap-1 items-center"
@@ -230,7 +228,7 @@
                         class="text-xs text-gray-700 uppercase bg-gray-100 border-b"
                     >
                         <tr>
-                            <th class="px-4 py-3 w-10 text-center">
+                            <th class="px-4 py-3 w-10 text-center" v-if="auth.user?.level === 2">
                                 <input
                                     type="checkbox"
                                     @change="toggleAll"
@@ -286,7 +284,7 @@
                                 'bg-indigo-50': selectedIds.includes(item.id),
                             }"
                         >
-                            <td class="px-4 py-3 text-center">
+                            <td class="px-4 py-3 text-center" v-if="auth.user?.level === 2">
                                 <input
                                     type="checkbox"
                                     :value="item.id"
