@@ -277,12 +277,24 @@ class DataDptController extends Controller
         // Jika user adalah admin sekolah (level 2), mereka harus menyertakan id_tps di body
         // Jika user adalah admin tps (level 3), id_tps otomatis diambil dari field id_tps mereka sendiri
         $idTps = $user->level == 3 ? $user->id_tps : $request->input('id_tps');
-
         if (!$idTps) {
             return response()->json([
                 'success' => false,
                 'message' => 'ID TPS harus disertakan.'
             ], 422);
+        }
+        // Cek apakah pemilihan sudah diselesaikan (closed)
+        $tpsSetting = DB::table('tb_tps_setting')
+            ->where('npsn', $npsn)
+            ->where('tahun', $tahun)
+            ->where('id_kelas', $idTps)
+            ->first();
+
+        if ($tpsSetting && !empty($tpsSetting->selesai_pemilihan_time)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal generate token: Waktu pemilihan telah ditutup/diakhiri secara manual.'
+            ], 403);
         }
 
         $result = $this->generateTokenService->generateForTps($idTps, $npsn, $tahun, $user);
@@ -316,6 +328,20 @@ class DataDptController extends Controller
                 'success' => false,
                 'message' => 'ID TPS harus disertakan.'
             ], 422);
+        }
+
+        // Cek apakah pemilihan sudah diselesaikan (closed)
+        $tpsSetting = DB::table('tb_tps_setting')
+            ->where('npsn', $npsn)
+            ->where('tahun', $tahun)
+            ->where('id_kelas', $idTps)
+            ->first();
+
+        if ($tpsSetting && !empty($tpsSetting->selesai_pemilihan_time)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal generate token: Waktu pemilihan telah ditutup/diakhiri secara manual.'
+            ], 403);
         }
 
         // Cek apakah ada siswa di TPS ini yang sudah terlanjur memilih.

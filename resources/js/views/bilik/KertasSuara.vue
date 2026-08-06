@@ -4,7 +4,7 @@
     <header class="bg-white shadow-sm py-4">
       <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
         <div class="flex items-center gap-3">
-          <img src="/asset/KPU.png" alt="Logo KPU" class="h-10" />
+          <img src="/images/kpu_logo.png" alt="Logo KPU" class="h-10" />
           <h1 class="text-xl font-bold text-gray-800 tracking-wide">SURAT SUARA ELEKTRONIK</h1>
         </div>
         <div class="text-right">
@@ -24,15 +24,15 @@
       <div v-if="loadingCalon" class="flex justify-center items-center py-20">
         <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-indigo-600"></div>
       </div>
-      
+
       <div v-else-if="kandidatList.length === 0" class="text-center py-20 text-gray-500 bg-white rounded-xl shadow">
         <p class="text-xl">Tidak ada data kandidat calon pada TPS ini.</p>
       </div>
 
       <!-- Grid Kandidat -->
       <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <div 
-          v-for="kandidat in kandidatList" 
+        <div
+          v-for="kandidat in kandidatList"
           :key="kandidat.id"
           @click="konfirmasiPilihan(kandidat)"
           class="bg-white rounded-2xl shadow-lg overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer border-2 border-transparent hover:border-indigo-400 flex flex-col"
@@ -42,12 +42,12 @@
             <span class="absolute top-2 left-4 text-xs opacity-75">PASLON NOMOR</span>
             <h3 class="text-4xl font-black">{{ kandidat.no }}</h3>
           </div>
-          
+
           <!-- Foto Kandidat -->
           <div class="aspect-w-3 aspect-h-4 bg-gray-200 relative overflow-hidden h-80">
-            <img 
-              :src="kandidat.photo ? `/uploads/kandidat/${kandidat.photo}` : '/asset/user.png'" 
-              alt="Foto Kandidat" 
+            <img
+              :src="kandidat.photo ? `/uploads/kandidat/${kandidat.photo}` : '/asset/user.png'"
+              alt="Foto Kandidat"
               class="w-full h-full object-cover object-top"
             />
           </div>
@@ -57,7 +57,7 @@
             <div>
               <h4 class="text-xl font-bold text-gray-900 leading-tight">{{ kandidat.nama }}</h4>
             </div>
-            
+
             <button class="mt-6 w-full bg-indigo-50 text-indigo-700 font-bold py-3 px-4 rounded-xl border border-indigo-200 hover:bg-indigo-600 hover:text-white transition-colors">
               PILIH NOMOR {{ kandidat.no }}
             </button>
@@ -73,7 +73,7 @@
         <div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-75" aria-hidden="true" @click="showModal = false"></div>
 
         <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-        
+
         <div class="relative inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
           <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
             <div class="sm:flex sm:items-start">
@@ -137,7 +137,7 @@ onMounted(() => {
   const savedData = localStorage.getItem('pemilih_data');
   if (!savedData) {
     toast.error('Sesi pemilih tidak valid! Silakan masukkan token kembali.');
-    
+
     // Jika bilik_info mengatakan ini mode luar sekolah mandiri, arahkan kembali ke login luar sekolah
     const bilikInfo = JSON.parse(localStorage.getItem('bilik_info') || '{}');
     if (bilikInfo.is_luar_sekolah_mode) {
@@ -145,7 +145,7 @@ onMounted(() => {
     }
     return router.push('/tpssekolah/token');
   }
-  
+
   pemilihData.value = JSON.parse(savedData);
   fetchKandidat();
 });
@@ -181,12 +181,13 @@ function konfirmasiPilihan(kandidat) {
 
 async function submitVote() {
   if (!selectedKandidat.value) return;
-  
+
   isSubmitting.value = true;
   try {
     await api.post('/bilik/submit-vote', {
       id_siswa_tps: pemilihData.value.id_siswa_tps, // ID unik row siswa_tps yang ditarik saat token valid
-      id_calon: selectedKandidat.value.id
+      id_calon: selectedKandidat.value.id,
+      log_id: pemilihData.value.log_id
     }, {
       headers: {
         'Authorization': `Bearer ${getBilikToken()}`
@@ -194,20 +195,20 @@ async function submitVote() {
     });
 
     toast.success('Pilihan Anda berhasil disimpan. Terima Kasih!');
-    
+
     // Auto logout sesi si pemilih
     localStorage.removeItem('pemilih_data');
-    
+
     // Cek apakah ini mode Luar Sekolah Mandiri
     const bilikInfo = JSON.parse(localStorage.getItem('bilik_info') || '{}');
-    
+
     if (bilikInfo.is_luar_sekolah_mode) {
       // Bersihkan semuanya karena ini perangkat pribadinya sendiri
       localStorage.removeItem('bilik_info');
       showModal.value = false;
       return router.push('/tpsluarsekolah');
     }
-    
+
     // Tutup modal dan lempar layar kembali ke form standby Input Token (Bilik Reguler)
     showModal.value = false;
     router.push('/tpssekolah/token');
