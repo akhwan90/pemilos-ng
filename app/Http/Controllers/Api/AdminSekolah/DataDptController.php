@@ -82,7 +82,8 @@ class DataDptController extends Controller
             });
         }
 
-        $data = $query->paginate(30);
+        $limit = $request->query('limit', 30);
+        $data = $query->paginate($limit);
 
         return response()->json([
             'success' => true,
@@ -267,6 +268,12 @@ class DataDptController extends Controller
         $npsn = $user->npsn;
         $tahun = env('TAHUN_AKTIF', date('Y'));
 
+
+        $cek = $this->waktuPemilihanService->cekJadwalBuka('generate_token', $tahun, $npsn);
+        if (!$cek['is_open']) {
+            return response()->json(['success' => false, 'message' => 'Gagal generate token: ' . $cek['message']], 403);
+        }
+
         // Jika user adalah admin sekolah (level 2), mereka harus menyertakan id_tps di body
         // Jika user adalah admin tps (level 3), id_tps otomatis diambil dari field id_tps mereka sendiri
         $idTps = $user->level == 3 ? $user->id_tps : $request->input('id_tps');
@@ -278,7 +285,7 @@ class DataDptController extends Controller
             ], 422);
         }
 
-        $result = $this->generateTokenService->generateForTps($idTps, $npsn, $tahun);
+        $result = $this->generateTokenService->generateForTps($idTps, $npsn, $tahun, $user);
 
         if ($result['success']) {
             return response()->json($result);
@@ -295,6 +302,12 @@ class DataDptController extends Controller
         $user = $request->user();
         $npsn = $user->npsn;
         $tahun = env('TAHUN_AKTIF', date('Y'));
+
+
+        $cek = $this->waktuPemilihanService->cekJadwalBuka('generate_token', $tahun, $npsn);
+        if (!$cek['is_open']) {
+            return response()->json(['success' => false, 'message' => 'Gagal generate token: ' . $cek['message']], 403);
+        }
 
         $idTps = $user->level == 3 ? $user->id_tps : $request->input('id_tps');
 
@@ -321,7 +334,7 @@ class DataDptController extends Controller
             ], 422);
         }
 
-        $result = $this->generateTokenService->cancelForTps($idTps, $npsn, $tahun);
+        $result = $this->generateTokenService->cancelForTps($idTps, $npsn, $tahun, $user);
 
         if ($result['success']) {
             return response()->json($result);

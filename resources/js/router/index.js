@@ -182,6 +182,18 @@ const routes = [
         ]
     },
     {
+        path: '/admin-sekolah/cetak-kartu-pemilih',
+        name: 'admin-sekolah-cetak-kartu',
+        component: () => import('../views/admin_tps/CetakKartuPemilih.vue'),
+        meta: { requiresAuth: true, level: 2, layout: 'blank' },
+    },
+    {
+        path: '/admin-tps/cetak-kartu-pemilih',
+        name: 'admin-tps-cetak-kartu',
+        component: () => import('../views/admin_tps/CetakKartuPemilih.vue'),
+        meta: { requiresAuth: true, level: 3, layout: 'blank' },
+    },
+    {
         path: '/tpssekolah',
         children: [
             {
