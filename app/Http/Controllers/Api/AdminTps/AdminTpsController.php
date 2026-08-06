@@ -249,9 +249,23 @@ class AdminTpsController extends Controller
             ];
         }
 
+        // Ambil juga info TPS dan Perangkat TPS agar tidak perlu request terpisah
+        $namaKelas = DB::table('tb_kelas')->where('kd_kelas', $user->id_tps)->value('nm_kelas');
+        $perangkatTps = null;
+        if ($tpsSetting && $tpsSetting->perangkat_tps) {
+            $perangkatTps = json_decode($tpsSetting->perangkat_tps, true);
+        }
+
         return response()->json([
             'success' => true,
-            'data' => $c2Config
+            'data' => [
+                'c2_config' => $c2Config,
+                'tps_info' => [
+                    'nama_kelas' => $namaKelas,
+                    'tahun' => env('TAHUN_AKTIF', date('Y'))
+                ],
+                'perangkat_tps' => $perangkatTps
+            ]
         ]);
     }
 

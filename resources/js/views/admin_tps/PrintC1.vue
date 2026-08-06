@@ -184,6 +184,7 @@ async function fetchHasil() {
 <style>
 @media print {
     @page { margin: 1cm; }
-    body { background-color: white !important; margin: 0; padding: 0; }
+    /* Override sudah diatur global di app.css, ini untuk spesifik komponen bila perlu */
+    .print-container { overflow: visible !important; height: auto !important; }
 }
 </style>

@@ -2,6 +2,10 @@
     <div class="space-y-6">
         <div class="flex items-center justify-between">
             <h1 class="text-2xl font-bold text-gray-900">Formulir C2 (Kejadian Khusus)</h1>
+            <button type="button" @click="cetakC2" class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                Cetak Form C2
+            </button>
         </div>
 
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 md:p-8">
@@ -115,9 +119,9 @@ onMounted(() => {
 async function fetchC2Config() {
     try {
         const res = await api.get('/admin-tps/c2');
-        if (res.data.success && res.data.data) {
-            form.value.ada_kejadian = res.data.data.ada_kejadian === true || res.data.data.ada_kejadian === 'true';
-            form.value.kejadian = res.data.data.kejadian || [];
+        if (res.data.success && res.data.data && res.data.data.c2_config) {
+            form.value.ada_kejadian = res.data.data.c2_config.ada_kejadian === true || res.data.data.c2_config.ada_kejadian === 'true';
+            form.value.kejadian = res.data.data.c2_config.kejadian || [];
         }
     } catch (error) {
         console.error('Gagal memuat config C2:', error);
@@ -147,5 +151,9 @@ function hapusKejadian(index) {
     if (confirm('Hapus catatan kejadian ini?')) {
         form.value.kejadian.splice(index, 1);
     }
+}
+
+function cetakC2() {
+    window.open('/admin-tps/print-c2', '_blank');
 }
 </script>

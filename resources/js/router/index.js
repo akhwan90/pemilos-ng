@@ -170,6 +170,12 @@ const routes = [
                 component: () => import('../views/admin_tps/LaporanC2.vue'),
             },
             {
+                path: 'print-c2',
+                name: 'admin-tps-print-c2',
+                component: () => import('../views/admin_tps/PrintC2.vue'),
+                meta: { layout: 'none' } 
+            },
+            {
                 path: 'perangkat',
                 name: 'admin-tps-perangkat',
                 component: () => import('../views/admin_tps/PerangkatTps.vue'),
