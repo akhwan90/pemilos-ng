@@ -14,7 +14,7 @@ class AdminTpsController extends Controller
     public function getStatus(Request $request)
     {
         $user = $request->user();
-        
+
         // Pastikan level 3 (Admin TPS)
         if ($user->level != 3) {
             return response()->json([
@@ -47,7 +47,7 @@ class AdminTpsController extends Controller
     public function akhiriPemilihan(Request $request)
     {
         $user = $request->user();
-        
+
         if ($user->level != 3) {
             return response()->json([
                 'success' => false,
@@ -92,6 +92,13 @@ class AdminTpsController extends Controller
                 'created_at' => $now
             ]);
         }
+
+        $activityService = new \App\Services\ActivityService();
+        $activityService->logActivity($user->username, 30, json_encode([
+            'tps_id' => $tpsId,
+            'tahun' => $tahun,
+            'npsn' => $npsn,
+        ]));
 
         return response()->json([
             'success' => true,
@@ -274,7 +281,7 @@ class AdminTpsController extends Controller
         // Prepare the config data
         $adaKejadian = filter_var($request->input('ada_kejadian'), FILTER_VALIDATE_BOOLEAN);
         $kejadian = $request->input('kejadian', []);
-        
+
         if (!is_array($kejadian)) {
             $kejadian = [];
         }
@@ -353,7 +360,7 @@ class AdminTpsController extends Controller
             $hasilLengkap = json_decode($tpsSetting->hasil, true);
         } else {
             // 3. Jika belum di-generate (pertama kali buka setelah klik Selesai Pemilihan), hitung dan simpan
-            
+
             // a. Ambil Paslon/Kandidat
             $kandidatList = DB::table('tb_pilihan')
                 ->where('npsn', $npsn)
