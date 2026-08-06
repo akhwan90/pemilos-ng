@@ -427,16 +427,82 @@ class AdminTpsController extends Controller
         // Ambil info nama kelas (TPS)
         $namaKelas = DB::table('tb_kelas')->where('kd_kelas', $tpsId)->value('nm_kelas');
 
+        $perangkatTps = null;
+        if ($tpsSetting->perangkat_tps) {
+            $perangkatTps = json_decode($tpsSetting->perangkat_tps, true);
+        }
+
         return response()->json([
             'success' => true,
             'data' => [
                 'tps' => $namaKelas,
                 'waktu_selesai' => $tpsSetting->selesai_pemilihan_time,
                 'hasil' => $hasilLengkap,
+                'perangkat_tps' => $perangkatTps,
                 // Kita tambahkan URL file scan (jika sudah di-upload)
                 'file_c1_url' => $tpsSetting->form_c1_file ? asset('uploads/c1/' . $tpsSetting->form_c1_file) : null,
                 'file_c1_time' => $tpsSetting->form_c1_upload_time,
             ]
         ]);
+    }
+
+    /**
+     * Upload hasil scan form C1
+     */
+    public function uploadC1(Request $request)
+    {
+        $user = $request->user();
+        if ($user->level != 3) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized.'], 403);
+        }
+
+        $request->validate([
+            'file_c1' => 'required|mimes:pdf,jpg,jpeg,png|max:2048' // Max 2MB
+        ]);
+
+        $npsn = $user->npsn;
+        $tpsId = $user->id_tps;
+        $tahun = env('TAHUN_AKTIF', date('Y'));
+
+        $tpsSetting = DB::table('tb_tps_setting')
+            ->where('npsn', $npsn)
+            ->where('tahun', $tahun)
+            ->where('id_kelas', $tpsId)
+            ->first();
+
+        if (!$tpsSetting) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pengaturan TPS tidak ditemukan.'
+            ], 404);
+        }
+
+        if ($request->hasFile('file_c1')) {
+            $file = $request->file('file_c1');
+            $extension = $file->getClientOriginalExtension();
+            $filename = $npsn . '_' . $tpsId . '_' . time() . '_c1.' . $extension;
+            
+            // Simpan ke direktori public/uploads/c1
+            $file->move(public_path('uploads/c1'), $filename);
+
+            // Update database
+            DB::table('tb_tps_setting')
+                ->where('id', $tpsSetting->id)
+                ->update([
+                    'form_c1_file' => $filename,
+                    'form_c1_upload_time' => date('Y-m-d H:i:s')
+                ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil mengunggah dokumen C1.',
+                'file_url' => asset('uploads/c1/' . $filename)
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Tidak ada file yang diunggah.'
+        ], 400);
     }
 }
