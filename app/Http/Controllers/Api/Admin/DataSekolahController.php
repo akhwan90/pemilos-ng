@@ -196,4 +196,23 @@ class DataSekolahController extends Controller
             'message' => 'Data sekolah berhasil diperbarui'
         ]);
     }
+
+    public function destroy($npsn)
+    {
+        $sekolah = DB::table('tb_sekolah')->where('npsn', $npsn)->first();
+        if (!$sekolah) {
+            return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
+        }
+
+        DB::table('tb_sekolah')->where('npsn', $npsn)
+        ->update([
+            'is_delete'=>1,
+            'deleted_time' => now(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data sekolah berhasil dihapus'
+        ]);
+    }
 }

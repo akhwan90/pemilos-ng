@@ -45,7 +45,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/admin/data-sekolah', [DataSekolahController::class, 'index']);
     Route::post('/admin/data-sekolah', [DataSekolahController::class, 'store']);
     Route::get('/admin/data-sekolah/{npsn}', [DataSekolahController::class, 'show']);
-    Route::post('/admin/data-sekolah/{npsn}', [DataSekolahController::class, 'update']); // Pakai POST agar bisa upload logo
+    Route::post('/admin/data-sekolah/{npsn}', [DataSekolahController::class, 'update']);
+    Route::delete('/admin/data-sekolah/{npsn}', [DataSekolahController::class, 'destroy']);
 
     // User Sekolah (Level 2) API
     Route::get('/admin/data-sekolah/{npsn}/users', [UserSekolahController::class, 'index']);
