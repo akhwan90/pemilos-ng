@@ -2,7 +2,7 @@
   <div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
       <div class="flex justify-center flex-col items-center">
-        <img src="/asset/img/kpu_logo.png" alt="Logo KPU" class="h-16 w-auto mb-4" />
+        <img src="/images/kpu_logo.png" alt="Logo KPU" class="h-16 w-auto mb-4" />
         <h2 class="text-center text-3xl font-extrabold text-gray-900">
           Aktivasi Bilik TPS
         </h2>
@@ -14,7 +14,7 @@
 
     <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
       <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-        
+
         <div v-if="errorMsg" class="mb-4 bg-red-50 border-l-4 border-red-500 p-4">
           <div class="flex">
             <div class="flex-shrink-0">
@@ -53,7 +53,7 @@
             </button>
           </div>
         </form>
-        
+
         <div class="mt-6 text-center">
           <router-link to="/" class="text-sm text-gray-500 hover:text-gray-900">Kembali ke Beranda</router-link>
         </div>
@@ -77,16 +77,16 @@ const errorMsg = ref('');
 async function handleLogin() {
   loading.value = true;
   errorMsg.value = '';
-  
+
   try {
     // Kita gunakan endpoint login yang sudah ada. Backend akan mengembalikan data user beserta token.
     const res = await api.post('/login', {
       username: username.value,
       password: password.value
     });
-    
+
     const { token, user } = res.data.data;
-    
+
     // Pastikan hanya TPS (Level 3) yang boleh mengaktifkan bilik ini
     if (parseInt(user.level) !== 3) {
       errorMsg.value = "Hanya akun Admin TPS yang diizinkan mengaktifkan Bilik.";
@@ -102,7 +102,7 @@ async function handleLogin() {
       nama_tps: user.nama_tps || 'TPS',
       is_luar_sekolah: !!user.is_tps_luar_sekolah
     }));
-    
+
     // Arahkan langsung ke halaman input token (standby)
     router.push('/tpssekolah/token');
   } catch (error) {

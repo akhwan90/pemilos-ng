@@ -2,7 +2,7 @@
   <div class="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
       <div class="flex justify-center flex-col items-center">
-        <img src="/asset/img/kpu_logo.png" alt="Logo KPU" class="h-20 w-auto mb-4" />
+        <img src="/images/kpu_logo.png" alt="Logo KPU" class="h-20 w-auto mb-4" />
         <h2 class="text-center text-3xl font-extrabold text-gray-900 tracking-wider">
           LOGIN PEMILIH<br/><span class="text-xl font-semibold text-indigo-700">(TPS Luar Sekolah)</span>
         </h2>
@@ -14,19 +14,19 @@
 
     <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
       <div class="bg-white py-10 px-4 shadow-xl border-t-4 border-indigo-600 sm:rounded-lg sm:px-10">
-        
+
         <form @submit.prevent="verifyToken" class="space-y-6">
           <!-- Input NISN -->
           <div>
             <label class="block text-sm font-medium text-gray-700 text-center mb-2">NISN Anda</label>
             <div class="flex justify-center">
-              <input 
+              <input
                 ref="nisnInputRef"
-                v-model="nisnPemilih" 
-                type="text" 
-                class="appearance-none block w-full text-center text-2xl tracking-[0.2em] font-mono px-2 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" 
+                v-model="nisnPemilih"
+                type="text"
+                class="appearance-none block w-full text-center text-2xl tracking-[0.2em] font-mono px-2 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                 placeholder="Ketik NISN Anda"
-                required 
+                required
                 autofocus
                 autocomplete="off"
               />
@@ -37,13 +37,13 @@
           <div>
             <label class="block text-sm font-medium text-gray-700 text-center mb-2">Token Pemilihan</label>
             <div class="mt-1 flex justify-center">
-              <input 
-                v-model="tokenPemilih" 
-                type="text" 
+              <input
+                v-model="tokenPemilih"
+                type="text"
                 maxlength="5"
-                class="appearance-none block w-full text-center text-4xl tracking-[0.5em] sm:tracking-[0.8em] font-mono uppercase px-2 py-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" 
+                class="appearance-none block w-full text-center text-4xl tracking-[0.5em] sm:tracking-[0.8em] font-mono uppercase px-2 py-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                 placeholder="XXXXX"
-                required 
+                required
                 autocomplete="off"
               />
             </div>
@@ -62,7 +62,7 @@
 
       </div>
     </div>
-    
+
     <div class="mt-6 text-center">
         <router-link to="/" class="text-sm text-gray-500 hover:text-gray-900">&larr; Kembali ke Beranda</router-link>
     </div>
@@ -87,7 +87,7 @@ onMounted(() => {
   // Clear any existing session to ensure a fresh login
   localStorage.removeItem('pemilih_data');
   localStorage.removeItem('bilik_token'); // Ensure they are not using regular bilik auth
-  
+
   if (nisnInputRef.value) {
     nisnInputRef.value.focus();
   }
@@ -95,10 +95,10 @@ onMounted(() => {
 
 async function verifyToken() {
   if (tokenPemilih.value.length < 5 || !nisnPemilih.value) return;
-  
+
   loading.value = true;
   try {
-    const payload = { 
+    const payload = {
         token: tokenPemilih.value.toUpperCase(),
         nisn: nisnPemilih.value
     };
@@ -115,7 +115,7 @@ async function verifyToken() {
     }
 
     toast.success(`Selamat datang, ${dataSiswa.nm_siswa}!`);
-    
+
     // Store regular pemilih data
     localStorage.setItem('pemilih_data', JSON.stringify({
       id_siswa_tps: dataSiswa.id_siswa_tps,
@@ -132,7 +132,7 @@ async function verifyToken() {
         nama_tps: 'TPS Luar Sekolah (Mandiri)',
         token_akses: res.data.token // Temporary token provided by backend
     }));
-    
+
     router.push('/tpssekolah/vote');
 
   } catch (error) {

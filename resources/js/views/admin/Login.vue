@@ -3,7 +3,7 @@
 		<div class="max-w-md w-full">
 			<div class="text-center mb-8">
 				<div class="w-16 h-16 mx-auto mb-4">
-					<img src="/asset/img/kpu_logo.png" alt="Logo KPU" class="w-full h-full object-contain" />
+					<img src="/images/kpu_logo.png" alt="Logo KPU" class="w-full h-full object-contain" />
 				</div>
 				<h1 class="text-2xl font-bold text-gray-800">PEMILOS Admin</h1>
 				<p class="text-sm text-gray-500 mt-1">Pemilihan Ketua OSIS Berbasis Elektronik</p>
