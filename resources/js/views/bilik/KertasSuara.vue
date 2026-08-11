@@ -186,7 +186,8 @@ async function submitVote() {
   try {
     await api.post('/bilik/submit-vote', {
       id_siswa_tps: pemilihData.value.id_siswa_tps, // ID unik row siswa_tps yang ditarik saat token valid
-      id_calon: selectedKandidat.value.id
+      id_calon: selectedKandidat.value.id,
+      log_id: pemilihData.value.log_id
     }, {
       headers: {
         'Authorization': `Bearer ${getBilikToken()}`

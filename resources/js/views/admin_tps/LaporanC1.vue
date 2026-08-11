@@ -112,11 +112,22 @@
                     <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg flex items-center justify-between">
                         <div>
                             <h4 class="font-bold text-gray-800 text-sm">Scan Dokumen Fisik</h4>
-                            <p class="text-xs text-gray-500">Anda dapat mengunggah hasil scan/foto dokumen C1 yang telah ditandatangani.</p>
+                            <p class="text-xs text-gray-500 mb-2">Anda dapat mengunggah hasil scan/foto dokumen C1 yang telah ditandatangani (PDF/JPG/PNG, Max 2MB).</p>
+                            <p v-if="hasilData.file_c1_url" class="text-sm font-semibold text-green-600">
+                                <a :href="hasilData.file_c1_url" target="_blank" class="hover:underline flex items-center gap-1">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                    Dokumen sudah diupload
+                                </a>
+                                <span class="text-xs font-normal text-gray-500">pada {{ moment(hasilData.file_c1_time).format('DD MMM YYYY HH:mm') }}</span>
+                            </p>
+                            <p v-else class="text-sm text-red-500">Belum ada dokumen yang diunggah.</p>
                         </div>
-                        <button class="px-4 py-2 bg-white border border-gray-300 rounded shadow-sm text-sm font-medium hover:bg-gray-50 transition">
-                            Upload File
-                        </button>
+                        <div>
+                            <input type="file" ref="fileUpload" class="hidden" @change="handleFileUpload" accept=".pdf,.jpg,.jpeg,.png">
+                            <button @click="$refs.fileUpload.click()" :disabled="isUploading" class="px-4 py-2 bg-white border border-gray-300 rounded shadow-sm text-sm font-medium hover:bg-gray-50 transition disabled:opacity-50">
+                                {{ isUploading ? 'Mengunggah...' : 'Upload File' }}
+                            </button>
+                        </div>
                     </div>
 
                 </div>
@@ -135,6 +146,7 @@ const toast = useToast();
 const loading = ref(true);
 const hasilData = ref(null);
 const errorMessage = ref(null);
+const isUploading = ref(false);
 
 onMounted(() => {
     fetchHasil();
@@ -154,6 +166,40 @@ async function fetchHasil() {
         }
     } finally {
         loading.value = false;
+    }
+}
+
+async function handleFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    if (file.size > 2 * 1024 * 1024) {
+        toast.error('Ukuran file maksimal 2MB');
+        event.target.value = '';
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('file_c1', file);
+    
+    isUploading.value = true;
+    try {
+        const res = await api.post('/admin-tps/upload-c1', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+        
+        if (res.data.success) {
+            toast.success('Berhasil mengunggah dokumen C1');
+            fetchHasil(); // Refresh data untuk update URL file
+        }
+    } catch (error) {
+        console.error('Error upload C1:', error);
+        toast.error(error.response?.data?.message || 'Gagal mengunggah dokumen');
+    } finally {
+        isUploading.value = false;
+        event.target.value = ''; // Reset input
     }
 }
 

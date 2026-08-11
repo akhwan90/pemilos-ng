@@ -29,4 +29,5 @@ return [
     '26' => 'Update data siswa',
     '27' => 'Hapus data siswa',
     '28' => 'Tambah DPT Banyak',
+    '30' => 'TPS mengakhiri pemilihan',
 ];

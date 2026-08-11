@@ -253,6 +253,17 @@
 					</router-link>
 
 					<router-link
+						to="/admin-tps/perangkat"
+						class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+						:class="$route.path.startsWith('/admin-tps/perangkat') ? 'bg-amber-50 text-amber-700' : 'text-gray-600 hover:bg-gray-100'"
+					>
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+						</svg>
+						Perangkat TPS
+					</router-link>
+
+					<router-link
 						to="/admin-tps/dpt"
 						class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
 						:class="$route.path.startsWith('/admin-tps/dpt') ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-100'"
@@ -261,6 +272,18 @@
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
 						</svg>
 						Data DPT
+					</router-link>
+
+
+					<router-link
+						to="/admin-tps/selesai"
+						class="flex items-center gap-3 px-3 py-2 mt-4 rounded-lg text-sm font-bold transition-colors"
+						:class="$route.path.startsWith('/admin-tps/selesai') ? 'bg-red-50 text-red-700' : 'bg-red-600 text-white hover:bg-red-700'"
+					>
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+						</svg>
+						Selesai Pemilihan
 					</router-link>
 
 					<div class="px-3 pt-4 pb-2">
@@ -289,31 +312,6 @@
 						Laporan C2
 					</router-link>
 
-					<div class="px-3 pt-4 pb-2">
-						<span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Pengaturan TPS</span>
-					</div>
-
-					<router-link
-						to="/admin-tps/perangkat"
-						class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
-						:class="$route.path.startsWith('/admin-tps/perangkat') ? 'bg-amber-50 text-amber-700' : 'text-gray-600 hover:bg-gray-100'"
-					>
-						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-						</svg>
-						Perangkat TPS
-					</router-link>
-
-					<router-link
-						to="/admin-tps/selesai"
-						class="flex items-center gap-3 px-3 py-2 mt-4 rounded-lg text-sm font-bold transition-colors"
-						:class="$route.path.startsWith('/admin-tps/selesai') ? 'bg-red-50 text-red-700' : 'bg-red-600 text-white hover:bg-red-700'"
-					>
-						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-						</svg>
-						Selesai Pemilihan
-					</router-link>
 				</template>
 
 				<template v-if="auth.user?.level === 4">

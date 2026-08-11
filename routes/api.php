@@ -159,8 +159,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/admin-tps/c2', [AdminTpsController::class, 'getC2']);
     Route::post('/admin-tps/c2', [AdminTpsController::class, 'saveC2']);
     Route::get('/admin-tps/hasil-c1', [AdminTpsController::class, 'getHasilC1']);
+    Route::post('/admin-tps/upload-c1', [AdminTpsController::class, 'uploadC1']);
 
     // Bilik Suara API (Khusus Level 3)
+    Route::get('/bilik/status', [BilikController::class, 'getStatus']);
     Route::post('/bilik/verify-token', [BilikController::class, 'verifyToken']);
     Route::get('/bilik/calon', [BilikController::class, 'listCalon']);
     Route::post('/bilik/submit-vote', [BilikController::class, 'submitVote']);

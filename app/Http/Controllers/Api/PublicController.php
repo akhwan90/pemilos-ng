@@ -62,7 +62,7 @@ class PublicController extends Controller
         $kandidat = [];
         $cekKampanye = $this->waktuPemilihanService->cekJadwalBuka('kampanye', $tahun, $npsn);
 
-        if ($cekKampanye['is_open'] || strpos($cekKampanye['message'], 'berakhir') !== false) {
+        if ($cekKampanye['is_open']) {
             $kandidat = DB::table('tb_pilihan')
                 ->select('id', 'npsn', 'nama', 'no', 'photo', 'photo_wakil')
                 ->where('npsn', $npsn)
@@ -76,7 +76,7 @@ class PublicController extends Controller
             'data' => [
                 'sekolah' => $sekolah,
                 'kandidat' => $kandidat,
-                'is_kampanye_buka' => ($cekKampanye['is_open'] || strpos($cekKampanye['message'], 'berakhir') !== false)
+                'is_kampanye_buka' => ($cekKampanye['is_open'])
             ]
         ]);
     }
@@ -90,11 +90,13 @@ class PublicController extends Controller
 
         $cek = $this->waktuPemilihanService->cekJadwalBuka('pengumuman_data_dps', $tahun, $npsn);
 
+        // dd($cek);
+
         // Membaca statusnya: Jika status belum open tapi juga bukan 'berakhir' (alias: belum diset atau belum masuk waktu mulai)
-        if (!$cek['is_open'] && strpos($cek['message'], 'berakhir') === false) {
+        if (!$cek['is_open']) {
             return response()->json([
                 'success' => false,
-                'message' => 'Data Pemilih Sementara (DPS) belum dibuka.',
+                'message' => 'Pengumuman Data Pemilih Sementara (DPS) belum dibuka atau sudah berakhir.',
                 'is_buka' => false
             ], 403);
         }
@@ -131,10 +133,10 @@ class PublicController extends Controller
 
         $cek = $this->waktuPemilihanService->cekJadwalBuka('pengumuman_data_dpt', $tahun, $npsn);
 
-        if (!$cek['is_open'] && strpos($cek['message'], 'berakhir') === false) {
+        if (!$cek['is_open']) {
             return response()->json([
                 'success' => false,
-                'message' => 'Data Pemilih Tetap (DPT) belum diumumkan.',
+                'message' => 'Pengumuman Data Pemilih Tetap (DPT) belum diumumkan atau sudah berakhir.',
                 'is_buka' => false
             ], 403);
         }

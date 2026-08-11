@@ -91,18 +91,50 @@
                             <td colspan="3" class="pb-12 font-bold">KELOMPOK PENYELENGGARA PEMUNGUTAN SUARA (KPPS) / PERANGKAT TPS</td>
                         </tr>
                         <tr>
-                            <td class="w-1/3 pb-8">(...................................................)<br>Ketua</td>
-                            <td class="w-1/3 pb-8">(...................................................)<br>Anggota 1</td>
-                            <td class="w-1/3 pb-8">(...................................................)<br>Anggota 2</td>
+                            <td class="w-1/3 pb-8">
+                                <span v-if="hasilData.perangkat_tps && hasilData.perangkat_tps.ketua && hasilData.perangkat_tps.ketua.nama">
+                                    ({{ hasilData.perangkat_tps.ketua.nama }})
+                                </span>
+                                <span v-else>(...................................................)</span>
+                                <br>Ketua
+                            </td>
+                            <td class="w-1/3 pb-8">
+                                <span v-if="hasilData.perangkat_tps && hasilData.perangkat_tps.anggota_1 && hasilData.perangkat_tps.anggota_1.nama">
+                                    ({{ hasilData.perangkat_tps.anggota_1.nama }})
+                                </span>
+                                <span v-else>(...................................................)</span>
+                                <br>Anggota 1
+                            </td>
+                            <td class="w-1/3 pb-8">
+                                <span v-if="hasilData.perangkat_tps && hasilData.perangkat_tps.anggota_2 && hasilData.perangkat_tps.anggota_2.nama">
+                                    ({{ hasilData.perangkat_tps.anggota_2.nama }})
+                                </span>
+                                <span v-else>(...................................................)</span>
+                                <br>Anggota 2
+                            </td>
                         </tr>
-                        <tr>
-                            <td colspan="3" class="pt-8 pb-12 font-bold">SAKSI PASANGAN CALON</td>
-                        </tr>
-                        <tr>
-                            <td class="w-1/3 pb-8">(...................................................)<br>Saksi 1</td>
-                            <td class="w-1/3 pb-8"></td>
-                            <td class="w-1/3 pb-8">(...................................................)<br>Saksi 2</td>
-                        </tr>
+                        <template v-if="hasilData.perangkat_tps && hasilData.perangkat_tps.saksi && hasilData.perangkat_tps.saksi.length > 0">
+                            <tr>
+                                <td colspan="3" class="pt-8 pb-12 font-bold">SAKSI PASANGAN CALON</td>
+                            </tr>
+                            <tr v-for="i in Math.ceil(hasilData.perangkat_tps.saksi.length / 3)" :key="'saksi-row-' + i">
+                                <td v-for="j in 3" :key="'saksi-col-' + i + '-' + j" class="w-1/3 pb-8">
+                                    <template v-if="hasilData.perangkat_tps.saksi[(i-1)*3 + (j-1)]">
+                                        <span>({{ hasilData.perangkat_tps.saksi[(i-1)*3 + (j-1)].nama }})</span><br>Saksi
+                                    </template>
+                                </td>
+                            </tr>
+                        </template>
+                        <template v-else>
+                            <tr>
+                                <td colspan="3" class="pt-8 pb-12 font-bold">SAKSI PASANGAN CALON</td>
+                            </tr>
+                            <tr>
+                                <td class="w-1/3 pb-8">(...................................................)<br>Saksi 1</td>
+                                <td class="w-1/3 pb-8"></td>
+                                <td class="w-1/3 pb-8">(...................................................)<br>Saksi 2</td>
+                            </tr>
+                        </template>
                     </tbody>
                 </table>
             </div>
@@ -152,6 +184,7 @@ async function fetchHasil() {
 <style>
 @media print {
     @page { margin: 1cm; }
-    body { background-color: white !important; margin: 0; padding: 0; }
+    /* Override sudah diatur global di app.css, ini untuk spesifik komponen bila perlu */
+    .print-container { overflow: visible !important; height: auto !important; }
 }
 </style>

@@ -5,7 +5,7 @@
         >
             <router-link to="/" class="flex items-center gap-4">
                 <img
-                    src="/asset/img/kpu_logo.png"
+                    src="/images/kpu_logo.png"
                     alt="Logo KPU"
                     class="h-10 w-auto object-contain fallback-bg"
                     @error="

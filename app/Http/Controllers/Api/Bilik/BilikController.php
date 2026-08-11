@@ -6,9 +6,59 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class BilikController extends Controller
 {
+    /**
+     * Mengecek status pemilihan apakah sedang dibuka atau tidak.
+     */
+    public function getStatus(Request $request)
+    {
+        $user = $request->user();
+
+        if ($user->level != 3) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akses ditolak! Anda bukan Admin TPS.'
+            ], 403);
+        }
+
+        $npsn = $user->npsn;
+        $tahun = env('TAHUN_AKTIF', date('Y'));
+
+        $idTps = $user->id_tps;
+        if (!$idTps) {
+            return response()->json([
+                'success' => false,
+                'message' => 'ID TPS harus disertakan.'
+            ], 422);
+        }
+        // Cek apakah pemilihan sudah diselesaikan (closed)
+        $tpsSetting = DB::table('tb_tps_setting')
+            ->where('npsn', $npsn)
+            ->where('tahun', $tahun)
+            ->where('id_kelas', $idTps)
+            ->first();
+
+        if ($tpsSetting && !empty($tpsSetting->selesai_pemilihan_time)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal get status pemilihan, karena Waktu pemilihan telah ditutup/diakhiri.'
+            ], 422);
+        }
+
+
+        $waktuService = app(\App\Services\WaktuPemilihanService::class);
+        $cekWaktu = $waktuService->cekJadwalBuka('pemilihan', $tahun, $npsn);
+
+        return response()->json([
+            'success' => true,
+            'is_open' => $cekWaktu['is_open'],
+            'message' => $cekWaktu['message']
+        ]);
+    }
+
     /**
      * Memverifikasi Token Pemilih.
      * Mengembalikan data siswa (DPT) jika token valid untuk TPS ini.
@@ -40,6 +90,17 @@ class BilikController extends Controller
         $tpsInfo = DB::table('tb_kelas')->where('kd_kelas', $idTps)->where('npsn', $npsn)->first();
         $isLuarSekolah = $tpsInfo && isset($tpsInfo->is_tps_luar_sekolah) && $tpsInfo->is_tps_luar_sekolah == 1;
 
+        // --- Tambahan: Pengecekan Jadwal Pemilihan ---
+        $waktuService = app(\App\Services\WaktuPemilihanService::class);
+        $cekWaktu = $waktuService->cekJadwalBuka('pemilihan', $tahun, $npsn);
+        if (!$cekWaktu['is_open']) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Token ditolak: ' . $cekWaktu['message']
+            ], 403);
+        }
+        // --- Akhir Tambahan ---
+
         if ($isLuarSekolah && empty($nisn)) {
             return response()->json([
                 'success' => false,
@@ -56,7 +117,7 @@ class BilikController extends Controller
             ->where('st.npsn', $npsn)
             ->where('st.tahun', $tahun)
             ->where('st.token', $token);
-            
+
         // Jika TPS Luar Sekolah, token DAN nisn harus cocok
         if ($isLuarSekolah) {
             $query->where('st.nisn', $nisn);
@@ -80,10 +141,25 @@ class BilikController extends Controller
             ], 422);
         }
 
+        $waktuLogin = Carbon::now();
+        \Illuminate\Support\Facades\Log::info('TOKEN '.$token.' MASUK - WAKTU MULAI: ' . $waktuLogin->format('Y-m-d H:i:s.u'));
+
+        // Insert ke tb_log_pilih
+        $logId = DB::table('tb_log_pilih')->insertGetId([
+            'npsn' => $npsn,
+            'nisn' => $nisn ?? $siswaTps->nisn,
+            'waktu_login' => $waktuLogin,
+            'id_tps' => $idTps,
+            'success' => 0,
+            'token' => $token,
+            'tahun' => $tahun,
+        ]);
+
         return response()->json([
             'success' => true,
             'message' => 'Token valid.',
-            'siswa' => $siswaTps
+            'siswa' => $siswaTps,
+            'log_id' => $logId
         ]);
     }
 
@@ -121,7 +197,8 @@ class BilikController extends Controller
 
         $request->validate([
             'id_siswa_tps' => 'required|integer',
-            'id_calon' => 'required|integer'
+            'id_calon' => 'required|integer',
+            'log_id' => 'required|integer'
         ]);
 
         $idTps = $user->id_tps;
@@ -130,6 +207,7 @@ class BilikController extends Controller
 
         $idSiswaTps = $request->id_siswa_tps;
         $idCalon = $request->id_calon;
+        $logId = $request->log_id;
 
         // Cek apakah request ini berasal dari token sementara luar sekolah
         $isLuarSekolahToken = $user->currentAccessToken()->can('submit-vote');
@@ -138,7 +216,7 @@ class BilikController extends Controller
             ->where('id', $idSiswaTps)
             ->where('npsn', $npsn)
             ->where('tahun', $tahun);
-            
+
         if (!$isLuarSekolahToken) {
             // Untuk bilik reguler, pastikan id_tps cocok secara eksak dengan bilik login saat ini
             $dptQuery->where('id_tps', $idTps);
@@ -154,20 +232,52 @@ class BilikController extends Controller
             return response()->json(['success' => false, 'message' => 'Siswa sudah pernah mencoblos! (Double Vote Protection)'], 422);
         }
 
-        // Simpan suara
-        DB::table('tb_siswa_tps')
-            ->where('id', $idSiswaTps)
-            ->update([
-                'pilihan' => $idCalon,
-                'waktu_pilih' => Carbon::now()
+        try {
+            DB::beginTransaction();
+
+            // Simpan suara
+            $waktuSelesai = Carbon::now();
+            DB::table('tb_siswa_tps')
+                ->where('id', $idSiswaTps)
+                ->update([
+                    'pilihan' => $idCalon,
+                    'waktu_pilih' => $waktuSelesai
+                ]);
+
+            \Illuminate\Support\Facades\Log::info('TOKEN '.$dpt->token.' SELESAI MEMILIH - WAKTU SELESAI: ' . $waktuSelesai->format('Y-m-d H:i:s.u'));
+
+            // Update tb_log_pilih
+            $logEntry = DB::table('tb_log_pilih')->where('id', $logId)->first();
+            if ($logEntry && $logEntry->waktu_login) {
+                $waktuLogin = Carbon::parse($logEntry->waktu_login);
+                $lamaDetik = $waktuLogin->diffInSeconds($waktuSelesai);
+
+                DB::table('tb_log_pilih')
+                    ->where('id', $logId)
+                    ->update([
+                        'waktu_logout' => $waktuSelesai,
+                        'success' => 1,
+                        'lama' => $lamaDetik,
+                    ]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Suara berhasil disimpan. Terima kasih telah berpartisipasi.'
             ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Suara berhasil disimpan. Terima kasih telah berpartisipasi.'
-        ]);
-    }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Illuminate\Support\Facades\Log::error('GAGAL SUBMIT VOTE TOKEN '.$dpt->token.': ' . $e->getMessage());
 
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan sistem saat menyimpan suara. Silakan coba lagi.'
+            ], 500);
+        }
+    }
     /**
      * Verifikasi Pemilih Luar Sekolah (Endpoint Publik)
      * Tidak perlu login admin TPS, pemilih memvalidasi dirinya sendiri menggunakan NISN + Token.
@@ -182,6 +292,28 @@ class BilikController extends Controller
         $token = strtoupper($request->token);
         $nisn = $request->nisn;
         $tahun = env('TAHUN_AKTIF', date('Y'));
+
+        // --- Tambahan: Pengecekan Jadwal Pemilihan ---
+        // Karena ini endpoint publik, kita perlu tau NPSN sekolah dari NISN tersebut
+        $siswa = DB::table('tb_siswa')->where('nisn', $nisn)->where('tahun', $tahun)->first();
+        if (!$siswa) {
+            return response()->json([
+                'success' => false,
+                'message' => 'NISN tidak ditemukan.'
+            ], 404);
+        }
+
+        $waktuService = app(\App\Services\WaktuPemilihanService::class);
+        $cekWaktu = $waktuService->cekJadwalBuka('pelaksanaan_pemilihan', $tahun, $siswa->npsn);
+        if (!$cekWaktu['is_open']) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Token ditolak: ' . $cekWaktu['message']
+            ], 403);
+        }
+        // --- Akhir Tambahan ---
+
+        $waktuLogin = Carbon::now();
 
         // Cek langsung dari tb_siswa_tps dan pastikan belongs ke tb_kelas yang is_tps_luar_sekolah = 1
         $siswaTps = DB::table('tb_siswa_tps as st')
@@ -204,18 +336,34 @@ class BilikController extends Controller
         // Cari Admin TPS (Level 3) yang mengurus sekolah & TPS ini untuk "dipinjam" token sementaranya
         $tpsAdmin = \App\Models\Admin::where('npsn', $siswaTps->npsn)->where('level', 3)->first();
         $tokenString = 'fallback-token-for-' . $siswaTps->npsn;
-        
+
         if ($tpsAdmin) {
             // Generate token sementara (bearer) yang akan dipakai untuk submitVote
             $tokenObj = $tpsAdmin->createToken('luar-sekolah-vote', ['submit-vote']);
             $tokenString = $tokenObj->plainTextToken;
         }
 
+        \Illuminate\Support\Facades\Log::info('TOKEN LUAR SEKOLAH '.$token.' MASUK - WAKTU MULAI: ' . $waktuLogin->format('Y-m-d H:i:s.u'));
+
+        // Insert ke tb_log_pilih
+        $logId = DB::table('tb_log_pilih')->insertGetId([
+            'npsn' => $siswaTps->npsn,
+            'nisn' => $nisn,
+            'waktu_login' => $waktuLogin,
+            'id_tps' => $siswaTps->id_tps ?? 0,
+            'success' => 0,
+            'token' => $token,
+            'tahun' => $tahun,
+            'created_at' => $waktuLogin,
+            'updated_at' => $waktuLogin
+        ]);
+
         return response()->json([
             'success' => true,
             'message' => 'Token Luar Sekolah diverifikasi',
             'data' => $siswaTps,
-            'token' => $tokenString
+            'token' => $tokenString,
+            'log_id' => $logId
         ]);
     }
 }

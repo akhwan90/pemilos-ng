@@ -9,7 +9,7 @@ class GenerateTokenService
 {
     /**
      * Generate token acak yang mudah dibaca (menghindari karakter ambigu)
-     * 
+     *
      * @param int $length
      * @return string
      */
@@ -17,24 +17,24 @@ class GenerateTokenService
     {
         // Menghapus 0, O, 1, I, L untuk menghindari kebingungan
         $pool = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
-        
+
         $token = '';
         for ($i = 0; $i < $length; $i++) {
             $token .= $pool[random_int(0, strlen($pool) - 1)];
         }
-        
+
         return $token;
     }
 
     /**
      * Mengeksekusi proses pembuatan token massal untuk seluruh siswa di satu TPS
-     * 
+     *
      * @param string $idTps (kd_kelas)
      * @param string $npsn (sebagai verifikasi keamanan ganda)
      * @param string $tahun
      * @return array
      */
-    public function generateForTps($idTps, $npsn, $tahun)
+    public function generateForTps($idTps, $npsn, $tahun, $user)
     {
         try {
             DB::beginTransaction();
@@ -57,7 +57,7 @@ class GenerateTokenService
             // 2. Loop dan update token dengan string acak (mudah dibaca)
             foreach ($siswaList as $siswa) {
                 $newToken = $this->generateReadableToken(5);
-                
+
                 DB::table('tb_siswa_tps')
                     ->where('id', $siswa->id)
                     ->update([
@@ -95,6 +95,14 @@ class GenerateTokenService
                 ]);
             }
 
+            $aktivityService = new \App\Services\ActivityService();
+            $aktivityService->logActivity($user->username, 16, json_encode([
+                'id_tps' => $idTps,
+                'npsn' => $npsn,
+                'tahun' => $tahun,
+                'siswa_count' => $siswaList->count()
+            ]));
+
             DB::commit();
 
             return [
@@ -114,13 +122,13 @@ class GenerateTokenService
 
     /**
      * Membatalkan (rollback) token untuk seluruh siswa di satu TPS
-     * 
+     *
      * @param string $idTps (kd_kelas)
      * @param string $npsn
      * @param string $tahun
      * @return array
      */
-    public function cancelForTps($idTps, $npsn, $tahun)
+    public function cancelForTps($idTps, $npsn, $tahun, $user)
     {
         try {
             DB::beginTransaction();
@@ -143,6 +151,14 @@ class GenerateTokenService
                     'is_generate_token' => 0,
                     'generate_token_time' => null
                 ]);
+
+            $aktivityService = new \App\Services\ActivityService();
+            $aktivityService->logActivity($user->username, 17, json_encode([
+                'id_tps' => $idTps,
+                'npsn' => $npsn,
+                'tahun' => $tahun,
+            ]));
+
 
             DB::commit();
 
