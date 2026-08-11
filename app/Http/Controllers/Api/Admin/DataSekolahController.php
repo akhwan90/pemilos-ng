@@ -65,11 +65,11 @@ class DataSekolahController extends Controller
                 case 'nama_sekolah_desc': $query->orderBy('nama_sekolah', 'desc'); break;
                 case 'npsn_asc': $query->orderBy('npsn', 'asc'); break;
                 case 'npsn_desc': $query->orderBy('npsn', 'desc'); break;
-                case 'persentase_dpt_desc': 
-                    $query->orderByRaw('(jml_dpt/jml_siswa) DESC')->orderBy('jml_siswa', 'desc'); 
+                case 'persentase_dpt_desc':
+                    $query->orderByRaw('(jml_dpt/jml_siswa) DESC')->orderBy('jml_siswa', 'desc');
                     break;
-                case 'persentase_memilih_desc': 
-                    $query->orderByRaw('(jml_memilih/jml_dpt) DESC')->orderBy('jml_dpt', 'desc'); 
+                case 'persentase_memilih_desc':
+                    $query->orderByRaw('(jml_memilih/jml_dpt) DESC')->orderBy('jml_dpt', 'desc');
                     break;
                 default: $query->orderBy('nama_sekolah', 'asc'); break;
             }
@@ -77,35 +77,11 @@ class DataSekolahController extends Controller
             $query->orderBy('nama_sekolah', 'asc');
         }
 
-        // Check if no_pagination is requested
-        if ($request->query('no_pagination') == 1) {
-            $sekolahs = $query->get()->map(function ($item) {
-                $item->persentase_dpt = 0;
-                $item->persentase_memilih = 0;
-                $item->persentase_belum_memilih = 0;
-                $item->is_over_capacity = false;
-
-                if ($item->jml_siswa > 0) {
-                    $item->persentase_dpt = round((($item->jml_dpt / $item->jml_siswa) * 100), 2);
-                }
-                if ($item->jml_memilih > 0 && $item->jml_dpt > 0) {
-                    $item->persentase_memilih = round((($item->jml_memilih / $item->jml_dpt) * 100), 2);
-                    $item->persentase_belum_memilih = 100 - $item->persentase_memilih;
-                }
-                if ($item->jml_dpt > $item->jml_siswa) {
-                    $item->is_over_capacity = true;
-                }
-                return $item;
-            });
-            return response()->json($sekolahs);
-        }
-
-        // Get and Process data (Calculate percentages like the CI3 did)
-        $sekolahs = $query->paginate(20)->through(function ($item) {
+        $sekolahs = $query->get()->map(function ($item) {
             $item->persentase_dpt = 0;
             $item->persentase_memilih = 0;
             $item->persentase_belum_memilih = 0;
-            $item->is_over_capacity = false; // "melebihi_class bg-warning" di CI3
+            $item->is_over_capacity = false;
 
             if ($item->jml_siswa > 0) {
                 $item->persentase_dpt = round((($item->jml_dpt / $item->jml_siswa) * 100), 2);
@@ -114,18 +90,14 @@ class DataSekolahController extends Controller
                 $item->persentase_memilih = round((($item->jml_memilih / $item->jml_dpt) * 100), 2);
                 $item->persentase_belum_memilih = 100 - $item->persentase_memilih;
             }
-
             if ($item->jml_dpt > $item->jml_siswa) {
                 $item->is_over_capacity = true;
             }
-
             return $item;
         });
 
-        return response()->json([
-            'success' => true,
-            'data' => $sekolahs
-        ]);
+        return response()->json($sekolahs);
+
     }
 
     public function store(Request $request)
@@ -210,7 +182,7 @@ class DataSekolahController extends Controller
             $filename = time() . '_' . \Illuminate\Support\Str::random(10) . '.' . $file->getClientOriginalExtension();
             // Simpan ke direktori yang sama dg CI3 lama
             $file->move(public_path('uploads/logo_sekolah'), $filename);
-            
+
             if ($sekolah->logo && file_exists(public_path('uploads/logo_sekolah/' . $sekolah->logo))) {
                 @unlink(public_path('uploads/logo_sekolah/' . $sekolah->logo));
             }
