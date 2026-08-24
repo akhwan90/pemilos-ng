@@ -7,6 +7,24 @@ use Carbon\Carbon;
 
 class WaktuPemilihanService
 {
+    public function cekJadwalMin() {
+        $jadwal = DB::table('tb_setting_waktu_pemilihan')
+        ->orderBy('waktu_mulai', 'asc')
+        ->where('tahun', env('APP_TAHUN_AKTIF'))
+        ->first();
+
+        return $jadwal->waktu_mulai ?? null;
+    }
+
+    public function cekJadwalMax() {
+        $jadwal = DB::table('tb_setting_waktu_pemilihan')
+        ->orderBy('waktu_selesai', 'desc')
+        ->where('tahun', env('APP_TAHUN_AKTIF'))
+        ->first();
+
+        return $jadwal->waktu_selesai ?? null;
+    }
+
     /**
      * Mengecek apakah waktu sekarang berada dalam rentang jadwal pemilihan
      * berdasarkan jenis, tahun, dan npsn.

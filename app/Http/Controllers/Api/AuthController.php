@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use App\Models\Sekolah;
 use App\Services\ActivityService;
+use App\Services\WaktuPemilihanService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -14,6 +15,22 @@ use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
+    public function cekJadwalPublic(Request $request, WaktuPemilihanService $waktuPemilihanService) {
+        $waktuMin = $waktuPemilihanService->cekJadwalMin();
+        $waktuMax = $waktuPemilihanService->cekJadwalMax();
+
+        if (!now()->between($waktuMin, $waktuMax)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Pemilihan belum dibuka'
+            ], 403);
+        }
+
+        return response()->json([
+            'status' => true
+        ]);
+    }
+
     /**
      * Handle Admin/Sekolah Login API (Sanctum)
      */

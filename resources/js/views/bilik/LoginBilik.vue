@@ -28,7 +28,7 @@
           </div>
         </div>
 
-        <form class="space-y-6" @submit.prevent="handleLogin">
+        <form class="space-y-6" @submit.prevent="handleLogin" v-if="isJadwalAktif">
           <div>
             <label for="username" class="block text-sm font-medium text-gray-700">Username TPS</label>
             <div class="mt-1">
@@ -83,6 +83,9 @@
             </button>
           </div>
         </form>
+        <div v-else>
+          <p class="text-sm text-white bg-red-400 border-red-800 p-4 rounded">Belum ada jadwal pemilihan yang aktif</p>
+        </div>
 
         <div class="mt-6 text-center">
           <router-link to="/" class="text-sm text-gray-500 hover:text-gray-900">Kembali ke Beranda</router-link>
@@ -108,6 +111,7 @@ const captchaKey = ref('');
 const captchaImage = ref('');
 const loading = ref(false);
 const errorMsg = ref('');
+const isJadwalAktif = ref(false);
 
 async function refreshCaptcha() {
 	try {
@@ -128,7 +132,18 @@ async function refreshCaptcha() {
 	}
 }
 
+async function cekJadwal() {
+  try {
+    const res = await api.get('/cek-jadwal-public');
+    console.log(res.data);
+    isJadwalAktif.value = res.data.status;
+  } catch (error) {
+    console.error('Gagal memuat jadwal:', error);
+  }
+}
+
 onMounted(() => {
+  cekJadwal();
 	refreshCaptcha();
 });
 

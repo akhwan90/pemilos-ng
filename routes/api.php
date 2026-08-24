@@ -22,7 +22,10 @@ use App\Http\Controllers\Api\PublicController;
 
 // ========== PUBLIC API (No Auth Required) ==========
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:6,1');
+Route::get('/cek-jadwal-public', [AuthController::class, 'cekJadwalPublic'])->middleware('throttle:10,1');
+
 Route::post('/bilik-luar-sekolah/verify', [BilikController::class, 'verifyLuarSekolah'])->middleware('throttle:10,1');
+
 Route::get('/public/sekolah', [PublicController::class, 'sekolah']);
 Route::get('/public/sekolah/{npsn}', [PublicController::class, 'detailSekolah']);
 Route::get('/public/sekolah/{npsn}/dps', [PublicController::class, 'dataDps']);
