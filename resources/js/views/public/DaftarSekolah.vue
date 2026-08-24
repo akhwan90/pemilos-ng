@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-gray-50 flex flex-col font-sans">
-    
+
     <!-- Navbar / Header (Reusable) -->
     <PublicHeader />
 
@@ -12,11 +12,11 @@
         </div>
         <div class="w-full md:w-1/3">
             <div class="relative">
-                <input 
-                    type="text" 
-                    v-model="searchQuery" 
+                <input
+                    type="text"
+                    v-model="searchQuery"
                     @input="fetchSekolah"
-                    placeholder="Cari nama sekolah..." 
+                    placeholder="Cari nama sekolah..."
                     class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
                 >
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -47,18 +47,18 @@
 
       <!-- Grid Daftar Sekolah -->
       <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        <div 
-          v-for="sekolah in sekolahList" 
-          :key="sekolah.npsn" 
+        <div
+          v-for="sekolah in sekolahList"
+          :key="sekolah.npsn"
           class="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden flex flex-col group"
         >
           <div class="p-6 flex-grow flex flex-col items-center text-center">
             <div class="h-24 w-24 mb-4 rounded-full bg-gray-50 p-2 border border-gray-100 group-hover:border-blue-300 transition-colors flex justify-center items-center overflow-hidden">
-              <img 
-                :src="sekolah.resolvedLogo" 
-                :alt="`Logo ${sekolah.nama_sekolah}`" 
+              <img
+                :src="sekolah.resolvedLogo"
+                :alt="`Logo ${sekolah.nama_sekolah}`"
                 class="h-full w-full object-contain"
-                @error="(e) => { e.target.src = '/asset/img/kpu_logo.png'; e.target.onerror = null; }"
+                @error="(e) => { e.target.src = '/images/kpu_logo.png'; e.target.onerror = null; }"
               />
             </div>
             <h3 class="text-lg font-bold text-gray-900 leading-tight mb-2 group-hover:text-blue-600 transition-colors">
@@ -71,7 +71,7 @@
               {{ sekolah.alamat || 'Alamat belum diatur' }}
             </p>
           </div>
-          
+
           <!-- Tombol Detail / Aksi -->
           <div class="bg-gray-50 border-t border-gray-100 p-4">
             <router-link :to="`/detail-sekolah?npsn=${sekolah.npsn}`" class="w-full inline-flex justify-center items-center py-2 px-4 border border-blue-200 shadow-sm text-sm font-medium rounded-lg text-blue-700 bg-blue-50 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
@@ -82,7 +82,7 @@
       </div>
 
     </main>
-    
+
     <!-- Footer (Reusable) -->
     <PublicFooter />
 
@@ -112,7 +112,7 @@ async function fetchSekolah() {
             // Helper function to resolve logo URL properly
             sekolahList.value = res.data.data.map(sekolah => {
                 let resolvedLogo = '/asset/img/kpu_logo.png'; // Default fallback
-                
+
                 if (sekolah.logo) {
                     // Cek apakah string berawal dengan http atau https (seperti logo SIAP-PPDB)
                     if (sekolah.logo.startsWith('http')) {
@@ -122,7 +122,7 @@ async function fetchSekolah() {
                         resolvedLogo = `/uploads/logo_sekolah/${sekolah.logo}`;
                     }
                 }
-                
+
                 return { ...sekolah, resolvedLogo };
             });
         }

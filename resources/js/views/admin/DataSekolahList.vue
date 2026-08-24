@@ -25,10 +25,10 @@
 					<input v-model="filterSearch" type="search" placeholder="Cari nama, NPSN, dll..." class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"/>
 				</div>
 				<div>
-					<BaseSelect v-model="filterOrderBy" :options="orderByOptions" :valueKey="'value'" :labelKey="'label'" placeholder="- Order By -"/>
+					<BaseSelect v-model="filterTingkat" :options="tingkatOptions" :valueKey="'value'" :labelKey="'label'" placeholder="- Tingkat -"/>
 				</div>
 				<div>
-					<BaseSelect v-model="filterTingkat" :options="tingkatOptions" :valueKey="'value'" :labelKey="'label'" placeholder="- Tingkat -"/>
+					<BaseSelect v-model="filterOrderBy" :options="orderByOptions" :valueKey="'value'" :labelKey="'label'" placeholder="- Order By -"/>
 				</div>
 				<div>
 					<BaseButton type="submit" variant="primary" class="w-full justify-center">
@@ -102,8 +102,9 @@
 									</BaseDropdown>
 								</div>
 							</td>
-							<td class="px-4 py-3 font-medium text-gray-900">
-								{{ item.nama_sekolah }}
+							<td class="px-4 py-3">
+								<p class="font-medium text-gray-900">{{ item.nama_sekolah }}</p>
+								<p class="text-sm text-gray-600">Tingkat : {{ item.jenjang }}</p>
 							</td>
 							<td class="px-4 py-3">{{ item.npsn }}</td>
 							<td class="px-4 py-3 text-center">
@@ -143,7 +144,7 @@
 		</BaseCard>
 
 		<!-- Modals -->
-		<ModalEditSekolah v-model="modals.edit" :npsn="selectedNpsn" :is-edit-mode="isEditMode" @updated="fetchData(pagination.current_page)" />
+		<ModalEditSekolah v-model="modals.edit" :npsn="selectedNpsn" :is-edit-mode="isEditMode" @updated="fetchData()" />
 		<ModalUserSekolah v-model="modals.user" :npsn="selectedNpsn" />
 		<ModalJadwalSekolah v-model="modals.jadwal" :npsn="selectedNpsn" />
 		<ModalKandidat v-model="modals.kandidat" :npsn="selectedNpsn" />
