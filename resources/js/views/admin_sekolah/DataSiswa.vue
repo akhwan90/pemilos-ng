@@ -11,6 +11,9 @@
                 <BaseButton variant="primary" @click="openModal('add')">
                     Tambah Siswa
                 </BaseButton>
+                <BaseButton variant="secondary" @click="downloadExcel">
+                    Unduh Excel
+                </BaseButton>
             </div>
         </div>
 
@@ -177,14 +180,11 @@
                                 {{ item.kelas }}
                             </td>
                             <td class="px-4 py-3 text-center">
-                                <span v-if="item.jk == 1" class="text-blue-600"
-                                    >Laki-laki</span
-                                >
+                                <span v-if="item.jk == 1" class="text-blue-600" >Laki-laki</span>
                                 <span
                                     v-else-if="item.jk == 2"
                                     class="text-pink-600"
-                                    >Perempuan</span
-                                >
+                                    >Perempuan</span>
                             </td>
                             <td class="px-4 py-3 text-center">
                                 <span v-if="item.difabel == 1" class="px-2 py-1 text-xs font-semibold rounded bg-amber-100 text-amber-800">Disabilitas Fisik</span>
@@ -344,8 +344,8 @@
                         type="submit"
                         variant="primary"
                         :loading="isSubmitting"
-                        >{{
-                            isEditMode ? "Simpan Perubahan" : "Tambah Siswa"
+                        >{{ 
+                            isEditMode ? "Simpan Perubahan" : "Tambah Siswa" 
                         }}</BaseButton
                     >
                 </div>
@@ -361,7 +361,7 @@
             <form @submit.prevent="submitBulkDelete" class="space-y-4">
                 <p class="text-sm text-gray-600 mb-4">
                     Anda akan menghapus
-                    <strong v-if="singleDeleteId === null">{{
+                    <strong v-if="singleDeleteId === null">{{ 
                         selectedIds.length
                     }}</strong
                     ><strong v-else>1</strong> siswa. Silakan pilih alasan
@@ -490,6 +490,58 @@ async function fetchKelas() {
     }
 }
 
+function downloadExcel() {
+
+    api.get('/admin-sekolah/siswa/excel', {
+        responseType: 'blob', // Penting: meminta respons sebagai blob (file biner)
+        headers: {
+            // Pastikan header Authorization disertakan jika 'api' tidak otomatis melakukannya
+            // Contoh jika api belum otomatis, Anda mungkin perlu menambahkan ini:
+            // 'Authorization': Bearer ${yourAuthToken}
+            // Jika 'api' Anda sudah menangani token secara otomatis, baris di atas tidak perlu.
+        }
+    })
+        .then(response => {
+            // Membuat URL dari blob
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+
+            // Membuat link sementara untuk mengunduh
+            const link = document.createElement('a');
+            link.href = url;
+
+            // Mendapatkan nama file dari header Content-Disposition jika ada
+            const contentDisposition = response.headers['content-disposition'];
+            let filename = 'data_siswa.xlsx'; // Nama default
+            if (contentDisposition) {
+                const filenameMatch = contentDisposition.match(/filename="?(.+?)"?$/);
+                if (filenameMatch && filenameMatch.length > 1) {
+                    filename = filenameMatch[1];
+                }
+            }
+            link.setAttribute('download', filename);
+
+            // Menambahkan link ke DOM dan memicu klik
+            document.body.appendChild(link);
+            link.click();
+
+            // Membersihkan URL objek setelah pengunduhan dimulai
+            URL.revokeObjectURL(url);
+
+            toast.success("File Excel berhasil diunduh.");
+            console.log("File Excel berhasil diunduh:", filename);
+        })
+        .catch(error => {
+            console.error("Gagal mengunduh file Excel:", error);
+            let errorMessage = "Gagal mengunduh file Excel.";
+            if (error.response && error.response.data && error.response.data.message) {
+                errorMessage = error.response.data.message;
+            } else if (error.request) {
+                errorMessage = "Tidak ada respons dari server.";
+            }
+            toast.error(errorMessage);
+        });
+}
+
 async function fetchSiswa(page = 1) {
     isLoading.value = true;
     try {
@@ -498,8 +550,7 @@ async function fetchSiswa(page = 1) {
         );
         items.value = res.data.data.data;
         // Reset selection on fetch
-        selectedIds.value = [];
-
+        selectedIds.value = []; 
         pagination.value = {
             current_page: res.data.data.current_page,
             last_page: res.data.data.last_page,
@@ -507,26 +558,19 @@ async function fetchSiswa(page = 1) {
             per_page: res.data.data.per_page,
         };
     } catch (error) {
-        toast.error("Gagal mengambil data siswa");
+        console.error("Gagal mengambil data siswa", error);
+        toast.error("Gagal memuat data siswa.");
     } finally {
         isLoading.value = false;
     }
 }
 
-function openModal(mode, data = null) {
-    isModalOpen.value = true;
-    if (mode === "edit" && data) {
-        isEditMode.value = true;
-        formId.value = data.id;
-        form.value = {
-            nisn: data.nisn,
-            nm_siswa: data.nm_siswa,
-            kelas: data.kelas,
-            jk: data.jk,
-            difabel: data.difabel || 0,
-        };
+function openModal(mode, item = null) {
+    isEditMode.value = mode === "edit";
+    if (isEditMode.value) {
+        formId.value = item.id;
+        form.value = { ...item };
     } else {
-        isEditMode.value = false;
         formId.value = null;
         form.value = {
             nisn: "",
@@ -536,6 +580,7 @@ function openModal(mode, data = null) {
             difabel: "0",
         };
     }
+    isModalOpen.value = true;
 }
 
 async function submitForm() {
@@ -543,73 +588,112 @@ async function submitForm() {
     try {
         if (isEditMode.value) {
             await api.put(`/admin-sekolah/siswa/${formId.value}`, form.value);
-            toast.success("Data siswa berhasil diperbarui");
+            toast.success("Data siswa berhasil diperbarui.");
         } else {
-            await api.post(`/admin-sekolah/siswa`, form.value);
-            toast.success("Siswa baru berhasil ditambahkan");
+            await api.post("/admin-sekolah/siswa", form.value);
+            toast.success("Siswa berhasil ditambahkan.");
         }
         isModalOpen.value = false;
-        fetchSiswa(pagination.value.current_page);
+        fetchSiswa(pagination.current_page);
     } catch (error) {
-        if (error.response?.data?.errors?.nisn) {
-            toast.error("Gagal: NISN sudah terdaftar di database.");
-        } else if (error.response?.data?.message) {
-            toast.error(error.response.data.message);
-        } else {
-            toast.error("Terjadi kesalahan saat menyimpan data.");
+        console.error("Error submitting form:", error);
+        let errorMessage = "Terjadi kesalahan.";
+        if (error.response && error.response.data && error.response.data.message) {
+            errorMessage = error.response.data.message;
+            if (typeof error.response.data.errors === "object") {
+                // Handle validation errors
+                let errors = Object.values(error.response.data.errors).flat().join("\n");
+                errorMessage += "\n" + errors;
+            }
         }
+        toast.error(errorMessage);
     } finally {
         isSubmitting.value = false;
     }
 }
 
 function openBulkDeleteModal() {
-    singleDeleteId.value = null;
-    bulkDeleteReason.value = "";
+    if (selectedIds.value.length === 0) {
+        toast.warning("Pilih siswa yang ingin dihapus terlebih dahulu.");
+        return;
+    }
+    bulkDeleteReason.value = ""; // Reset alasan
     isBulkDeleteModalOpen.value = true;
 }
+
+// async function submitBulkDelete() {
+//     isSubmittingBulkDelete.value = true;
+//     try {
+//         await api.delete("/admin-sekolah/siswa/bulk-delete", {
+//             data: {
+//                 ids: selectedIds.value,
+//                 alasan: bulkDeleteReason.value,
+//             },
+//         });
+//         toast.success("Siswa terpilih berhasil dihapus.");
+//         isBulkDeleteModalOpen.value = false;
+//         selectedIds.value = []; // Kosongkan pilihan
+//         fetchSiswa(pagination.current_page);
+//     } catch (error) {
+//         console.error("Error deleting bulk siswa:", error);
+//         toast.error("Gagal menghapus siswa terpilih.");
+//     } finally {
+//         isSubmittingBulkDelete.value = false;
+//     }
+// }
 
 function openSingleDeleteModal(id) {
+    // Untuk single delete, kita set singleDeleteId dan gunakan modal yang sama
     singleDeleteId.value = id;
-    bulkDeleteReason.value = "";
-    isBulkDeleteModalOpen.value = true;
+    bulkDeleteReason.value = ""; // Reset alasan untuk single delete juga
+    isBulkDeleteModalOpen.value = true; // Gunakan modal yang sama, tapi kita akan cek singleDeleteId di submitBulkDelete
 }
 
+// Modifikasi submitBulkDelete untuk menangani single delete
 async function submitBulkDelete() {
-    const isSingle = singleDeleteId.value !== null;
-    const targetIds = isSingle ? [singleDeleteId.value] : selectedIds.value;
-
-    if (targetIds.length === 0) return;
-
     isSubmittingBulkDelete.value = true;
     try {
-        if (isSingle) {
-            const response = await api.post(
-                `/admin-sekolah/siswa/${singleDeleteId.value}/delete`,
-                {
-                    alasan_hapus: bulkDeleteReason.value,
+        if (singleDeleteId.value !== null) {
+            // Single delete
+            await api.delete(`/admin-sekolah/siswa/${singleDeleteId.value}`, {
+                data: { alasan: bulkDeleteReason.value },
+            });
+            toast.success("Siswa berhasil dihapus.");
+        } else if (selectedIds.value.length > 0) {
+            // Bulk delete
+            await api.delete("/admin-sekolah/siswa/bulk-delete", {
+                data: {
+                    ids: selectedIds.value,
+                    alasan: bulkDeleteReason.value,
                 },
-            );
-            toast.success(response.data.message || "1 siswa berhasil dihapus");
+            });
+            toast.success("Siswa terpilih berhasil dihapus.");
+            selectedIds.value = []; // Kosongkan pilihan setelah bulk delete
         } else {
-            const payload = {
-                ids: targetIds,
-                alasan_hapus: bulkDeleteReason.value,
-            };
-            const response = await api.post(`/admin-sekolah/siswa/bulk-delete`, payload);
-            toast.success(response.data.message || `${targetIds.length} siswa berhasil dihapus`);
+            toast.warning("Tidak ada siswa yang dipilih atau ID tunggal yang diberikan.");
+            isBulkDeleteModalOpen.value = false;
+            return;
         }
-
+        
         isBulkDeleteModalOpen.value = false;
-        singleDeleteId.value = null;
-        bulkDeleteReason.value = "";
-
-        // Refresh table
-        fetchSiswa(pagination.value.current_page);
+        singleDeleteId.value = null; // Reset single delete ID
+        fetchSiswa(pagination.current_page);
     } catch (error) {
-        toast.error(error.response?.data?.message || "Gagal menghapus data siswa");
+        console.error("Error deleting siswa:", error);
+        let errorMessage = "Gagal menghapus siswa.";
+        if (error.response && error.response.data && error.response.data.message) {
+            errorMessage = error.response.data.message;
+        }
+        toast.error(errorMessage);
     } finally {
         isSubmittingBulkDelete.value = false;
     }
 }
+
 </script>
+
+<style scoped>
+.min-h-\[300px\] {
+    min-height: 300px;
+}
+</style>

@@ -7,6 +7,9 @@ use App\Services\ActivityService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Services\WaktuPemilihanService;
+use Illuminate\Support\Facades\Auth; // Untuk mendapatkan user yang login
+use Maatwebsite\Excel\Facades\Excel; // Import facade Excel
+use App\Exports\DataSiswaSekolah; // Akan kita buat nanti
 
 class DataSiswaController extends Controller
 {
@@ -268,5 +271,52 @@ class DataSiswaController extends Controller
             'success' => true,
             'message' => $msg
         ], ($failed > 0 ? 422 : 200));
+    }
+
+    /**
+     * Ekspor data siswa ke format Excel.
+     *
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
+     */
+    public function excel(Request $request) 
+    {
+        // Dapatkan ID sekolah dari user yang sedang login
+        // Asumsi: User yang login memiliki relasi 'sekolah' atau ID sekolah ada di tabel users
+        // Sesuaikan 'auth()->user()->sekolah_id' jika struktur Anda berbeda
+
+        $npsn = $request->user()->npsn;
+        // Ambil query filter dari request, sama seperti di fungsi index()
+        $searchQuery = $request->input('cari', '');
+        $filterKelas = $request->input('kelas', '');
+
+        // Mulai query builder untuk Siswa
+        $query = DB::table('tb_siswa');
+
+        // Filter berdasarkan sekolah yang login
+        $query->where('npsn', $npsn)
+        ->where('status', 1);
+
+        // Terapkan filter pencarian jika ada
+        // if (!empty($searchQuery)) {
+        //     $query->where(function ($q) use ($searchQuery) {
+        //         $q->where('nisn', 'like', '%' . $searchQuery . '%')
+        //             ->orWhere('nm_siswa', 'like', '%' . $searchQuery . '%');
+        //     });
+        // }
+
+        // Terapkan filter kelas jika ada
+        // if (!empty($filterKelas)) {
+        //     $query->where('kelas', $filterKelas);
+        // }
+
+        // Ambil semua data siswa yang difilter (tanpa paginasi)
+        $siswa = $query->get();
+
+        // Nama file Excel yang akan diunduh
+        $namaFile = 'data_siswa_' . $npsn.'_'.now()->format('Ymd_His') . '.xlsx';
+
+        // Ekspor data menggunakan Laravel Excel
+        // SiswaExport adalah class export yang akan kita buat
+        return Excel::download(new DataSiswaSekolah($siswa), $namaFile);
     }
 }
