@@ -148,6 +148,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Approval Pindah Sekolah
     Route::get('/admin-sekolah/approval-pindah', [ApprovalPindahController::class, 'index']);
+    Route::get('/admin-sekolah/approval-pindah-keluar', [ApprovalPindahController::class, 'indexKeluar']);
     Route::post('/admin-sekolah/approval-pindah/{id}/approve', [ApprovalPindahController::class, 'approve']);
 
     // Dashboard Info

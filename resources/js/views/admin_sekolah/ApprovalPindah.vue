@@ -7,7 +7,20 @@
 			</div>
 		</div>
 
-		<!-- Table Section -->
+		<!-- Tabs Section -->
+		<div class="border-b border-gray-200">
+			<nav class="-mb-px flex space-x-6" aria-label="Tabs">
+				<a href="#" @click.prevent="activeTab = 'from_other_schools'"
+					:class="[activeTab === 'from_other_schools' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300', 'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm']">
+					Dari Sekolah Lain
+				</a>
+				<a href="#" @click.prevent="activeTab = 'from_my_school'"
+					:class="[activeTab === 'from_my_school' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300', 'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm']">
+					Dari Sekolah Saya
+				</a>
+			</nav>
+		</div>
+
 		<div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
 			<!-- Table Actions/Filter -->
 			<div class="p-4 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -38,21 +51,24 @@
 							<th class="py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">No</th>
 							<th class="py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">NISN</th>
 							<th class="py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Nama Siswa</th>
-							<th class="py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Alasan Pindah</th>
+							<th class="py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Keterangan</th>
 							<th class="py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Tanggal Pengajuan</th>
 							<th class="py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Status</th>
 							<th class="py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Aksi</th>
 						</tr>
 					</thead>
 					<tbody class="divide-y divide-gray-200">
-						<tr v-if="filteredData.length === 0">
+						<tr v-if="tabFilteredData.length === 0">
 							<td colspan="7" class="py-8 text-center text-gray-500">Tidak ada data permohonan pindah.</td>
 						</tr>
-						<tr v-for="(item, index) in filteredData" :key="item.id" class="hover:bg-gray-50 transition-colors">
+						<tr v-for="(item, index) in tabFilteredData" :key="item.id" class="hover:bg-gray-50 transition-colors">
 							<td class="py-3 px-4 text-sm text-gray-900">{{ index + 1 }}</td>
 							<td class="py-3 px-4 text-sm font-medium text-gray-900">{{ item.nisn }}</td>
 							<td class="py-3 px-4 text-sm text-gray-800">{{ item.nama_baru || item.nama_siswa_asal || '-' }}</td>
-							<td class="py-3 px-4 text-sm text-gray-600">Pindah Sekolah (NPSN Asal: {{ item.user_pemohon_npsn }})</td>
+							<td class="py-3 px-4 text-sm text-gray-600">
+								<span v-if="item.npsn === auth.user.npsn">Dimintakan pindah ke {{ item.nama_sekolah_asal }}</span>
+								<span v-else>Dimintakan pindah dari {{ item.nama_sekolah_tujuan }}</span>
+							</td>
 							<td class="py-3 px-4 text-sm text-gray-600">{{ formatDate(item.created_at) }}</td>
 							<td class="py-3 px-4 text-sm text-center">
 								<span :class="getStatusBadge(item.status)">
@@ -60,17 +76,17 @@
 								</span>
 							</td>
 							<td class="py-3 px-4 text-sm text-center">
-							  <BaseButton 
-							    v-if="Number(item.status) === 0"
-							    variant="success"
-							    @click="approvePermohonan(item)" 
-							    :disabled="isProcessing"
-							    :loading="isProcessing"
-							    class="inline-flex items-center gap-1.5 !px-3 !py-1.5 !text-xs"
-							  >
-							    <svg v-if="!isProcessing" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
-							    Approve
-							  </BaseButton>
+								<BaseButton 
+									v-if="Number(item.status) === 0 && item.npsn == auth.user.npsn"
+									variant="success"
+									@click="approvePermohonan(item)" 
+									:disabled="isProcessing"
+									:loading="isProcessing"
+									class="inline-flex items-center gap-1.5 !px-3 !py-1.5 !text-xs"
+								>
+									<svg v-if="!isProcessing" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+									Approve
+								</BaseButton>
 							</td>
 						</tr>
 					</tbody>
@@ -81,7 +97,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import axios from 'axios';
 import { useAuthStore } from '../../stores/auth';
 import { useToast } from '../../composables/useToast';
@@ -94,6 +110,9 @@ const loading = ref(true);
 const isProcessing = ref(false);
 const searchQuery = ref('');
 const currentYear = ref(new Date().getFullYear());
+
+// Tab state
+const activeTab = ref('from_other_schools'); // Default tab
 
 const fetchData = async () => {
 	try {
@@ -114,13 +133,46 @@ const fetchData = async () => {
 	}
 };
 
-const filteredData = computed(() => {
-	if (!searchQuery.value) return dataApproval.value;
+const tabFilteredData = computed(() => {
 
-	const query = searchQuery.value.toLowerCase();
-	return dataApproval.value.filter((item) => {
-		return item.nama_baru?.toLowerCase().includes(query) || item.nama_siswa_asal?.toLowerCase().includes(query) || item.nisn?.toString().toLowerCase().includes(query);
-	});
+	console.log(activeTab.value);
+
+	if (!searchQuery.value) {
+		// Jika tidak ada search query, kembalikan semua data sesuai tab
+		return dataApproval.value.filter(item => {
+			// Logika Anda untuk memfilter berdasarkan tab
+			if (activeTab.value === 'from_other_schools') {
+				return item.npsn == auth.user.npsn;
+			} else if (activeTab.value === 'from_my_school') {
+				return item.user_pemohon_npsn == auth.user.npsn;
+			}
+			return true; // Default to show all if no active tab matches (should not happen)
+		});
+	} else {
+		// Jika ada search query, filter dulu berdasarkan search, lalu filter hasilnya berdasarkan tab
+		const query = searchQuery.value.toLowerCase();
+		const searchedItems = dataApproval.value.filter(item => {
+			return item.nisn?.toString().toLowerCase().includes(query) ||
+				item.nama_baru?.toLowerCase().includes(query) ||
+				item.nama_siswa_asal?.toLowerCase().includes(query);
+		});
+
+		return searchedItems.filter(item => {
+			if (activeTab.value === 'from_other_schools') {
+				return item.user_pemohon_npsn !== auth.user.npsn;
+			} else if (activeTab.value === 'from_my_school') {
+				return item.npsn === auth.user.npsn;
+			}
+			return true;
+		});
+	}
+});
+
+watch(activeTab, () => {
+	// Anda tidak perlu memanggil fetchData di sini.
+	// Computed property akan otomatis mengupdate berdasarkan activeTab yang baru.
+	// Jika Anda perlu memuat data baru berdasarkan tab (misal, API berbeda),
+	// maka di sini Anda bisa memanggil fetchData() lagi, tapi itu berbeda dari memanggilnya di dalam computed.
 });
 
 const formatDate = (dateString) => {
@@ -182,13 +234,13 @@ const approvePermohonan = async (item) => {
 		  fetchData();
 		  toast.success('Berhasil menyetujui permohonan pindah sekolah.');
 		}
-		} catch (error) {
+	} catch (error) {
 		console.error('Error approving data:', error);
 		toast.error(error.response?.data?.message || 'Terjadi kesalahan saat memproses data.');
-		} finally {
+	} finally {
 		isProcessing.value = false;
-		}
-		};
+	}
+};
 
 onMounted(() => {
 	fetchData();

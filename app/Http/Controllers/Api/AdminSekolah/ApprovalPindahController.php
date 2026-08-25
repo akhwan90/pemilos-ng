@@ -17,9 +17,19 @@ class ApprovalPindahController extends Controller
         $tahunSekarang = date('Y');
 
         $data = DB::table('aproval_pindah_sekolah')
-            ->select('aproval_pindah_sekolah.*', 'tb_siswa.nm_siswa as nama_siswa_asal')
+            ->select(
+                'aproval_pindah_sekolah.*', 
+                'tb_siswa.nm_siswa as nama_siswa_asal',
+                'sekolah_tujuan.nama_sekolah as nama_sekolah_tujuan',
+                'sekolah_asal.nama_sekolah as nama_sekolah_asal'
+            )
             ->leftJoin('tb_siswa', 'aproval_pindah_sekolah.nisn', '=', 'tb_siswa.nisn')
-            ->where('aproval_pindah_sekolah.npsn', $npsn)
+            ->leftJoin('tb_sekolah AS sekolah_tujuan', 'aproval_pindah_sekolah.npsn', '=', 'sekolah_tujuan.npsn')
+            ->leftJoin('tb_sekolah AS sekolah_asal', 'aproval_pindah_sekolah.user_pemohon_npsn', '=', 'sekolah_asal.npsn')
+            ->where(function ($query) {
+                $query->where('aproval_pindah_sekolah.user_pemohon_npsn', auth()->user()->npsn)
+                ->orWhere('aproval_pindah_sekolah.npsn', auth()->user()->npsn);
+            })
             ->whereYear('aproval_pindah_sekolah.created_at', $tahunSekarang)
             ->orderBy('aproval_pindah_sekolah.created_at', 'desc')
             ->get();
