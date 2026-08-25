@@ -200,6 +200,12 @@ const routes = [
         meta: { requiresAuth: true, level: 3, layout: 'blank' },
     },
     {
+        path: '/admin-tps/cetak-daftar-hadir',
+        name: 'admin-tps-cetak-daftar-hadir',
+        component: () => import('../views/admin_tps/CetakDaftarHadir.vue'),
+        meta: { requiresAuth: true, level: 3, layout: 'blank' },
+    },
+    {
         path: '/tpssekolah',
         children: [
             {

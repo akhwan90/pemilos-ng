@@ -105,6 +105,21 @@
                             </svg>
     						Cetak Kartu Pemilih
     					</BaseButton>
+						<BaseButton variant="primary" @click="cetakDdaftarHadir"
+							class="!py-2 shadow-sm flex items-center gap-2" title="Batal Generate Token">
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+								fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+								stroke-linejoin="round"
+								class="icon icon-tabler icons-tabler-outline icon-tabler-printer">
+								<path stroke="none" d="M0 0h24v24H0z" fill="none" />
+								<path
+									d="M17 17h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-14a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h2" />
+								<path d="M17 9v-4a2 2 0 0 0 -2 -2h-6a2 2 0 0 0 -2 2v4" />
+								<path
+									d="M7 15a2 2 0 0 1 2 -2h6a2 2 0 0 1 2 2v4a2 2 0 0 1 -2 2h-6a2 2 0 0 1 -2 -2l0 -4" />
+							</svg>
+							Cetak Daftar Hadir
+						</BaseButton>
 					</div>
 				</template>
 			</div>
@@ -177,16 +192,6 @@
 						</tr>
 					</tbody>
 				</table>
-			</div>
-
-			<!-- Pagination Footer -->
-			<div class="p-4 border-t flex justify-between items-center text-sm text-gray-600 bg-white">
-				<div>Menampilkan {{ items.length }} dari {{ pagination.total }} data</div>
-				<div class="flex gap-2">
-					<button @click="fetchDpt(pagination.current_page - 1)" :disabled="pagination.current_page === 1" class="px-3 py-1 border rounded hover:bg-gray-50 disabled:opacity-50">Prev</button>
-					<span class="px-3 py-1 font-semibold text-gray-800 border rounded bg-gray-50">{{ pagination.current_page }} / {{ pagination.last_page }}</span>
-					<button @click="fetchDpt(pagination.current_page + 1)" :disabled="pagination.current_page === pagination.last_page" class="px-3 py-1 border rounded hover:bg-gray-50 disabled:opacity-50">Next</button>
-				</div>
 			</div>
 		</BaseCard>
 
@@ -288,12 +293,6 @@ const isLoading = ref(false);
 const searchQuery = ref('');
 const filterTps = ref('');
 const listTps = ref([]);
-const pagination = ref({
-	current_page: 1,
-	last_page: 1,
-	total: 0,
-	per_page: 30,
-});
 const selectedIds = ref([]);
 
 const isAddModalOpen = ref(false);
@@ -353,6 +352,11 @@ function cetakKartuPemilih() {
     }
 }
 
+
+function cetakDdaftarHadir() {
+	window.open('/admin-tps/cetak-daftar-hadir', '_blank');
+}
+
 async function fetchListTps() {
 	try {
 		const res = await api.get('/admin-sekolah/dpt/tps-aktif');
@@ -393,17 +397,11 @@ const cancelToken = async () => {
 async function fetchDpt(page = 1, showLoading = true) {
 	if (showLoading) isLoading.value = true;
 	try {
-		const res = await api.get(`/admin-sekolah/dpt?page=${page}&cari=${searchQuery.value}&tps_id=${filterTps.value}&belum_memilih=${filterBelumMemilih.value}`);
-		items.value = res.data.data.data;
+		const res = await api.get(`/admin-sekolah/dpt?cari=${searchQuery.value}&tps_id=${filterTps.value}&belum_memilih=${filterBelumMemilih.value}`);
+		items.value = res.data.data;
 		if (res.data.rekap) {
 			rekapData.value = res.data.rekap;
 		}
-		pagination.value = {
-			current_page: res.data.data.current_page,
-			last_page: res.data.data.last_page,
-			total: res.data.data.total,
-			per_page: res.data.data.per_page,
-		};
 
 		// Jangan mereset selectedIds saat silent refresh berjalan (agar checklist tidak hilang)
 		if (showLoading) selectedIds.value = [];

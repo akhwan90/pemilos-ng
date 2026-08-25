@@ -10,7 +10,7 @@
 						</svg>
 						Kembali
 					</button>
-					<h1 class="text-2xl font-bold text-gray-800">Cetak Kartu Pemilih</h1>
+					<h1 class="text-2xl font-bold text-gray-800">Cetak Daftar Hadir</h1>
 				</div>
 				<button @click="printPage" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 flex items-center gap-2">
 					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -20,34 +20,28 @@
 				</button>
 			</div>
 
-			<div v-if="isLoading" class="text-center py-20 print:hidden">
-				Memuat data DPT...
+			<div class="text-center mb-3">
+				<h3>DAFTAR HADIR PEMILIH</h3>
+				TPS : 
 			</div>
-
-			<!-- Grid Kartu Pemilih -->
-			<div v-else class="grid grid-cols-3">
-				<div v-for="(item, index) in items" :key="index" class="border border-gray-400 border-dashed p-3 bg-white card-container break-inside-avoid text-left text-sm">
-					<div class="flex items-start">
-						<span class="w-10 shrink-0">Nama</span>
-						<span class="mx-1">:</span>
-						<span class="font-bold uppercase leading-tight">{{ item.nm_siswa }}</span>
-					</div>
-					<div class="flex items-start mt-1">
-						<span class="w-10 shrink-0">TPS</span>
-						<span class="mx-1">:</span>
-						<span class="uppercase leading-tight">{{ item.nama_tps }}</span>
-					</div>
-					<div class="flex items-center mt-1">
-						<span class="w-10 shrink-0">Token</span>
-						<span class="mx-1">:</span>
-						<span class="font-mono font-bold text-base tracking-widest">{{ item.token || '-' }}</span>
-					</div>
-				</div>
-			</div>
-			
-			<div v-if="!isLoading && items.length === 0" class="text-center py-20 print:hidden">
-				Tidak ada data DPT.
-			</div>
+			<table class="w-full">
+				<thead>
+					<tr>
+						<th class="w-1/12 text-center border p-2">No</th>
+						<th class="w-2/12 border p-2">NISN</th>
+						<th	class="w-6/12 border p-2">Nama</th>
+						<th class="w-3/12 border p-2">Tanda Tangan</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="(item, index) in items" :key="index">
+						<td class="border p-1">{{ index + 1 }}</td>
+						<td class="border p-1">{{ item.nisn }}</td>
+						<td class="border p-1">{{ item.nm_siswa }}</td>
+						<td class="border p-1">{{ index + 1 }}</td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
 	</div>
 </template>

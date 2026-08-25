@@ -82,8 +82,9 @@ class DataDptController extends Controller
             });
         }
 
-        $limit = $request->query('limit', 30);
-        $data = $query->paginate($limit);
+        // $limit = $request->query('limit', 30);
+        // $data = $query->paginate($limit);
+        $data = $query->get();
 
         return response()->json([
             'success' => true,
