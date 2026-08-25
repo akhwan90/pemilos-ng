@@ -21,6 +21,13 @@
 			</nav>
 		</div>
 
+		<div class="p-2 bg-blue-300 rounded border-blue-900" v-if="activeTab === 'from_other_schools'">
+			Ini merupakan daftar siswa Anda yang sekarang sudah mengajukan permohonan pindah sekolah dari sekolah lain.
+		</div>
+		<div class="p-2 bg-blue-300 rounded border-blue-900" v-else-if="activeTab === 'from_my_school'">
+			Ini merupakan daftar siswa yang diminta masuk ke sekolah Anda
+		</div>
+
 		<div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
 			<!-- Table Actions/Filter -->
 			<div class="p-4 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
