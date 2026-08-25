@@ -16,7 +16,7 @@ class LogRequestIp
      */
     public function handle(Request $request, Closure $next): Response
     {
-        Log::info("Request IP: " . $request->ip() . " [".$request->method()."] : " . $request->getRequestUri());
+        // Log::info("Request IP: " . $request->ip() . " [".$request->method()."] : " . $request->getRequestUri());
         return $next($request);
     }
 }

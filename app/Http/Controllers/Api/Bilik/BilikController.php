@@ -244,8 +244,6 @@ class BilikController extends Controller
                     'waktu_pilih' => $waktuSelesai
                 ]);
 
-            \Illuminate\Support\Facades\Log::info('TOKEN '.$dpt->token.' SELESAI MEMILIH - WAKTU SELESAI: ' . $waktuSelesai->format('Y-m-d H:i:s.u'));
-
             // Update tb_log_pilih
             $logEntry = DB::table('tb_log_pilih')->where('id', $logId)->first();
             if ($logEntry && $logEntry->waktu_login) {
@@ -259,6 +257,8 @@ class BilikController extends Controller
                         'success' => 1,
                         'lama' => $lamaDetik,
                     ]);
+
+                \Illuminate\Support\Facades\Log::info('TOKEN ' . $dpt->token . ' SELESAI MEMILIH - WAKTU SELESAI: ' . $waktuSelesai->format('Y-m-d H:i:s.u').' => '.$lamaDetik.' detik');
             }
 
             DB::commit();

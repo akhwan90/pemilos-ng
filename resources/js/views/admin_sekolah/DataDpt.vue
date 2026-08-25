@@ -331,7 +331,7 @@ onMounted(() => {
 	refreshInterval = setInterval(() => {
 		// Jangan refresh jika fitur dimatikan, user sedang mengetik pencarian, atau menyeleksi checkbox
 		if (isAutoRefreshEnabled.value && !searchQuery.value && selectedIds.value.length === 0) {
-			fetchDpt(pagination.value.current_page, false); // pass false agar tidak memunculkan indikator loading yang mengganggu
+			fetchDpt(false); // pass false agar tidak memunculkan indikator loading yang mengganggu
 		}
 	}, 10000);
 });
@@ -374,8 +374,9 @@ const generateToken = async () => {
 	try {
 		const res = await api.post('/admin-sekolah/dpt/generate-token');
 		toast.success(res.data.message || 'Token berhasil di-generate', 'Sukses');
-		fetchDpt(pagination.value.current_page);
+		fetchDpt();
 	} catch (error) {
+		console.log('error', error);
 		toast.error(error.response?.data?.message || 'Gagal melakukan generate token', 'Error');
 	}
 };
@@ -388,13 +389,14 @@ const cancelToken = async () => {
 	try {
 		const res = await api.post('/admin-sekolah/dpt/cancel-token');
 		toast.success(res.data.message || 'Token berhasil dibatalkan', 'Sukses');
-		fetchDpt(pagination.value.current_page);
+		fetchDpt();
 	} catch (error) {
+		console.log('error', error);
 		toast.error(error.response?.data?.message || 'Gagal membatalkan token', 'Error');
 	}
 };
 
-async function fetchDpt(page = 1, showLoading = true) {
+async function fetchDpt(showLoading = true) {
 	if (showLoading) isLoading.value = true;
 	try {
 		const res = await api.get(`/admin-sekolah/dpt?cari=${searchQuery.value}&tps_id=${filterTps.value}&belum_memilih=${filterBelumMemilih.value}`);
@@ -489,7 +491,7 @@ async function submitBulkDelete() {
 			ids: selectedIds.value,
 		});
 		toast.success(res.data.message);
-		fetchDpt(pagination.value.current_page);
+		fetchDpt(1);
 	} catch (e) {
 		toast.error(e.response?.data?.message || 'Gagal menghapus data DPT');
 	}
@@ -509,7 +511,7 @@ async function submitSingleDelete(id, isSudahMemilih, token) {
 			ids: [id],
 		});
 		toast.success('Berhasil dikeluarkan dari DPT');
-		fetchDpt(pagination.value.current_page);
+		fetchDpt();
 	} catch (e) {
 		toast.error(e.response?.data?.message || 'Gagal menghapus');
 	}
