@@ -28,7 +28,7 @@ class ActivityService
         $activity = new Activity();
         $activity->username = $username;
         $activity->id_aktifitas = $idAktifitas;
-        $activity->keterangan = $keterangan;
+        $activity->keterangan = substr($keterangan, 0, 490); // Limit keterangan ke 255 karakter
         $activity->ip = Request::ip();
         
         $browser = $agent->browser();
