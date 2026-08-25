@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\AdminSekolah\DataDptController;
 use App\Http\Controllers\Api\AdminSekolah\DokumentasiController;
 use App\Http\Controllers\Api\AdminSekolah\DashboardController;
 use App\Http\Controllers\Api\AdminSekolah\ApprovalPindahController;
+use App\Http\Controllers\Api\AdminSekolah\AdminPpoController;
 use App\Http\Controllers\Api\AdminTps\AdminTpsController;
 use App\Http\Controllers\Api\Bilik\BilikController;
 use App\Http\Controllers\Api\PublicController;
@@ -153,6 +154,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Dashboard Info
     Route::get('/admin-sekolah/dashboard', [DashboardController::class, 'index']);
+
+    Route::get('/admin-sekolah/perangkat', [AdminPpoController::class, 'getPerangkat']);
+    Route::post('/admin-sekolah/perangkat', [AdminPpoController::class, 'savePerangkat']);
 
     // ==========================================
     // LEVEL 3: ADMIN TPS API

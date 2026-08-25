@@ -135,6 +135,16 @@ const routes = [
                 path: 'dokumentasi',
                 name: 'admin-sekolah-dokumentasi',
                 component: () => import('../views/admin_sekolah/Dokumentasi.vue'),
+            },
+            {
+                path: 'perangkat',
+                name: 'admin-sekolah-perangkat',
+                component: () => import('../views/admin_sekolah/Perangkat.vue'),
+            },
+            {
+                path: 'selesai',
+                name: 'admin-sekolah-selesai',
+                component: () => import('../views/admin_sekolah/SelesaiPemilihan.vue'),
             }
         ],
     },

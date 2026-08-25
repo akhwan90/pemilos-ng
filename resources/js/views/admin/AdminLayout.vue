@@ -232,6 +232,25 @@
 						</svg>
 						Dokumentasi
 					</router-link>
+							<router-link to="/admin-sekolah/perangkat"
+						class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+						:class="$route.path.startsWith('/admin-sekolah/perangkat') ? 'bg-amber-50 text-amber-700' : 'text-gray-600 hover:bg-gray-100'">
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+								d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+						</svg>
+						Anggota PPO
+					</router-link>
+
+					<router-link to="/admin-sekolah/selesai"
+						class="flex items-center gap-3 px-3 py-2 mt-4 rounded-lg text-sm font-bold transition-colors"
+						:class="$route.path.startsWith('/admin-sekolah/selesai') ? 'bg-red-50 text-red-700' : 'bg-red-600 text-white hover:bg-red-700'">
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+								d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+						</svg>
+						Selesai Pemilihan
+					</router-link>
 				</template>
 
 				<!-- Nav (Level 3: Admin TPS) -->
