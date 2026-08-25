@@ -39,23 +39,83 @@
 
                 <!-- Laporan C1 Ready -->
                 <div v-else-if="hasilData">
+
                     <!-- Data Pemilih (DPT) -->
                     <div class="mb-8">
                         <h3 class="font-bold text-gray-800 bg-gray-50 p-3 rounded-t-lg border border-gray-200">I. DATA PEMILIH DAN PENGGUNA HAK PILIH</h3>
                         <div class="border border-t-0 border-gray-200 rounded-b-lg overflow-hidden">
                             <table class="min-w-full divide-y divide-gray-200">
+                                <thead>
+                                    <tr>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-6/12">Uraian</th>
+                                        <th class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider w-2/12">Laki-Laki</th>
+                                        <th class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider w-2/12">Perempuan</th>
+                                        <th class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider w-2/12">Jumlah</th>
+                                    </tr>
+                                </thead>
                                 <tbody class="bg-white divide-y divide-gray-200 text-sm">
                                     <tr>
                                         <td class="px-4 py-3 font-medium text-gray-700 w-3/4">1. Jumlah Pemilih dalam Daftar Pemilih Tetap (DPT)</td>
-                                        <td class="px-4 py-3 text-right font-bold">{{ hasilData.hasil.statistik.total_dpt }}</td>
+                                        <td class="px-4 py-3 text-center font-bold">{{ hasilData.hasil.total_dpt[0].jumlah_l }}</td>
+                                        <td class="px-4 py-3 text-center font-bold">{{ hasilData.hasil.total_dpt[0].jumlah_p }}</td>
+                                        <td class="px-4 py-3 text-center font-bold">{{ hasilData.hasil.total_dpt[0].total }}</td>
                                     </tr>
                                     <tr class="bg-gray-50">
                                         <td class="px-4 py-3 font-medium text-gray-700">2. Jumlah Pengguna Hak Pilih (Suara Masuk)</td>
-                                        <td class="px-4 py-3 text-right font-bold text-indigo-700">{{ hasilData.hasil.statistik.suara_masuk }}</td>
+                                        <td class="px-4 py-3 text-center font-bold text-indigo-700">{{ hasilData.hasil.suara_masuk[0].jumlah_l }}</td>
+                                        <td class="px-4 py-3 text-center font-bold text-indigo-700">{{ hasilData.hasil.suara_masuk[0].jumlah_p }}</td>
+                                        <td class="px-4 py-3 text-center font-bold text-indigo-700">{{ hasilData.hasil.suara_masuk[0].total }}</td>
                                     </tr>
                                     <tr>
                                         <td class="px-4 py-3 font-medium text-gray-700 text-red-600">3. Jumlah Pemilih yang Tidak Menggunakan Hak Pilih</td>
-                                        <td class="px-4 py-3 text-right font-bold text-red-600">{{ hasilData.hasil.statistik.tidak_memilih }}</td>
+                                        <td class="px-4 py-3 text-center font-bold text-red-600">{{ hasilData.hasil.total_dpt[0].jumlah_l - hasilData.hasil.suara_masuk[0].jumlah_l }}</td>
+                                        <td class="px-4 py-3 text-center font-bold text-red-600">{{ hasilData.hasil.total_dpt[0].jumlah_p - hasilData.hasil.suara_masuk[0].jumlah_p }}</td>
+                                        <td class="px-4 py-3 text-center font-bold text-red-600">{{ hasilData.hasil.total_dpt[0].total - hasilData.hasil.suara_masuk[0].total }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Data Pemilih Difable -->
+                    <div class="mb-8">
+                        <h3 class="font-bold text-gray-800 bg-gray-50 p-3 rounded-t-lg border border-gray-200">II. DATA PEMILIH DAN PENGGUNAAN HAK PILIH DISABILITAS / PENYANDANG CACAT</h3>
+                        <div class="border border-t-0 border-gray-200 rounded-b-lg overflow-hidden">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead>
+                                    <tr>
+                                        <th
+                                            class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-6/12">
+                                            Uraian</th>
+                                        <th
+                                            class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider w-2/12">
+                                            Laki-Laki</th>
+                                        <th
+                                            class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider w-2/12">
+                                            Perempuan</th>
+                                        <th
+                                            class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider w-2/12">
+                                            Jumlah</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200 text-sm">
+                                    <tr>
+                                        <td class="px-4 py-3 font-medium text-gray-700 w-3/4">1. Jumlah Pemilih Disabilitas / Penyandang Cacat</td>
+                                        <td class="px-4 py-3 text-center font-bold">{{
+                                            hasilData.hasil.difabel[0].jumlah_l }}</td>
+                                        <td class="px-4 py-3 text-center font-bold">{{
+                                            hasilData.hasil.difabel[0].jumlah_p }}</td>
+                                        <td class="px-4 py-3 text-center font-bold">{{
+                                            hasilData.hasil.difabel[0].total }}</td>
+                                    </tr>
+                                    <tr class="bg-gray-50">
+                                        <td class="px-4 py-3 font-medium text-gray-700">2. Jumlah Pemilih Disabilitas / Penyandang Cacat yang menggunakan hak pilih</td>
+                                        <td class="px-4 py-3 text-center font-bold text-indigo-700">{{
+                                            hasilData.hasil.difabel_memilih[0].jumlah_l }}</td>
+                                        <td class="px-4 py-3 text-center font-bold text-indigo-700">{{
+                                            hasilData.hasil.difabel_memilih[0].jumlah_p }}</td>
+                                        <td class="px-4 py-3 text-center font-bold text-indigo-700">{{
+                                            hasilData.hasil.difabel_memilih[0].total }}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -64,21 +124,21 @@
 
                     <!-- Perolehan Suara Paslon -->
                     <div class="mb-8">
-                        <h3 class="font-bold text-gray-800 bg-gray-50 p-3 rounded-t-lg border border-gray-200">II. DATA PEROLEHAN SUARA PASANGAN CALON</h3>
+                        <h3 class="font-bold text-gray-800 bg-gray-50 p-3 rounded-t-lg border border-gray-200">III. DATA PEROLEHAN SUARA PASANGAN CALON</h3>
                         <div class="border border-t-0 border-gray-200 rounded-b-lg overflow-hidden">
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead class="bg-white">
                                     <tr>
-                                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-16">No</th>
-                                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Nama Calon / Paslon</th>
-                                        <th class="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider w-32">Suara Sah</th>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-2/12">No</th>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-6/12">Nama Calon / Paslon</th>
+                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider w-4/12 text-center">Suara Sah</th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200 text-sm">
-                                    <tr v-for="paslon in hasilData.hasil.perolehan" :key="paslon.id_calon">
-                                        <td class="px-4 py-3 font-bold text-center bg-gray-50">{{ paslon.no_urut }}</td>
-                                        <td class="px-4 py-3 font-medium text-gray-900" v-html="paslon.nama_lengkap"></td>
-                                        <td class="px-4 py-3 text-right font-bold text-xl text-indigo-600">{{ paslon.jumlah_suara }}</td>
+                                    <tr v-for="paslon in hasilData.hasil.perolehan_paslon" :key="paslon.id_calon">
+                                        <td class="px-4 py-3 font-bold text-center bg-gray-50">{{ paslon.no }}</td>
+                                        <td class="px-4 py-3 font-medium text-gray-900" v-html="paslon.nama"></td>
+                                        <td class="px-4 py-3 text-center font-bold text-xl text-indigo-600">{{ paslon.total }}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -87,7 +147,7 @@
 
                     <!-- Rekap Akhir -->
                     <div class="mb-8">
-                        <h3 class="font-bold text-gray-800 bg-gray-50 p-3 rounded-t-lg border border-gray-200">III. DATA SUARA SAH DAN TIDAK SAH</h3>
+                        <h3 class="font-bold text-gray-800 bg-gray-50 p-3 rounded-t-lg border border-gray-200">IV. DATA SUARA SAH DAN TIDAK SAH</h3>
                         <div class="border border-t-0 border-gray-200 rounded-b-lg overflow-hidden">
                             <table class="min-w-full divide-y divide-gray-200">
                                 <tbody class="bg-white divide-y divide-gray-200 text-sm">

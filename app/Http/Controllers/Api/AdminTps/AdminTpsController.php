@@ -75,12 +75,111 @@ class AdminTpsController extends Controller
                 ], 400);
             }
 
+
+            // 3. Jika belum di-generate (pertama kali buka setelah klik Selesai Pemilihan), hitung dan simpan
+
+            // b. Hitung Suara Masuk & DPT
+            $totalDpt = DB::table('tb_siswa_tps')
+                ->where('npsn', $npsn)
+                ->where('id_tps', $tpsId)
+                ->where('tahun', $tahun)
+                ->select(
+                    DB::raw('CAST(SUM(CASE WHEN jk = 1 THEN 1 ELSE 0 END) AS SIGNED) as jumlah_l'),
+                    DB::raw('CAST(SUM(CASE WHEN jk = 2 THEN 1 ELSE 0 END) AS SIGNED) as jumlah_p'),
+                    DB::raw('CAST(COUNT(id) AS SIGNED) as total')
+                )
+                ->get()
+                ->toArray();
+
+            $suaraMasuk = DB::table('tb_siswa_tps')
+                ->where('npsn', $npsn)
+                ->where('id_tps', $tpsId)
+                ->where('tahun', $tahun)
+                ->whereNotNull('waktu_pilih')
+                ->select(
+                    DB::raw('CAST(SUM(CASE WHEN jk = 1 THEN 1 ELSE 0 END) AS SIGNED) as jumlah_l'),
+                    DB::raw('CAST(SUM(CASE WHEN jk = 2 THEN 1 ELSE 0 END) AS SIGNED) as jumlah_p'),
+                    DB::raw('CAST(COUNT(id) AS SIGNED) as total')
+                )
+                ->get()
+                ->toArray();
+
+            $difable = DB::table('tb_siswa_tps')
+                ->where('npsn', $npsn)
+                ->where('id_tps', $tpsId)
+                ->where('tahun', $tahun)
+                ->where('difabel', '!=', 0)
+                ->select(
+                    DB::raw('CAST(IFNULL(SUM(CASE WHEN jk = 1 THEN 1 ELSE 0 END), 0) AS SIGNED) as jumlah_l'),
+                    DB::raw('CAST(IFNULL(SUM(CASE WHEN jk = 2 THEN 1 ELSE 0 END), 0) AS SIGNED) as jumlah_p'),
+                    DB::raw('CAST(COUNT(id) AS SIGNED) as total')
+                )
+                ->get()
+                ->toArray();
+
+
+
+            $difableMemilih = DB::table('tb_siswa_tps')
+                ->where('npsn', $npsn)
+                ->where('id_tps', $tpsId)
+                ->where('tahun', $tahun)
+                ->whereNotNull('waktu_pilih')
+                ->where('difabel', '!=', 0)
+                ->select(
+                    DB::raw('CAST(IFNULL(SUM(CASE WHEN jk = 1 THEN 1 ELSE 0 END), 0) AS SIGNED) as jumlah_l'),
+                    DB::raw('CAST(IFNULL(SUM(CASE WHEN jk = 2 THEN 1 ELSE 0 END), 0) AS SIGNED) as jumlah_p'),
+                    DB::raw('CAST(COUNT(id) AS SIGNED) as total')
+                )
+                ->get()
+                ->toArray();
+
+            $perolehanPaslon = DB::table('tb_siswa_tps')
+                ->join('tb_pilihan as b', 'tb_siswa_tps.pilihan', '=', 'b.id')
+                ->where('tb_siswa_tps.tahun', $tahun)
+                ->where('tb_siswa_tps.id_tps', $tpsId)
+                ->where('tb_siswa_tps.npsn', $npsn)
+                ->select(
+                    'b.nama',
+                    'b.no',
+                    DB::raw('CAST(SUM(CASE WHEN tb_siswa_tps.jk = 1 THEN 1 ELSE 0 END) AS SIGNED) as jumlah_l'),
+                    DB::raw('CAST(SUM(CASE WHEN tb_siswa_tps.jk = 2 THEN 1 ELSE 0 END) AS SIGNED) as jumlah_p'),
+                    DB::raw('CAST(COUNT(tb_siswa_tps.id) AS SIGNED) as total')
+                )
+                ->groupBy('b.id', 'b.nama', 'b.no')
+                ->get()
+                ->toArray();
+
+            // c. Hitung Statistik
+            $totalDptJumlah = array_sum(array_column($totalDpt, 'total'));
+            $suaraMasukJumlah = array_sum(array_column($suaraMasuk, 'total')); // is_memilih != null
+            $totalSuaraSah = array_sum(array_column($perolehanPaslon, 'total'));
+
+            $hasilLengkap = [
+                'statistik' => [
+                    'total_dpt' => $totalDptJumlah,
+                    'suara_masuk' => $suaraMasukJumlah,
+                    'suara_sah' => $totalSuaraSah,
+                    'suara_tidak_sah' => $suaraMasukJumlah - $totalSuaraSah,
+                    'tidak_memilih' => $totalDptJumlah - $suaraMasukJumlah
+                ],
+                'total_dpt' => $totalDpt,
+                'suara_masuk' => $suaraMasuk,
+                'perolehan_paslon' => $perolehanPaslon,
+                'difabel' => $difable,
+                'difabel_memilih' => $difableMemilih,
+                'generated_at' => date('Y-m-d H:i:s')
+            ];
+
+            // Simpan snapshot hasil JSON secara permanen agar nilainya terkunci saat pemilihan selesai
             DB::table('tb_tps_setting')
                 ->where('id', $tpsSetting->id)
                 ->update([
-                    'selesai_pemilihan_time' => $now
+                    'selesai_pemilihan_time' => $now,
+                    'hasil' => json_encode($hasilLengkap)
                 ]);
+
         } else {
+            
             // Jika belum ada row setting, buat baru
             DB::table('tb_tps_setting')->insert([
                 'npsn' => $npsn,
@@ -369,74 +468,7 @@ class AdminTpsController extends Controller
             ], 400);
         }
 
-        // 2. Jika hasil sudah tersimpan di JSON, langsung gunakan itu
-        if ($tpsSetting->hasil) {
-            $hasilLengkap = json_decode($tpsSetting->hasil, true);
-        } else {
-            // 3. Jika belum di-generate (pertama kali buka setelah klik Selesai Pemilihan), hitung dan simpan
-
-            // a. Ambil Paslon/Kandidat
-            $kandidatList = DB::table('tb_pilihan')
-                ->where('npsn', $npsn)
-                ->where('tahun', $tahun)
-                ->orderBy('no', 'asc')
-                ->get();
-
-            // b. Hitung Suara Masuk & DPT
-            $totalDpt = DB::table('tb_siswa_tps')
-                ->where('npsn', $npsn)
-                ->where('id_tps', $tpsId)
-                ->where('tahun', $tahun)
-                ->count();
-
-            $suaraMasuk = DB::table('tb_siswa_tps')
-                ->where('npsn', $npsn)
-                ->where('id_tps', $tpsId)
-                ->where('tahun', $tahun)
-                ->whereNotNull('waktu_pilih')
-                ->count();
-
-            // c. Hitung perolehan masing-masing paslon
-            $perolehanPaslon = [];
-            foreach ($kandidatList as $kand) {
-                $jumlahSuara = DB::table('tb_siswa_tps')
-                    ->where('npsn', $npsn)
-                    ->where('id_tps', $tpsId)
-                    ->where('tahun', $tahun)
-                    ->where('pilihan', $kand->id)
-                    ->count();
-
-                $perolehanPaslon[] = [
-                    'id_calon' => $kand->id,
-                    'no_urut' => $kand->no,
-                    'nama_ketua' => current(explode('<br>', $kand->nama)), // Ambil baris pertama jika ada tag <br>
-                    'nama_lengkap' => $kand->nama,
-                    'jumlah_suara' => $jumlahSuara
-                ];
-            }
-
-            // Validasi suara tidak sah (kalau is_memilih=1 tapi pilihan_id null atau tidak cocok)
-            // Di sistem e-voting standar ini jarang terjadi, tapi jaga-jaga
-            $totalSuaraSah = array_sum(array_column($perolehanPaslon, 'jumlah_suara'));
-            $suaraTidakSah = $suaraMasuk - $totalSuaraSah;
-
-            $hasilLengkap = [
-                'statistik' => [
-                    'total_dpt' => $totalDpt,
-                    'suara_masuk' => $suaraMasuk,
-                    'suara_sah' => $totalSuaraSah,
-                    'suara_tidak_sah' => $suaraTidakSah < 0 ? 0 : $suaraTidakSah,
-                    'tidak_memilih' => $totalDpt - $suaraMasuk
-                ],
-                'perolehan' => $perolehanPaslon,
-                'generated_at' => date('Y-m-d H:i:s')
-            ];
-
-            // Simpan snapshot hasil JSON secara permanen agar nilainya terkunci saat pemilihan selesai
-            DB::table('tb_tps_setting')
-                ->where('id', $tpsSetting->id)
-                ->update(['hasil' => json_encode($hasilLengkap)]);
-        }
+        $hasilLengkap = json_decode($tpsSetting->hasil, true);
 
         // Ambil info nama kelas (TPS)
         $namaKelas = DB::table('tb_kelas')->where('kd_kelas', $tpsId)->value('nm_kelas');
