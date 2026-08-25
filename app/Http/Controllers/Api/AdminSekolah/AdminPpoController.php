@@ -69,6 +69,11 @@ class AdminPpoController extends Controller
             ->where('is_hapus', 0)
             ->get();
 
+        $getCalons = DB::table('tb_pilihan')
+            ->where('npsn', $npsn)
+            ->where('tahun', $tahun)
+            ->get();
+        
         $hasilTps = [];
         // 3. Jika belum di-generate (pertama kali buka setelah klik Selesai Pemilihan), hitung dan simpan
         foreach ($getTps as $tps) {
@@ -80,8 +85,8 @@ class AdminPpoController extends Controller
                 ->where('id_tps', $tpsId)
                 ->where('tahun', $tahun)
                 ->select(
-                    DB::raw('CAST(SUM(CASE WHEN jk = 1 THEN 1 ELSE 0 END) AS SIGNED) as jumlah_l'),
-                    DB::raw('CAST(SUM(CASE WHEN jk = 2 THEN 1 ELSE 0 END) AS SIGNED) as jumlah_p'),
+                    DB::raw('CAST(IFNULL(SUM(CASE WHEN jk = 1 THEN 1 ELSE 0 END), 0) AS SIGNED) as jumlah_l'),
+                    DB::raw('CAST(IFNULL(SUM(CASE WHEN jk = 2 THEN 1 ELSE 0 END), 0) AS SIGNED) as jumlah_p'),
                     DB::raw('CAST(COUNT(id) AS SIGNED) as total')
                 )
                 ->get()
@@ -93,8 +98,8 @@ class AdminPpoController extends Controller
                 ->where('tahun', $tahun)
                 ->whereNotNull('waktu_pilih')
                 ->select(
-                    DB::raw('CAST(SUM(CASE WHEN jk = 1 THEN 1 ELSE 0 END) AS SIGNED) as jumlah_l'),
-                    DB::raw('CAST(SUM(CASE WHEN jk = 2 THEN 1 ELSE 0 END) AS SIGNED) as jumlah_p'),
+                    DB::raw('CAST(IFNULL(SUM(CASE WHEN jk = 1 THEN 1 ELSE 0 END), 0) AS SIGNED) as jumlah_l'),
+                    DB::raw('CAST(IFNULL(SUM(CASE WHEN jk = 2 THEN 1 ELSE 0 END), 0) AS SIGNED) as jumlah_p'),
                     DB::raw('CAST(COUNT(id) AS SIGNED) as total')
                 )
                 ->get()
@@ -133,6 +138,7 @@ class AdminPpoController extends Controller
                 ->where('tb_siswa_tps.id_tps', $tpsId)
                 ->where('tb_siswa_tps.npsn', $npsn)
                 ->select(
+                    'b.id',
                     'b.nama',
                     'b.no',
                     DB::raw('CAST(SUM(CASE WHEN tb_siswa_tps.jk = 1 THEN 1 ELSE 0 END) AS SIGNED) as jumlah_l'),
@@ -141,7 +147,23 @@ class AdminPpoController extends Controller
                 )
                 ->groupBy('b.id', 'b.nama', 'b.no')
                 ->get()
+                ->keyBy('id')
                 ->toArray();
+
+            // dd($perolehanPaslon);
+
+            $perolehanPaslonNew = [];
+            foreach ($getCalons as $getCalon) {
+                $perolehanPaslonNew[$getCalon->id] = [
+                    'id' => $getCalon->id,
+                    'nama' => $getCalon->nama,
+                    'no' => $getCalon->no,
+                    'jumlah_l' => $perolehanPaslon[$getCalon->id]->jumlah_l ?? 0,
+                    'jumlah_p' => $perolehanPaslon[$getCalon->id]->jumlah_p ?? 0,
+                    'total' => $perolehanPaslon[$getCalon->id]->total ?? 0,
+                ];
+            }
+            
 
             // c. Hitung Statistik
             $totalDptJumlah = array_sum(array_column($totalDpt, 'total'));
@@ -158,7 +180,7 @@ class AdminPpoController extends Controller
                 ],
                 'total_dpt' => $totalDpt,
                 'suara_masuk' => $suaraMasuk,
-                'perolehan_paslon' => $perolehanPaslon,
+                'perolehan_paslon' => $perolehanPaslonNew,
                 'difabel' => $difable,
                 'difabel_memilih' => $difableMemilih,
                 'generated_at' => date('Y-m-d H:i:s')
@@ -445,51 +467,55 @@ class AdminPpoController extends Controller
     /**
      * Dapatkan Laporan Hasil C1 (Hanya bisa diakses jika pemilihan telah diakhiri)
      */
-    public function getHasilC1(Request $request)
+    public function getHasilD1(Request $request)
     {
         $user = $request->user();
-        if ($user->level != 3) {
+        if ($user->level != 2) {
             return response()->json(['success' => false, 'message' => 'Unauthorized.'], 403);
         }
 
         $npsn = $user->npsn;
-        $tpsId = $user->id_tps;
         $tahun = env('TAHUN_AKTIF', date('Y'));
 
-        $tpsSetting = DB::table('tb_tps_setting')
+        $tpsSetting = DB::table('tb_sekolah_settings')
             ->where('npsn', $npsn)
             ->where('tahun', $tahun)
-            ->where('id_kelas', $tpsId)
             ->first();
 
         // 1. Pastikan pemilihan sudah selesai
-        if (!$tpsSetting || !$tpsSetting->selesai_pemilihan_time) {
+        if (!$tpsSetting || !$tpsSetting->selesai_at) {
             return response()->json([
                 'success' => false,
-                'message' => 'Laporan Hasil C1 belum tersedia. Anda harus mengakhiri pemilihan terlebih dahulu pada menu Selesai Pemilihan.'
+                'message' => 'Laporan Hasil D1 belum tersedia. Anda harus mengakhiri pemilihan terlebih dahulu pada menu Selesai Pemilihan.'
             ], 400);
         }
 
         $hasilLengkap = json_decode($tpsSetting->hasil, true);
 
         // Ambil info nama kelas (TPS)
-        $namaKelas = DB::table('tb_kelas')->where('kd_kelas', $tpsId)->value('nm_kelas');
+        $namaKelas = DB::table('tb_sekolah')->where('npsn', $npsn)->value('nama_sekolah');
+
+        $calons = DB::table('tb_pilihan')
+            ->where('npsn', $npsn)
+            ->where('tahun', $tahun)
+            ->get();
 
         $perangkatTps = null;
-        if ($tpsSetting->perangkat_tps) {
-            $perangkatTps = json_decode($tpsSetting->perangkat_tps, true);
+        if ($tpsSetting->ppo) {
+            $perangkatTps = json_decode($tpsSetting->ppo, true);
         }
 
         return response()->json([
             'success' => true,
             'data' => [
                 'tps' => $namaKelas,
-                'waktu_selesai' => $tpsSetting->selesai_pemilihan_time,
+                'waktu_selesai' => $tpsSetting->selesai_at,
                 'hasil' => $hasilLengkap,
                 'perangkat_tps' => $perangkatTps,
+                'calons' => $calons
                 // Kita tambahkan URL file scan (jika sudah di-upload)
-                'file_c1_url' => $tpsSetting->form_c1_file ? asset('uploads/c1/' . $tpsSetting->form_c1_file) : null,
-                'file_c1_time' => $tpsSetting->form_c1_upload_time,
+                // 'file_c1_url' => $tpsSetting->form_c1_file ? asset('uploads/c1/' . $tpsSetting->form_c1_file) : null,
+                // 'file_c1_time' => $tpsSetting->form_c1_upload_time,
             ]
         ]);
     }

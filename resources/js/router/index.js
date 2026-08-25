@@ -145,7 +145,12 @@ const routes = [
                 path: 'selesai',
                 name: 'admin-sekolah-selesai',
                 component: () => import('../views/admin_sekolah/SelesaiPemilihan.vue'),
-            }
+            },
+            {
+                path: 'laporan-d1',
+                name: 'admin-sekolah-laporan-d1',
+                component: () => import('../views/admin_sekolah/LaporanD1.vue'),
+            },
         ],
     },
     {
