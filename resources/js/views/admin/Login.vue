@@ -9,7 +9,7 @@
 				<p class="text-sm text-gray-500 mt-1">Pemilihan Ketua OSIS Berbasis Elektronik</p>
 			</div>
 			<div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-				<h2 class="text-lg font-semibold text-gray-800 mb-6">Login Admin Sekolah (PPO)</h2>
+				<h2 class="text-lg font-semibold text-gray-800 mb-6">Login Admin Sekolah (PPO) dan Admin TPS</h2>
 				<div v-if="errorMsg" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
 					{{ errorMsg }}
 				</div>

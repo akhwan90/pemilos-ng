@@ -63,9 +63,8 @@
 						<p class="text-lg text-gray-600 leading-relaxed mb-8 pr-0 lg:pr-12 text-justify">
 							e-Pemilos adalah platform e-Voting Pemilihan Ketua OSIS yang cepat, aman, dan transparan. Diinisiasi oleh KPU Kulon Progo sejak tahun 2020 sebagai wadah edukasi politik bagi pemilih pemula yang ramah lingkungan.
 						</p>
-
 						<!-- Tombol Aksi Hero -->
-						<div class="flex flex-col sm:flex-row flex-wrap gap-4 mb-8">
+						<div class="flex flex-col sm:flex-row flex-wrap gap-4 mb-2">
 							<router-link
 								to="/tpssekolah/login"
 								class="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white text-base font-bold rounded-xl shadow-lg shadow-blue-200 transition-all transform hover:-translate-y-0.5"
@@ -73,22 +72,35 @@
 								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
 								</svg>
-								Masuk ke TPS
+								Setting TPS
 							</router-link>
 
 							<router-link
 								to="/tpsluarsekolah"
 								class="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white hover:bg-gray-50 border-2 border-gray-200 text-gray-700 text-base font-bold rounded-xl shadow-sm transition-all transform hover:-translate-y-0.5"
 							>
-								TPS Luar Sekolah
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+									fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+									stroke-linejoin="round"
+									class="icon icon-tabler icons-tabler-outline icon-tabler-world-upload">
+									<path stroke="none" d="M0 0h24v24H0z" fill="none" />
+									<path d="M21 12a9 9 0 1 0 -9 9" />
+									<path d="M3.6 9h16.8" />
+									<path d="M3.6 15h8.4" />
+									<path d="M11.578 3a17 17 0 0 0 0 18" />
+									<path d="M12.5 3c1.719 2.755 2.5 5.876 2.5 9" />
+									<path d="M18 21v-7m3 3l-3 -3l-3 3" />
+								</svg>
+								Pemilih Luar Sekolah
 							</router-link>
+						</div>
 
-							<router-link
-								to="/admin/login"
-								class="inline-flex items-center justify-center gap-2 px-8 py-4 bg-slate-800 hover:bg-slate-900 text-white text-base font-bold rounded-xl shadow-sm transition-all transform hover:-translate-y-0.5"
-							>
+						<div class="flex">
+							<router-link to="/admin/login"
+								class="inline-flex items-center justify-center gap-2 px-8 py-4 bg-slate-800 hover:bg-slate-900 text-white text-base font-bold rounded-xl shadow-sm transition-all transform hover:-translate-y-0.5">
 								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+										d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
 								</svg>
 								Login Admin
 							</router-link>
