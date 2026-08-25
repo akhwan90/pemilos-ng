@@ -23,7 +23,7 @@
 
                 <div v-if="isSelesai" class="text-gray-500 mb-8 space-y-2">
                     <p>
-                        Status pemilihan di TPS Anda ({{ tpsName }}) sudah dinyatakan <strong class="text-gray-700">ditutup</strong> pada sistem. 
+                        Status pemilihan di Sekolah Anda ({{ tpsName }}) sudah dinyatakan <strong class="text-gray-700">ditutup</strong> pada sistem. 
                         Tindakan ini tidak bisa dibatalkan secara sepihak.
                     </p>
                     <div class="inline-flex items-center gap-2 mt-4 bg-gray-50 border border-gray-200 px-4 py-2 rounded-lg text-sm font-mono text-gray-600">
@@ -33,14 +33,14 @@
 
                 <div v-else class="text-gray-500 mb-8 space-y-4">
                     <p>
-                        Dengan mengklik tombol di bawah, Anda selaku Admin TPS menyatakan bahwa proses pemungutan suara di <strong>{{ tpsName }}</strong> telah resmi berakhir.
+                        Dengan mengklik tombol di bawah, Anda selaku Admin Sekolah (PPO) menyatakan bahwa proses pemungutan suara di <strong>{{ tpsName }}</strong> telah resmi berakhir.
                     </p>
                     <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 p-4 rounded-lg text-sm text-left">
                         <strong class="block mb-1 font-bold">Peringatan:</strong>
                         <ul class="list-disc pl-5 space-y-1">
                             <li>Siswa (pemilih) tidak akan bisa login lagi ke dalam Bilik Suara.</li>
                             <li>Token yang belum digunakan akan otomatis hangus.</li>
-                            <li>Sistem akan mencatat waktu penutupan TPS Anda saat ini juga.</li>
+                            <li>Sistem akan mencatat waktu penutupan pemilihan pada sekolah Anda saat ini juga.</li>
                         </ul>
                     </div>
                 </div>
@@ -88,7 +88,7 @@
                                 <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Konfirmasi Akhiri Pemilihan</h3>
                                 <div class="mt-2">
                                     <p class="text-sm text-gray-500">
-                                        Apakah Anda yakin ingin menutup proses pemilihan? Tindakan ini <strong>permanen</strong> dan Anda tidak dapat membukanya kembali dari halaman ini. Pastikan semua bilik sudah selesai digunakan.
+                                        Apakah Anda yakin ingin menutup proses pemilihan? Tindakan ini <strong>permanen</strong> dan Anda tidak dapat membukanya kembali dari halaman ini. Pastikan semua TPS sudah menyelesaikan pemilihan.
                                     </p>
                                 </div>
                             </div>
@@ -140,7 +140,7 @@ onMounted(() => {
 
 async function fetchStatus() {
     try {
-        const res = await api.get('/admin-tps/status-pemilihan');
+        const res = await api.get('/admin-sekolah/status-pemilihan');
         if (res.data.success) {
             const status = res.data.data;
             if (status && status.selesai_pemilihan_time) {
@@ -156,7 +156,7 @@ async function fetchStatus() {
 async function submitSelesai() {
     loading.value = true;
     try {
-        const res = await api.post('/admin-tps/akhiri-pemilihan');
+        const res = await api.post('/admin-sekolah/akhiri-pemilihan');
         if (res.data.success) {
             toast.success('Pemilihan berhasil diakhiri!');
             isSelesai.value = true;

@@ -16,7 +16,7 @@ class AdminPpoController extends Controller
         $user = $request->user();
 
         // Pastikan level 3 (Admin TPS)
-        if ($user->level != 3) {
+        if ($user->level != 2) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized Access.'
@@ -24,19 +24,17 @@ class AdminPpoController extends Controller
         }
 
         $npsn = $user->npsn;
-        $tpsId = $user->id_tps;
         $tahun = env('TAHUN_AKTIF', date('Y'));
 
-        $tpsSetting = DB::table('tb_tps_setting')
+        $tpsSetting = DB::table('tb_sekolah_settings')
             ->where('npsn', $npsn)
             ->where('tahun', $tahun)
-            ->where('id_kelas', $tpsId)
             ->first();
 
         return response()->json([
             'success' => true,
             'data' => [
-                'selesai_pemilihan_time' => $tpsSetting ? $tpsSetting->selesai_pemilihan_time : null
+                'selesai_pemilihan_time' => $tpsSetting ? $tpsSetting->selesai_at : null
             ]
         ]);
     }
@@ -48,7 +46,7 @@ class AdminPpoController extends Controller
     {
         $user = $request->user();
 
-        if ($user->level != 3) {
+        if ($user->level != 2) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized Access.'
@@ -56,27 +54,25 @@ class AdminPpoController extends Controller
         }
 
         $npsn = $user->npsn;
-        $tpsId = $user->id_tps;
         $tahun = env('TAHUN_AKTIF', date('Y'));
-        $now = date('Y-m-d H:i:s');
+        $now = now();
 
-        $tpsSetting = DB::table('tb_tps_setting')
+        $tpsSetting = DB::table('tb_sekolah_settings')
             ->where('npsn', $npsn)
             ->where('tahun', $tahun)
-            ->where('id_kelas', $tpsId)
             ->first();
 
-        if ($tpsSetting) {
-            // Update
-            if ($tpsSetting->selesai_pemilihan_time) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Pemilihan TPS sudah ditandai selesai sebelumnya.'
-                ], 400);
-            }
 
 
-            // 3. Jika belum di-generate (pertama kali buka setelah klik Selesai Pemilihan), hitung dan simpan
+        $getTps = DB::table('tb_kelas')
+            ->where('npsn', $npsn)
+            ->where('is_hapus', 0)
+            ->get();
+
+        $hasilTps = [];
+        // 3. Jika belum di-generate (pertama kali buka setelah klik Selesai Pemilihan), hitung dan simpan
+        foreach ($getTps as $tps) {
+            $tpsId = $tps->kd_kelas;
 
             // b. Hitung Suara Masuk & DPT
             $totalDpt = DB::table('tb_siswa_tps')
@@ -116,8 +112,6 @@ class AdminPpoController extends Controller
                 )
                 ->get()
                 ->toArray();
-
-
 
             $difableMemilih = DB::table('tb_siswa_tps')
                 ->where('npsn', $npsn)
@@ -170,38 +164,52 @@ class AdminPpoController extends Controller
                 'generated_at' => date('Y-m-d H:i:s')
             ];
 
+            $hasilTps[] = [
+                'tps_id' => $tpsId,
+                'nama_tps' => $tps->nm_kelas,
+                'is_tps_luar_sekolah' => $tps->is_tps_luar_sekolah,
+                'hasil' => $hasilLengkap,
+            ];
+        }
+
+        if ($tpsSetting) {
+            // Update
+            if ($tpsSetting->selesai_at) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Pemilihan TPS sudah ditandai selesai sebelumnya.'
+                ], 400);
+            }
+
             // Simpan snapshot hasil JSON secara permanen agar nilainya terkunci saat pemilihan selesai
-            DB::table('tb_tps_setting')
+            DB::table('tb_sekolah_settings')
                 ->where('id', $tpsSetting->id)
                 ->update([
-                    'selesai_pemilihan_time' => $now,
-                    'hasil' => json_encode($hasilLengkap)
+                    'selesai_at' => $now,
+                    'hasil' => json_encode($hasilTps),
+                    'updated_at' => $now
                 ]);
 
-        } else {
-            
+        } else {            
             // Jika belum ada row setting, buat baru
-            DB::table('tb_tps_setting')->insert([
+            DB::table('tb_sekolah_settings')->insert([
                 'npsn' => $npsn,
                 'tahun' => $tahun,
-                'id_kelas' => $tpsId,
-                'is_generate_token' => 0,
-                'is_cetak_ba' => 0,
-                'selesai_pemilihan_time' => $now,
+                'selesai_at' => $now,
+                'hasil' => json_encode($hasilTps),
                 'created_at' => $now
             ]);
         }
 
         $activityService = new \App\Services\ActivityService();
         $activityService->logActivity($user->username, 30, json_encode([
-            'tps_id' => $tpsId,
-            'tahun' => $tahun,
             'npsn' => $npsn,
+            'tahun' => $tahun,
         ]));
 
         return response()->json([
             'success' => true,
-            'message' => 'Pemilihan di TPS ini berhasil diakhiri.',
+            'message' => 'Pemilihan di Sekolah ini berhasil diakhiri.',
             'selesai_time' => $now
         ]);
     }
