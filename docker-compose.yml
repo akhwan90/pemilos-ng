@@ -7,7 +7,7 @@ services:
     container_name: pemilos_ng_app
     restart: unless-stopped
     networks:
-      - pemilos_app-network
+      - pemilos_app_network
     ports:
       - "${APP_PORT:-8000}:80"
     env_file:
@@ -34,6 +34,6 @@ services:
       - ./storage/app/public:/var/www/html/storage/app/public
       - ./storage/logs:/var/www/html/storage/logs
 networks:
-  pemilos_app-network: 
+  pemilos_app_network: 
     driver: bridge
 # Tidak perlu service mariadb disini karena memakai pemilos-db yang ada di luar project ini
