@@ -29,14 +29,14 @@ class CreateJadwalGlobal extends Command
         $listJadwals = config('pemilos.jenis_jadwal');
         $sekolahs = DB::table('tb_sekolah')->get();
         $waktu = [
-            'input_data_dps'=>['mulai'=>'2026-08-01 00:01:00', 'selesai'=>'2026-10-30 23:59:00',],
-            'pengumuman_data_dps'=>['mulai'=>'2026-08-01 00:01:00', 'selesai'=>'2026-10-30 23:59:00',],
-            'input_data_dpt'=>['mulai'=>'2026-08-01 00:01:00', 'selesai'=>'2026-10-30 23:59:00',],
-            'pengumuman_data_dpt'=>['mulai'=>'2026-08-01 00:01:00', 'selesai'=>'2026-10-30 23:59:00',],
-            'input_data_calon'=>['mulai'=>'2026-08-01 00:01:00', 'selesai'=>'2026-10-30 23:59:00',],
-            'kampanye'=>['mulai'=>'2026-08-01 00:01:00', 'selesai'=>'2026-10-30 23:59:00',],
-            'generate_token'=>['mulai'=>'2026-08-01 00:01:00', 'selesai'=>'2026-10-30 23:59:00',],
-            'pemilihan'=>['mulai'=>'2026-08-01 00:01:00', 'selesai'=>'2026-10-30 23:59:00',],
+            'input_data_dps'=>['mulai'=>'2026-08-01 00:01:00', 'selesai'=>'2026-09-30 23:59:00',],
+            'pengumuman_data_dps'=>['mulai'=>'2026-08-01 00:01:00', 'selesai'=>'2026-09-30 23:59:00',],
+            'input_data_dpt'=>['mulai'=>'2026-08-01 00:01:00', 'selesai'=>'2026-09-30 23:59:00',],
+            'pengumuman_data_dpt'=>['mulai'=>'2026-08-01 00:01:00', 'selesai'=>'2026-09-30 23:59:00',],
+            'input_data_calon'=>['mulai'=>'2026-08-01 00:01:00', 'selesai'=>'2026-10-02 23:59:00',],
+            'kampanye'=>['mulai'=>'2026-10-01 00:01:00', 'selesai'=>'2026-10-02 23:59:00',],
+            'generate_token'=>['mulai'=>'2026-10-06 00:01:00', 'selesai'=>'2026-10-07 23:59:00',],
+            'pemilihan'=>['mulai'=>'2026-10-08 00:01:00', 'selesai'=>'2026-10-08 23:59:00',],
         ];
 
 
