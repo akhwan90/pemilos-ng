@@ -23,7 +23,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:-root}
 
       # Menulis log ke console (docker logs) dan ke dalam storage/logs/ (bisa diatur dari LOG_STACK di .env)
-      LOG_CHANNEL: stack
+      LOG_CHANNEL: ${LOG_CHANNEL:-daily}
 
     # Supaya container ini bisa mengakses jaringan/DB localhost dari OS Induk (tempat pemilos-db berjalan)
     extra_hosts:
