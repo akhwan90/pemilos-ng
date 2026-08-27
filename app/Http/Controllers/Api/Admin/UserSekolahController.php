@@ -29,9 +29,18 @@ class UserSekolahController extends Controller
     {
         // Validasi
         $request->validate([
-            'username' => 'required|string|min:6|unique:tb_admin,username',
-            'password' => 'required|string|min:6',
-            'level'    => 'required|in:2,3',
+            'username' => 'required|string|min:6|unique:tb_admin,username',   
+            'level'    => 'required|in:2,3,4',         
+            'password' => [
+                'required',
+                'string',
+                'min:6',
+                'regex:/[A-Z]/',
+                'regex:/[!#_@$]/'
+            ],
+        ], [
+            'password.min' => 'Password minimal harus :min karakter.',
+            'password.regex' => 'Password harus mengandung minimal satu huruf besar dan satu karakter spesial (!#_@$).',
         ]);
 
         $id = DB::table('tb_admin')->insertGetId([
@@ -53,8 +62,17 @@ class UserSekolahController extends Controller
     // Mereset password user
     public function update(Request $request, $npsn, $id)
     {
-        $request->validate([
-            'password' => 'required|string|min:6',
+        $request->validate([       
+            'password' => [
+                'required',
+                'string',
+                'min:6',
+                'regex:/[A-Z]/',
+                'regex:/[!#_@$]/'
+            ],
+        ], [
+            'password.min' => 'Password minimal harus :min karakter.',
+            'password.regex' => 'Password harus mengandung minimal satu huruf besar dan satu karakter spesial (!#_@$).',
         ]);
 
         $affected = DB::table('tb_admin')
