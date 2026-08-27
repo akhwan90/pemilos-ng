@@ -57,7 +57,16 @@ class DataUserController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'password' => 'nullable|string|min:6',
+            'password' => [
+                'nullable',
+                'string',
+                'min:6',
+                'regex:/[A-Z]/',
+                'regex:/[!#_@$]/'
+            ],
+        ], [
+            'password.min' => 'Password minimal harus :min karakter.',
+            'password.regex' => 'Password harus mengandung minimal satu huruf besar dan satu karakter spesial (!#_@$).',
         ]);
 
         $admin = Admin::find($id);

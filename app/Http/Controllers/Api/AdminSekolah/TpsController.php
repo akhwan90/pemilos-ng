@@ -153,7 +153,16 @@ class TpsController extends Controller
 
         $request->validate([
             'username' => 'required|string|min:4|unique:tb_admin,username',
-            'password' => 'required|string|min:4',
+            'password' => [
+                'required',
+                'string',
+                'min:6',
+                'regex:/[A-Z]/',
+                'regex:/[!#_@$]/'
+            ],
+        ], [
+            'password.min' => 'Password minimal harus :min karakter.',
+            'password.regex' => 'Password harus mengandung minimal satu huruf besar dan satu karakter spesial (!#_@$).',
         ]);
 
         $id = DB::table('tb_admin')->insertGetId([
@@ -199,7 +208,16 @@ class TpsController extends Controller
         $npsn = $request->user()->npsn;
 
         $request->validate([
-            'password' => 'required|string|min:4',
+            'password' => [
+                'required',
+                'string',
+                'min:6',
+                'regex:/[A-Z]/',
+                'regex:/[!#_@$]/'
+            ],
+        ], [
+            'password.min' => 'Password minimal harus :min karakter.',
+            'password.regex' => 'Password harus mengandung minimal satu huruf besar dan satu karakter spesial (!#_@$).',
         ]);
 
         $affected = DB::table('tb_admin')
