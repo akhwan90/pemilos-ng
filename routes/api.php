@@ -78,6 +78,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/admin/data-sekolah/{npsn}/tps/{kd_kelas}/admin/{id}', [TpsSekolahController::class, 'destroyAdmin']);
     Route::put('/admin/data-sekolah/{npsn}/tps/{kd_kelas}/admin/{id}/password', [TpsSekolahController::class, 'updateAdminPassword']);
 
+    // Jadwal Sekolah API
+    Route::get('/admin/data-sekolah/{npsn}/upload', [App\Http\Controllers\Api\Admin\SekolahUploadController::class, 'index']);
+    Route::get('/admin/data-sekolah/{npsn}/upload/{id}', [App\Http\Controllers\Api\Admin\SekolahUploadController::class, 'detil']);
+    Route::get('/admin/data-sekolah/{npsn}/upload/{id}/download', [App\Http\Controllers\Api\Admin\SekolahUploadController::class, 'download']);
+
     // Data Siswa Global
     Route::get('/admin/data-siswa-global', [DataSiswaGlobalController::class, 'index']);
     Route::delete('/admin/data-siswa-global/{id}', [DataSiswaGlobalController::class, 'destroy']);
