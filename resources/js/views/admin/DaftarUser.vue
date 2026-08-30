@@ -143,14 +143,6 @@
 		</BaseCard>
 
 		<ModalEditUser v-model="modals.user" :user="selectedUser" @saved="onUserSaved" @error="onUserError" />
-
-		<!-- Tambahkan ToastComponent di sini -->
-		<ToastNotification 
-			:show="toast.show" 
-			:message="toast.message" 
-			:type="toast.type" 
-			@close="toast.show = false" 
-		/>
 	</div>
 </template>
 
@@ -159,9 +151,10 @@ import { ref, onMounted, watch } from 'vue';
 import api from '../../services/api';
 import BaseCard from '../../components/BaseCard.vue';
 import BaseButton from '../../components/BaseButton.vue';
-import ToastNotification from '../../components/ToastNotification.vue';
 import ModalEditUser from './modals/ModalEditUser.vue';
+import { useToast } from '../../composables/useToast';
 
+const toast = useToast();
 const loading = ref(false);
 const users = ref([]);
 const daftarLevel = ref([
@@ -190,21 +183,13 @@ function openModal(modalName, user) {
 }
 
 // Use the Toast Component logically assuming it's globally registered or imported
-const toast = ref({ show: false, message: '', type: 'success' });
-const showToast = (message, type = 'success') => {
-	toast.value = { show: true, message, type };
-	setTimeout(() => {
-		toast.value.show = false;
-	}, 3000);
-};
-
 const onUserSaved = () => {
-	showToast('Data user berhasil diperbarui', 'success');
+	toast.success('Data user berhasil diperbarui');
 	fetchUsers(pagination.value.current_page);
 };
 
 const onUserError = (errorMsg) => {
-	showToast(errorMsg, 'error');
+	toast.error(errorMsg);
 };
 
 const fetchUsers = async (page = 1) => {
@@ -228,8 +213,8 @@ const fetchUsers = async (page = 1) => {
 			to: response.data.to,
 		};
 	} catch (error) {
-		console.error('Error fetching data siswa global:', error);
-		showToast('Gagal memuat data siswa', 'error');
+		console.error('Error fetching data user:', error);
+		toast.error('Gagal memuat data user');
 	} finally {
 		loading.value = false;
 	}
@@ -244,15 +229,15 @@ watch(search, () => {
 	}, 500);
 });
 
-const deleteSiswa = async (item) => {
-	if (confirm(`Apakah Anda yakin ingin menghapus data siswa "${item.nm_siswa}" secara permanen? Data yang telah dihapus tidak dapat dikembalikan.`)) {
+const deleteUser = async (id) => {
+	if (confirm(`Apakah Anda yakin ingin menghapus data user ini secara permanen? Data yang telah dihapus tidak dapat dikembalikan.`)) {
 		try {
-			await api.delete(`/admin/data-siswa-global/${item.id}`);
-			showToast('Data siswa berhasil dihapus secara permanen', 'success');
+			await api.delete(`/admin/data-user/${id}`);
+			toast.success('Data user berhasil dihapus secara permanen');
 			fetchUsers(pagination.value.current_page);
 		} catch (error) {
-			console.error('Error deleting data siswa:', error);
-			showToast(error.response?.data?.message || 'Gagal menghapus data siswa', 'error');
+			console.error('Error deleting user:', error);
+			toast.error(error.response?.data?.message || 'Gagal menghapus data user');
 		}
 	}
 };

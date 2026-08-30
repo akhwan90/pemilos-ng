@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Admin;
+use App\Services\ActivityService;
 
 class DataUserController extends Controller
 {
@@ -54,7 +55,7 @@ class DataUserController extends Controller
         return response()->json($users);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, ActivityService $activityService)
     {
         $request->validate([
             'password' => [
@@ -81,6 +82,15 @@ class DataUserController extends Controller
         if ($request->filled('password')) {
             $admin->password = Hash::make($request->password);
             $admin->save();
+
+            $username = $request->user()->username;
+
+            $activityService->logActivity($username, 41, json_encode([
+                'id' => $id,
+                'username' => $admin->username,
+                'npsn' => $admin->npsn,
+                'level' => $admin->level
+            ]));
         }
 
         return response()->json([
@@ -89,7 +99,7 @@ class DataUserController extends Controller
         ]);
     }
 
-    public function destroy(Request $request, $id)
+    public function destroy(Request $request, $id, ActivityService $activityService)
     {
         $admin = Admin::find($id);
 
@@ -109,6 +119,15 @@ class DataUserController extends Controller
 
         $admin->tokens()->delete();
         $admin->delete();
+
+        $username = $request->user()->username;
+
+        $activityService->logActivity($username, 42, json_encode([
+            'id' => $id,
+            'username' => $admin->username,
+            'npsn' => $admin->npsn,
+            'level' => $admin->level
+        ]));
 
         return response()->json([
             'success' => true,

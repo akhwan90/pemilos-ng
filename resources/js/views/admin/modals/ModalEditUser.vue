@@ -8,7 +8,9 @@
 			</div>
 			<div>
 				<label class="block text-sm font-medium text-gray-700 mb-1">Password Baru (Opsional)</label>
-				<input v-model="form.password" type="password" placeholder="Kosongkan jika tidak ingin mengubah password" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" />
+				<input v-model="form.password" @keydown.space.prevent
+					@input="form.password = form.password.replace(/\s/g, '')"
+					type="password" placeholder="Kosongkan jika tidak ingin mengubah password" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" />
 			</div>
 			<div>
 				<label class="block text-sm font-medium text-gray-700 mb-1">Level</label>
