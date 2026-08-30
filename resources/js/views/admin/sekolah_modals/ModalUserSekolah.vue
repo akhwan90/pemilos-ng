@@ -15,11 +15,13 @@
           </div>
           <div class="flex-1 w-full">
             <label class="block text-xs font-medium text-gray-600 mb-1">Username (Min 6 Karakter)</label>
-            <input v-model="form.username" type="text" required minlength="6" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Masukkan username unik">
+            <input v-model="form.username" @keydown.space.prevent
+              @input="form.username = form.username.replace(/\s/g, '')" type="text" required minlength="6" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Masukkan username unik">
           </div>
           <div class="flex-1 w-full">
             <label class="block text-xs font-medium text-gray-600 mb-1">Password (Min 6 Karakter)</label>
-            <input v-model="form.password" type="password" required minlength="6" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Masukkan password">
+            <input v-model="form.password" @keydown.space.prevent
+              @input="form.password = form.password.replace(/\s/g, '')" type="password" required minlength="6" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Masukkan password">
           </div>
           <div class="w-full sm:w-auto">
             <BaseButton type="submit" variant="primary" :loading="isSubmitting" class="w-full sm:w-auto h-[38px]">
@@ -162,7 +164,12 @@ async function promptResetPassword(user) {
     await api.put(`/admin/data-sekolah/${props.npsn}/users/${user.id}`, { password: newPass });
     toast.success('Password berhasil direset');
   } catch (error) {
-    toast.error('Gagal reset password');
+    if (error.response?.data?.message) {
+      toast.error(error.response.data.message);
+    } else {
+      toast.error('Gagal reset password');
+    }
+    // toast.error('Gagal reset password');
   }
 }
 
@@ -174,7 +181,12 @@ async function deleteUser(id) {
     toast.success('User berhasil dihapus');
     fetchUsers();
   } catch (error) {
-    toast.error('Gagal menghapus user');
+    if (error.response?.data?.message) {
+      toast.error(error.response.data.message);
+    } else {
+      toast.error('Gagal menghapus user');
+    }
+    // toast.error('Gagal menghapus user');
   }
 }
 </script>

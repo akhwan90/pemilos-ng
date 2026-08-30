@@ -30,4 +30,8 @@ return [
     '27' => 'Hapus data siswa',
     '28' => 'Tambah DPT Banyak',
     '30' => 'TPS mengakhiri pemilihan',
+
+    '40' => 'Admin membuat user',
+    '41' => 'Admin edit user (password)',
+    '42' => 'Admin hapus user',
 ];
