@@ -219,10 +219,10 @@ class DataSiswaController extends Controller
         }
 
         $request->validate([
-            'alasan_hapus' => 'required|integer|in:2,3' // 2: Lulus, 3: Pindah
+            'alasan' => 'required|integer|in:2,3' // 2: Lulus, 3: Pindah
         ]);
 
-        $success = $this->tryDeleteSiswa($id, $npsn, $user_id, $request->alasan_hapus);
+        $success = $this->tryDeleteSiswa($id, $npsn, $user_id, $request->alasan);
 
         if (!$success) {
             return response()->json(['success' => false, 'message' => 'Data tidak ditemukan atau siswa sudah masuk di TPS tahun aktif sehingga tidak bisa dihapus.'], 422);
@@ -248,14 +248,14 @@ class DataSiswaController extends Controller
         $request->validate([
             'ids' => 'required|array',
             'ids.*' => 'integer',
-            'alasan_hapus' => 'required|integer|in:2,3' // 2: Lulus, 3: Pindah
+            'alasan' => 'required|integer|in:2,3' // 2: Lulus, 3: Pindah
         ]);
 
         $affected = 0;
         $failed = 0;
 
         foreach ($request->ids as $id) {
-            if ($this->tryDeleteSiswa($id, $npsn, $user_id, $request->alasan_hapus)) {
+            if ($this->tryDeleteSiswa($id, $npsn, $user_id, $request->alasan)) {
                 $affected++;
             } else {
                 $failed++;

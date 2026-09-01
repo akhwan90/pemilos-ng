@@ -111,8 +111,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/admin-sekolah/siswa', [DataSiswaController::class, 'index']);
     Route::get('/admin-sekolah/siswa/kelas', [DataSiswaController::class, 'listKelas']);
     Route::post('/admin-sekolah/siswa', [DataSiswaController::class, 'store']);
-    Route::post('/admin-sekolah/siswa/bulk-delete', [DataSiswaController::class, 'bulkDestroy']);
     Route::put('/admin-sekolah/siswa/{id}', [DataSiswaController::class, 'update']);
+    Route::post('/admin-sekolah/siswa/bulk-delete', [DataSiswaController::class, 'bulkDestroy']);
     Route::post('/admin-sekolah/siswa/{id}/delete', [DataSiswaController::class, 'destroy']);
     Route::get('/admin-sekolah/siswa/excel', [DataSiswaController::class, 'excel']);
 

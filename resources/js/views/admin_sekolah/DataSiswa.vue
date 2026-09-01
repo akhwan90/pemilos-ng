@@ -160,6 +160,7 @@
                                     :value="item.id"
                                     v-model="selectedIds"
                                     class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 w-4 h-4"
+                                    :id="`row-${index}`"
                                 />
                             </td>
                             <td class="px-4 py-3 text-center">
@@ -171,10 +172,10 @@
                                 }}
                             </td>
                             <td class="px-4 py-3 font-mono text-gray-600">
-                                {{ item.nisn }}
+                                <label :for="`row-${index}`">{{ item.nisn }}</label>
                             </td>
                             <td class="px-4 py-3 font-medium text-gray-800">
-                                {{ item.nm_siswa }}
+                                <label :for="`row-${index}`">{{ item.nm_siswa }}</label>
                             </td>
                             <td class="px-4 py-3 text-center">
                                 {{ item.kelas }}
@@ -566,6 +567,9 @@ async function fetchSiswa(page = 1) {
 }
 
 function openModal(mode, item = null) {
+    console.log("item:", item);
+    console.log("selectedIds", selectedIds.value);
+
     isEditMode.value = mode === "edit";
     if (isEditMode.value) {
         formId.value = item.id;
@@ -652,20 +656,19 @@ function openSingleDeleteModal(id) {
 // Modifikasi submitBulkDelete untuk menangani single delete
 async function submitBulkDelete() {
     isSubmittingBulkDelete.value = true;
+
     try {
         if (singleDeleteId.value !== null) {
             // Single delete
-            await api.delete(`/admin-sekolah/siswa/${singleDeleteId.value}`, {
-                data: { alasan: bulkDeleteReason.value },
+            await api.post(`/admin-sekolah/siswa/${singleDeleteId.value}/delete`, {
+                alasan: bulkDeleteReason.value,
             });
             toast.success("Siswa berhasil dihapus.");
         } else if (selectedIds.value.length > 0) {
             // Bulk delete
-            await api.delete("/admin-sekolah/siswa/bulk-delete", {
-                data: {
-                    ids: selectedIds.value,
-                    alasan: bulkDeleteReason.value,
-                },
+            await api.post("/admin-sekolah/siswa/bulk-delete", {
+                ids: selectedIds.value,
+                alasan: bulkDeleteReason.value,
             });
             toast.success("Siswa terpilih berhasil dihapus.");
             selectedIds.value = []; // Kosongkan pilihan setelah bulk delete
