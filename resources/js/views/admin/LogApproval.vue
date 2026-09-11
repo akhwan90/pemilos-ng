@@ -24,6 +24,7 @@
 					<thead>
 						<tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider border-b border-gray-200">
 							<th class="px-6 py-4 font-medium">No</th>
+							<th class="px-6 py-4 font-medium">Aksi</th>
 							<th class="px-6 py-4 font-medium">NPSN Pemohon</th>
 							<th class="px-6 py-4 font-medium">NISN</th>
 							<th class="px-6 py-4 font-medium">Terdaftar Di</th>
@@ -34,7 +35,6 @@
 							<th class="px-6 py-4 font-medium">Tanggal Dibuat</th>
 							<th class="px-6 py-4 font-medium">Tanggal Approve</th>
 							<th class="px-6 py-4 font-medium">User Approve</th>
-							<th class="px-6 py-4 font-medium">Aksi</th>
 						</tr>
 					</thead>
 					<tbody class="divide-y divide-gray-200 text-sm">
@@ -63,6 +63,19 @@
 							<td class="px-6 py-4 whitespace-nowrap text-gray-900 font-medium">
 								{{ pagination.from + index }}
 							</td>
+							<td class="px-6 py-4 whitespace-nowrap text-center">
+								<BaseButton
+									v-if="Number(item.status) === 0"
+									variant="success"
+									@click="approvePermohonan(item)"
+									:disabled="isProcessing"
+									:loading="isProcessing"
+									class="inline-flex items-center gap-1.5 !px-3 !py-1.5 !text-xs"
+								>
+									<svg v-if="!isProcessing" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+									Approve
+								</BaseButton>
+							</td>
 							<td class="px-6 py-4">
 								<div class="font-medium text-gray-900">{{ item.user_pemohon_npsn }}</div>
 								<div class="text-xs text-gray-500">{{ item.nama_sekolah_pemohon || '-' }}</div>
@@ -84,9 +97,9 @@
 								{{ item.kelas_baru || '-' }}
 							</td>
 							<td class="px-6 py-4 whitespace-nowrap">
-								<StatusBadge 
-									:status="Number(item.status) === 1 ? 'disetujui' : (Number(item.status) === 2 ? 'ditolak' : 'baru')" 
-									:label="Number(item.status) === 1 ? 'Sudah Diapprove' : (Number(item.status) === 2 ? 'Ditolak' : 'Belum Diapprove')" 
+								<StatusBadge
+									:status="Number(item.status) === 1 ? 'disetujui' : (Number(item.status) === 2 ? 'ditolak' : 'baru')"
+									:label="Number(item.status) === 1 ? 'Sudah Diapprove' : (Number(item.status) === 2 ? 'Ditolak' : 'Belum Diapprove')"
 								/>
 							</td>
 							<td class="px-6 py-4 whitespace-nowrap text-gray-500">
@@ -97,19 +110,6 @@
 							</td>
 							<td class="px-6 py-4 whitespace-nowrap text-gray-700">
 								{{ Number(item.status) === 1 ? (item.user_pengapprove || '-') : '-' }}
-							</td>
-							<td class="px-6 py-4 whitespace-nowrap text-center">
-								<BaseButton 
-									v-if="Number(item.status) === 0"
-									variant="success"
-									@click="approvePermohonan(item)" 
-									:disabled="isProcessing"
-									:loading="isProcessing"
-									class="inline-flex items-center gap-1.5 !px-3 !py-1.5 !text-xs"
-								>
-									<svg v-if="!isProcessing" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
-									Approve
-								</BaseButton>
 							</td>
 						</tr>
 					</tbody>

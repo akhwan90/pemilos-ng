@@ -41,13 +41,13 @@ class LogApprovalController extends Controller
                   ->orWhere('aproval_pindah_sekolah.nama_baru', 'like', "%{$cari}%");
             });
         }
-        
+
         // Filter status (opsional jika dibutuhkan di frontend nanti)
         if ($request->has('status') && $request->status !== '') {
             $query->where('aproval_pindah_sekolah.status', $request->status);
         }
 
-        $logs = $query->orderBy('aproval_pindah_sekolah.created_at', 'desc')->paginate(15);
+        $logs = $query->orderBy('aproval_pindah_sekolah.created_at', 'desc')->paginate(500);
 
         return response()->json($logs);
     }
