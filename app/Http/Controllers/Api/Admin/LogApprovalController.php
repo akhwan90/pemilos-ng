@@ -46,8 +46,10 @@ class LogApprovalController extends Controller
         if ($request->has('status') && $request->status !== '') {
             $query->where('aproval_pindah_sekolah.status', $request->status);
         }
-
-        $logs = $query->orderBy('aproval_pindah_sekolah.created_at', 'desc')->paginate(500);
+        $logs = $query
+        ->orderBy('aproval_pindah_sekolah.status', 'asc')
+        ->orderBy('aproval_pindah_sekolah.created_at', 'desc')
+        ->paginate(500);
 
         return response()->json($logs);
     }

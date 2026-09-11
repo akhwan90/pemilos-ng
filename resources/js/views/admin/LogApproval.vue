@@ -75,6 +75,7 @@
 									<svg v-if="!isProcessing" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
 									Approve
 								</BaseButton>
+								<div v-else>-</div>
 							</td>
 							<td class="px-6 py-4">
 								<div class="font-medium text-gray-900">{{ item.user_pemohon_npsn }}</div>
