@@ -87,7 +87,7 @@
                 <span class="inline-flex items-center text-xs font-medium" :class="item.jk === 'L' ? 'text-indigo-600' : 'text-pink-600'">
                   <svg v-if="item.jk === 'L'" class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                   <svg v-else class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                  {{ item.jk === 'L' ? 'Laki-laki' : 'Perempuan' }}
+                  {{ item.jk === 1 ? 'Laki-laki' : 'Perempuan' }}
                 </span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
