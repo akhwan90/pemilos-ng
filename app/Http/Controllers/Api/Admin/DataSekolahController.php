@@ -23,7 +23,7 @@ class DataSekolahController extends Controller
                 DB::raw("(SELECT COUNT(tb_tps_setting.id) FROM tb_tps_setting WHERE tb_tps_setting.npsn = tb_sekolah.npsn AND tb_tps_setting.is_generate_token = 1 AND tb_tps_setting.tahun = '{$tahun}') AS jml_tps_generate_token"),
                 DB::raw("(SELECT COUNT(tb_siswa_tps.id) FROM tb_siswa_tps WHERE tb_siswa_tps.npsn = tb_sekolah.npsn AND tb_siswa_tps.tahun = '{$tahun}') AS jml_dpt"),
                 DB::raw("(SELECT COUNT(tb_siswa_tps.id) FROM tb_siswa_tps WHERE tb_siswa_tps.npsn = tb_sekolah.npsn AND tb_siswa_tps.tahun = '{$tahun}' AND tb_siswa_tps.pilihan IS NOT NULL) AS jml_memilih"),
-                DB::raw("(SELECT COUNT(tb_siswa.id) FROM tb_siswa WHERE tb_siswa.npsn = tb_sekolah.npsn) AS jml_siswa")
+                DB::raw("(SELECT COUNT(tb_siswa.id) FROM tb_siswa WHERE tb_siswa.npsn = tb_sekolah.npsn AND tb_siswa.status = 1) AS jml_siswa")
             ])
             ->where('is_delete', 0);
 

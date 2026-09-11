@@ -30,7 +30,8 @@ class DataSiswaController extends Controller
         $query = DB::table('tb_siswa')
             ->where('npsn', $npsn)
             // ->where('tahun', $tahun)
-            ->where('status', 1); // 1 = Aktif, 0 = Terhapus/Nonaktif
+            ->where('status', 1)  // 1 = Aktif, 0 = Terhapus/Nonaktif
+            ;
 
         if (!empty($search)) {
             $query->where(function($q) use ($search) {
@@ -295,7 +296,8 @@ class DataSiswaController extends Controller
 
         // Filter berdasarkan sekolah yang login
         $query->where('npsn', $npsn)
-        ->where('status', 1);
+        ->where('status', 1)
+        ;
 
         // Terapkan filter pencarian jika ada
         // if (!empty($searchQuery)) {
