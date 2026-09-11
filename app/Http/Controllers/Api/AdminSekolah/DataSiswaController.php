@@ -35,7 +35,9 @@ class DataSiswaController extends Controller
         if (!empty($search)) {
             $query->where(function($q) use ($search) {
                 $q->where('nm_siswa', 'like', "%{$search}%")
-                  ->orWhere('nisn', 'like', "%{$search}%");
+                  ->orWhere('nisn', 'like', "%{$search}%")
+                  ->orWhere('kelas', 'like', "%{$search}%")
+                  ;
             });
         }
 
@@ -60,7 +62,6 @@ class DataSiswaController extends Controller
         $kelas = DB::table('tb_siswa')
             ->select('kelas')
             ->where('npsn', $npsn)
-            ->where('tahun', $tahun)
             ->where('status', 1)
             ->whereNotNull('kelas')
             ->where('kelas', '!=', '')
@@ -278,7 +279,7 @@ class DataSiswaController extends Controller
      *
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
-    public function excel(Request $request) 
+    public function excel(Request $request)
     {
         // Dapatkan ID sekolah dari user yang sedang login
         // Asumsi: User yang login memiliki relasi 'sekolah' atau ID sekolah ada di tabel users
