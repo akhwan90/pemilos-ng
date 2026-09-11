@@ -5,7 +5,7 @@
 				<h2 class="text-xl font-bold text-gray-800">Data Sekolah & Progres Pemilihan</h2>
 				<p class="text-sm text-gray-500">Monitoring progres pemilihan di setiap sekolah yang terdaftar.</p>
 			</div>
-			<div v-if="auth.user?.level === 1" class="flex gap-2">
+			<div v-if="auth.user?.level === 1 || auth.user?.level === 4" class="flex gap-2">
 				<BaseButton @click="openModal('edit')" variant="primary">
 					<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
