@@ -24,7 +24,7 @@ class UploadSiswaController extends Controller
         $tahun = env('TAHUN_AKTIF', date('Y'));
 
         $history = DB::table('upload_job')
-            ->where('username', $username)
+            // ->where('username', $username)
             ->whereYear('create_at', $tahun)
             ->orderBy('id', 'desc')
             ->get();
@@ -39,7 +39,7 @@ class UploadSiswaController extends Controller
     {
         $user = $request->user();
         $tahun = env('TAHUN_AKTIF', date('Y'));
-        
+
         $cek = $this->waktuPemilihanService->cekJadwalBuka('input_data_dps', $tahun, $user->npsn);
         if (!$cek['is_open']) {
             return response()->json(['success' => false, 'message' => 'Upload ditolak: ' . $cek['message']], 403);
