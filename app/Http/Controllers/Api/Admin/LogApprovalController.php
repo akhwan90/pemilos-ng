@@ -92,7 +92,8 @@ class LogApprovalController extends Controller
                     'jk' => $approval->jk_baru,
                     'difabel' => $approval->difabel_baru,
                     'no_wa' => $approval->nomor_wa_baru,
-                    'email' => $approval->email_baru
+                    'email' => $approval->email_baru,
+                    'status' => 1,
                 ]);
 
             DB::commit();

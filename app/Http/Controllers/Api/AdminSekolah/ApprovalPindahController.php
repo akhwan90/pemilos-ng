@@ -18,7 +18,7 @@ class ApprovalPindahController extends Controller
 
         $data = DB::table('aproval_pindah_sekolah')
             ->select(
-                'aproval_pindah_sekolah.*', 
+                'aproval_pindah_sekolah.*',
                 'tb_siswa.nm_siswa as nama_siswa_asal',
                 'sekolah_tujuan.nama_sekolah as nama_sekolah_tujuan',
                 'sekolah_asal.nama_sekolah as nama_sekolah_asal'
@@ -80,7 +80,8 @@ class ApprovalPindahController extends Controller
                     'jk' => $approval->jk_baru,
                     'difabel' => $approval->difabel_baru,
                     'no_wa' => $approval->nomor_wa_baru,
-                    'email' => $approval->email_baru
+                    'email' => $approval->email_baru,
+                    'status' => 1,
                 ]);
 
             DB::commit();
