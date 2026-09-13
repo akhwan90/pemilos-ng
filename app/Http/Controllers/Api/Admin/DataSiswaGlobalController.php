@@ -52,23 +52,38 @@ class DataSiswaGlobalController extends Controller
         ];
 
         if (!empty($queryString)) {
-            // Regex memecah: (kolom) (operator) ('nilai_teks' atau nilai_angka)
-            $pattern = '/^([a-zA-Z0-9_\.]+)\s*(==|=|!=|<>|<=|>=|<|>|like)\s*(?:\'([^\']*)\'|([0-9]+))$/i';
+            if (trim($queryString) === 'tidak normal') {
+                $query->where(function ($q) {
+                    // 1. Panjang NISN < 6 atau null
+                    $q->whereRaw('LENGTH(tb_siswa.nisn) < 6')
+                        ->orWhereNull('tb_siswa.nisn')
 
-            if (preg_match($pattern, trim($queryString), $matches)) {
-                $column   = $matches[1];
-                $operator = strtolower($matches[2]);
+                        // 2. NISN mengandung karakter selain angka (huruf / simbol)
+                        ->orWhereRaw("tb_siswa.nisn REGEXP '[^0-9]'")
 
-                // Ambil nilai teks (grup 3) atau angka (grup 4)
-                $value    = $matches[3] !== '' ? $matches[3] : $matches[4];
+                        // 3. Jenis kelamin bukan 1 dan bukan 2 (termasuk 0 atau null)
+                        ->orWhereNotIn('tb_siswa.jk', [1, 2])
+                        ->orWhereNull('tb_siswa.jk');
+                });
+            } else {
+                // Regex memecah: (kolom) (operator) ('nilai_teks' atau nilai_angka)
+                $pattern = '/^([a-zA-Z0-9_\.]+)\s*(==|=|!=|<>|<=|>=|<|>|like)\s*(?:\'([^\']*)\'|([0-9]+))$/i';
 
-                // Normalisasi operator '==' ke '='
-                if ($operator === '==') {
-                    $operator = '=';
-                }
+                if (preg_match($pattern, trim($queryString), $matches)) {
+                    $column   = $matches[1];
+                    $operator = strtolower($matches[2]);
 
-                if (in_array($column, $allowedColumns)) {
-                    $query->where($column, $operator, $value);
+                    // Ambil nilai teks (grup 3) atau angka (grup 4)
+                    $value    = $matches[3] !== '' ? $matches[3] : $matches[4];
+
+                    // Normalisasi operator '==' ke '='
+                    if ($operator === '==') {
+                        $operator = '=';
+                    }
+
+                    if (in_array($column, $allowedColumns)) {
+                        $query->where($column, $operator, $value);
+                    }
                 }
             }
         }
