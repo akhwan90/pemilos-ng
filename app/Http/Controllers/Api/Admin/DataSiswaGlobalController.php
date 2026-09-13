@@ -52,13 +52,20 @@ class DataSiswaGlobalController extends Controller
         ];
 
         if (!empty($queryString)) {
-            // Regex memecah: (nama_kolom) (operator) '(nilai)'
-            $pattern = '/^([a-zA-Z0-9_\.]+)\s+(like|=|>|<|>=|<=)\s+\'([^\']*)\'$/i';
+            // Regex memecah: (kolom) (operator) ('nilai_teks' atau nilai_angka)
+            $pattern = '/^([a-zA-Z0-9_\.]+)\s*(==|=|!=|<>|<=|>=|<|>|like)\s*(?:\'([^\']*)\'|([0-9]+))$/i';
 
             if (preg_match($pattern, trim($queryString), $matches)) {
                 $column   = $matches[1];
                 $operator = strtolower($matches[2]);
-                $value    = $matches[3];
+
+                // Ambil nilai teks (grup 3) atau angka (grup 4)
+                $value    = $matches[3] !== '' ? $matches[3] : $matches[4];
+
+                // Normalisasi operator '==' ke '='
+                if ($operator === '==') {
+                    $operator = '=';
+                }
 
                 if (in_array($column, $allowedColumns)) {
                     $query->where($column, $operator, $value);
