@@ -87,24 +87,89 @@ class DataSiswaController extends Controller
         }
 
         $request->validate([
-            'nisn' => 'required|string|max:100|unique:tb_siswa,nisn',
-            'nm_siswa' => 'required|string|max:200',
-            'jk' => 'required|integer|in:1,2',
-            'kelas' => 'required|string|max:50',
-            'difabel' => 'required|integer'
+            'nisn' => 'required|digits_between:6,14',
+            'nm_siswa' => 'required|min:3',
+            'jk' => 'required|in:1,2|numeric',
+            'kelas' => 'nullable',
+            'difabel' => 'nullable|in:0,1,2,3,4,5|numeric',
+            // 'hapus_time' => 'nullable|date_format:Y-m-d H:i:s',
+            // 'npsn' => 'nullable|min:4|max:16|numeric',
+            // 'status' => 'required|in:0,1,2,3|numeric',
+            // 'tahun' => 'required',
+
+            // 'nisn' => 'required|string|max:100',
+            // 'nm_siswa' => 'required|string|max:200',
+            // 'jk' => 'required|integer|in:1,2',
+            // 'kelas' => 'required|string|max:50',
+            // 'difabel' => 'required|integer'
         ]);
 
-        DB::table('tb_siswa')->insert([
-            'nisn' => $request->nisn,
-            'nm_siswa' => $request->nm_siswa,
-            'jk' => $request->jk,
-            'kelas' => $request->kelas,
-            'difabel' => $request->difabel,
-            'npsn' => $npsn,
-            'tahun' => env('TAHUN_AKTIF', date('Y')),
-            'status' => 1,
-            'create_at' => date('Y-m-d H:i:s')
-        ]);
+        $cekNisn = DB::table('tb_siswa')
+        ->where('nisn', $request->nisn)
+        ->first();
+
+        $jenisUpdate = '';
+        $success = false;
+        $message = 'Data siswa gagal disimpan';
+
+        if ($cekNisn == null) {
+            DB::table('tb_siswa')->insert([
+                'nisn' => $request->nisn,
+                'nm_siswa' => $request->nm_siswa,
+                'jk' => $request->jk,
+                'kelas' => $request->kelas,
+                'difabel' => $request->difabel,
+                'npsn' => $npsn,
+                'tahun' => env('TAHUN_AKTIF', date('Y')),
+                'status' => 1,
+                'create_at' => date('Y-m-d H:i:s')
+            ]);
+            $jenisUpdate = 'insert baru';
+            $message = 'Data disimpan';
+            $success = true;
+        } else {
+            // jika status = 1, maka masuk approval
+            if ($cekNisn->status == 1) {
+                $sekolah_lama = DB::table('tb_sekolah')->where('npsn', $cekNisn->npsn)->first();
+                $nama_sekolah_lama = $sekolah_lama ? $sekolah_lama->nama_sekolah : $cekNisn->npsn;
+
+
+                // Masukkan ke tabel aproval_pindah_sekolah
+                DB::table('aproval_pindah_sekolah')->updateOrInsert(
+                    ['nisn' => $cekNisn->nisn],
+                    [
+                        'user_pemohon' => $request->user()->username,
+                        'user_pemohon_npsn' => $npsn,
+                        'npsn' => $cekNisn->npsn ?? 'NO_NPSN',
+                        'status' => 0,
+                        'created_at' => now(),
+                        'nama_baru' => $request->nm_siswa,
+                        'jk_baru' => $request->jk,
+                        'kelas_baru' => $request->kelas,
+                        'difabel_baru' => $request->difabel
+                    ]
+                );
+                $message = 'Data siswa masih di sekolah lain. Status : Diajukan approval pindah, dan menunggu approval';
+                $success = true;
+                $jenisUpdate = 'pengajuan approval';
+            } else if ($cekNisn->status == 2 || $cekNisn->status == 3) {
+                $update = DB::table('tb_siswa')
+                ->where('id', $cekNisn->id)
+                ->update([
+                    'nm_siswa'=>$request->nm_siswa,
+                    'jk'=>$request->jk,
+                    'kelas'=>$request->kelas,
+                    'difabel'=>$request->difabel,
+                    'status'=>1,
+                    'npsn'=>$npsn,
+                ]);
+                $message = 'Data disimpan';
+                $success = true;
+                $jenisUpdate = 'aquisisi npsn';
+            }
+            // jika status = 2, 3, maka auto akuisisi, update npsn nya, dan set status = 1
+
+        }
 
         $activityService->logActivity($request->user()->username, 25, json_encode([
             'nisn' => $request->nisn,
@@ -112,11 +177,13 @@ class DataSiswaController extends Controller
             'jk' => $request->jk,
             'kelas' => $request->kelas,
             'difabel' => $request->difabel,
+            'jenis'=>$jenisUpdate,
         ]));
 
         return response()->json([
-            'success' => true,
-            'message' => 'Data Siswa berhasil ditambahkan'
+            'success' => $success,
+            'message' => $message,
+            'jenis'=>$jenisUpdate,
         ]);
     }
 
