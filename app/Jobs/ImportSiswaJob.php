@@ -85,7 +85,7 @@ class ImportSiswaJob implements ShouldQueue
 
                         // Validasi difabel (hanya menerima angka)
                         $difabel = null;
-                        if (is_numeric($difabel_str)) {
+                        if (is_numeric($difabel_str) || $difabel_str == '') {
                             $difabel = (int)$difabel_str;
                         }
 
@@ -152,7 +152,14 @@ class ImportSiswaJob implements ShouldQueue
                                 } else {
                                     if ($cek_nisn->npsn == null) {
                                         // jika npsn null, maka update npsn menjadi npsn sekolah yang import
-                                        DB::table('tb_siswa')->where('nisn', $nisn)->update(['npsn' => $this->npsn]);
+                                        DB::table('tb_siswa')->where('nisn', $nisn)->update([
+                                            'npsn' => $this->npsn,
+                                            'nm_siswa' => $nama,
+                                            'jk' => $jk,
+                                            'kelas' => $kelas,
+                                            'difabel' => $difabel,
+                                            'status' => 1
+                                        ]);
                                         $this->logToDb("Berhasil update {$nama} (NISN: {$nisn}). NPSN sebelumnya NULL", 1, $nisn);
                                     } else {
                                         // Beda sekolah (Pindah Sekolah)
