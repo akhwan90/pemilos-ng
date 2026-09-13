@@ -591,11 +591,13 @@ async function submitForm() {
     isSubmitting.value = true;
     try {
         if (isEditMode.value) {
-            await api.put(`/admin-sekolah/siswa/${formId.value}`, form.value);
-            toast.success("Data siswa berhasil diperbarui.");
+            const req = await api.put(`/admin-sekolah/siswa/${formId.value}`, form.value);
+
+            toast.success(req.data?.message);
         } else {
-            await api.post("/admin-sekolah/siswa", form.value);
-            toast.success("Siswa berhasil ditambahkan.");
+            const req = await api.post("/admin-sekolah/siswa", form.value);
+
+            toast.success(req.data?.message);
         }
         isModalOpen.value = false;
         fetchSiswa(pagination.current_page);
