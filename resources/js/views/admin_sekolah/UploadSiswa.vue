@@ -60,7 +60,7 @@
             </tr>
             <tr v-else v-for="(item, index) in history" :key="item.id" class="bg-white border-b hover:bg-gray-50">
               <td class="px-4 py-3 text-center">{{ index + 1 }}</td>
-              <td class="px-4 py-3 font-medium">{{ item.file_excel }}</td>
+              <td class="px-4 py-3 font-medium"><a :href="`/uploads/xlsx_temp/${item.file_excel}`" target="_blank">{{ item.file_excel }}</a></td>
               <td class="px-4 py-3 whitespace-nowrap">{{ item.create_at }}</td>
               <td class="px-4 py-3 whitespace-nowrap">{{ item.finish_at || '-' }}</td>
               <td class="px-4 py-3 text-center">
