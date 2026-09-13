@@ -33,6 +33,7 @@ services:
       # Mount folder storage agar file upload (foto) dan Logs persisten
       - ./storage/app/public:/var/www/html/storage/app/public
       - ./storage/logs:/var/www/html/storage/logs
+      - ./public/uploads:/var/www/html/public/uploads
 networks:
   pemilos_app_network: 
     driver: bridge
