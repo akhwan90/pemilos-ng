@@ -42,8 +42,8 @@
 		</BaseCard>
 
 		<!-- Table Card -->
-		<BaseCard class="overflow-visible p-0">
-			<div class="overflow-visible min-h-[300px]">
+		<BaseCard>
+			<div class="overflow-x-auto min-h-[300px]">
 				<table class="w-full text-sm text-left">
 					<thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b">
 						<tr>
