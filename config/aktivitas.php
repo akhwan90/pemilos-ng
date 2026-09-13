@@ -34,4 +34,5 @@ return [
     '40' => 'Admin membuat user',
     '41' => 'Admin edit user (password)',
     '42' => 'Admin hapus user',
+    '43' => 'Admin approve siswa pindah',
 ];

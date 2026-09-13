@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Services\ActivityService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -54,7 +55,7 @@ class LogApprovalController extends Controller
         return response()->json($logs);
     }
 
-    public function approve(Request $request, $id)
+    public function approve(Request $request, $id, ActivityService $activityService)
     {
         $user = auth()->user();
 
@@ -95,6 +96,12 @@ class LogApprovalController extends Controller
                     'email' => $approval->email_baru,
                     'status' => 1,
                 ]);
+
+            $activityService->logActivity($user->username, 43, json_encode([
+                'nisn'=> $approval->nisn,
+                'nm_siswa'=> $approval->nama_baru,
+                'npsn' => $approval->user_pemohon_npsn,
+            ]));
 
             DB::commit();
 
