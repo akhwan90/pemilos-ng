@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\NisnHistory;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -135,6 +136,17 @@ class ImportSiswaJob implements ShouldQueue
                                     'create_at' => date('Y-m-d H:i:s')
                                 ]);
 
+                                NisnHistory::create([
+                                    'nisn' => $nisn,
+                                    'npsn' => $this->npsn,
+                                    'nama' => $nama,
+                                    'kelas' => $kelas,
+                                    'jk' => $jk,
+                                    'difabel' => $difabel,
+                                    'status' => 1,
+                                    'keterangan' => 'Insert oleh Admin Sekolah Via Import : ' . $this->username,
+                                ]);
+
                                 $this->logToDb("Berhasil insert {$nama} (NISN: {$nisn})", 1, $nisn);
                             } else {
                                 // Jika ada, cek npsn
@@ -148,6 +160,18 @@ class ImportSiswaJob implements ShouldQueue
                                         'difabel' => $difabel,
                                         'status' => 1 // Pastikan aktif
                                     ]);
+
+                                    NisnHistory::create([
+                                        'nisn' => $cek_nisn->nisn,
+                                        'npsn' => $cek_nisn->npsn,
+                                        'nama' => $cek_nisn->nm_siswa,
+                                        'kelas' => $cek_nisn->kelas,
+                                        'jk' => $cek_nisn->jk,
+                                        'difabel' => $cek_nisn->difabel,
+                                        'status' => $cek_nisn->status,
+                                        'keterangan' => 'Update oleh Admin Sekolah Via Import : ' . $this->username.', auto acquire : NPSN=NPSN',
+                                    ]);
+
                                     $this->logToDb("Berhasil update {$nama} (NISN: {$nisn})", 1, $nisn);
                                 } else {
                                     if ($cek_nisn->npsn == null) {
@@ -160,6 +184,18 @@ class ImportSiswaJob implements ShouldQueue
                                             'difabel' => $difabel,
                                             'status' => 1
                                         ]);
+
+                                        NisnHistory::create([
+                                            'nisn' => $cek_nisn->nisn,
+                                            'npsn' => $cek_nisn->npsn,
+                                            'nama' => $cek_nisn->nm_siswa,
+                                            'kelas' => $cek_nisn->kelas,
+                                            'jk' => $cek_nisn->jk,
+                                            'difabel' => $cek_nisn->difabel,
+                                            'status' => $cek_nisn->status,
+                                            'keterangan' => 'Update oleh Admin Sekolah Via Import : ' . $this->username . ', auto acquire : NPSN=null',
+                                        ]);
+
                                         $this->logToDb("Berhasil update {$nama} (NISN: {$nisn}). NPSN sebelumnya NULL", 1, $nisn);
                                     } else {
                                         // Beda sekolah (Pindah Sekolah)
