@@ -299,6 +299,19 @@ class DataSiswaController extends Controller
                 'hapus_user_id' => $user_id
             ]) > 0;
 
+
+
+            NisnHistory::create([
+                'nisn' => $siswa->nisn,
+                'npsn' => $npsn,
+                'nama' => $siswa->nm_siswa,
+                'kelas' => $siswa->kelas,
+                'jk' => $siswa->jk,
+                'difabel' => $siswa->difabel,
+                'status' => $alasan_hapus,
+                'keterangan' => 'Update oleh Admin Sekolah : userid: '.$user_id
+            ]);
+
         if ($ret) {
             $activityService = new \App\Services\ActivityService();
 
