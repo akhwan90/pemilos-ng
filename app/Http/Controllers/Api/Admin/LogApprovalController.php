@@ -84,14 +84,17 @@ class LogApprovalController extends Controller
                     'user_pengapprove' => $user->username
                 ]);
 
+            $dataSiswa = DB::table('tb_siswa')->where('nisn', $approval->nisn)
+            ->first();
+
             NisnHistory::create([
-                'nisn' => $approval->nisn,
-                'npsn' => $approval->npsn,
-                'nama' => $approval->nm_siswa,
-                'kelas' => $approval->kelas,
-                'jk' => $approval->jk,
-                'difabel' => $approval->difabel,
-                'status' => $approval->status,
+                'nisn' => $dataSiswa->nisn,
+                'npsn' => $dataSiswa->npsn,
+                'nama' => $dataSiswa->nm_siswa,
+                'kelas' => $dataSiswa->kelas,
+                'jk' => $dataSiswa->jk,
+                'difabel' => $dataSiswa->difabel,
+                'status' => $dataSiswa->status,
                 'keterangan' => 'Approval oleh Admin :' . $request->user()->username.', userid: '.$request->user()->id
             ]);
 
