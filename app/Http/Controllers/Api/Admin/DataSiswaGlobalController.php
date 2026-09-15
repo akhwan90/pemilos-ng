@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\NisnHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class DataSiswaGlobalController extends Controller
 {
@@ -20,6 +21,8 @@ class DataSiswaGlobalController extends Controller
         $search = $request->query('cari');
         $filterNpsn = $request->query('npsn');
         $queryString = $request->query('query');
+
+        DB::enableQueryLog();
 
         $query = DB::table('tb_siswa')
             ->leftJoin('tb_sekolah', 'tb_siswa.npsn', '=', 'tb_sekolah.npsn')
@@ -42,6 +45,7 @@ class DataSiswaGlobalController extends Controller
         $allowedColumns = [
             'tb_siswa.nisn',
             'tb_siswa.nm_siswa',
+            'tb_siswa.npsn',
             'tb_siswa.jk',
             'tb_siswa.kelas',
             'tb_siswa.difabel',
@@ -93,6 +97,9 @@ class DataSiswaGlobalController extends Controller
                       ->orderBy('tb_siswa.kelas', 'asc')
                       ->orderBy('tb_siswa.nm_siswa', 'asc')
                       ->paginate(50);
+        $queryLog = DB::getQueryLog();
+
+        Log::info('querylog', $queryLog);
 
         return response()->json($siswa);
     }
