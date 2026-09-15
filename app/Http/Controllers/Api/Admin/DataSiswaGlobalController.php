@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\NisnHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -111,10 +112,22 @@ class DataSiswaGlobalController extends Controller
             'tahun'=>'required',
         ]);
         
+        $dataLama = DB::table('tb_siswa')->where('id', $id)->first();
 
         $siswa = DB::table('tb_siswa')
         ->where('id', $id)
         ->update($validated);
+
+        NisnHistory::create([
+            'nisn' => $dataLama->nisn,
+            'npsn' => $dataLama->npsn,
+            'nama' => $dataLama->nm_siswa,
+            'kelas' => $dataLama->kelas,
+            'jk' => $dataLama->jk,
+            'difabel' => $dataLama->difabel,
+            'status' => $dataLama->status,
+            'keterangan' => 'Pembaruan oleh ' . $request->user()->username.', userid: '.$request->user()->id
+        ]);
 
         return response()->json(['message'=>'Data berhasil diupdate']);
     }
@@ -125,8 +138,21 @@ class DataSiswaGlobalController extends Controller
         if ($request->user()->level != 1) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
+        $dataSiswa = DB::table('tb_siswa')->where('id', $id)->first();
+        
+        NisnHistory::create([
+            'nisn' => $dataSiswa->nisn,
+            'npsn' => $dataSiswa->npsn,
+            'nama' => $dataSiswa->nm_siswa,
+            'kelas' => $dataSiswa->kelas,
+            'jk' => $dataSiswa->jk,
+            'difabel' => $dataSiswa->difabel,
+            'status' => $dataSiswa->status,
+            'keterangan' => 'Hapus permanen oleh ' . $request->user()->username.', userid: '.$request->user()->id
+        ]);
 
         $deleted = DB::table('tb_siswa')->where('id', $id)->delete();
+
 
         if ($deleted) {
             return response()->json(['message' => 'Data siswa berhasil dihapus secara permanen.']);

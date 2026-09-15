@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\NisnHistory;
 use App\Services\ActivityService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -82,6 +83,17 @@ class LogApprovalController extends Controller
                     'disetujui_at' => now(),
                     'user_pengapprove' => $user->username
                 ]);
+
+            NisnHistory::create([
+                'nisn' => $approval->nisn,
+                'npsn' => $approval->npsn,
+                'nama' => $approval->nm_siswa,
+                'kelas' => $approval->kelas,
+                'jk' => $approval->jk,
+                'difabel' => $approval->difabel,
+                'status' => $approval->status,
+                'keterangan' => 'Approval oleh Admin :' . $request->user()->username.', userid: '.$request->user()->id
+            ]);
 
             // Update the student record
             DB::table('tb_siswa')

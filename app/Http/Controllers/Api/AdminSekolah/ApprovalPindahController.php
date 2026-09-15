@@ -7,6 +7,7 @@ use App\Services\ActivityService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\ApprovalPindahSekolah; // Assuming this model exists, if not we use DB facade
+use App\Models\NisnHistory;
 
 class ApprovalPindahController extends Controller
 {
@@ -69,6 +70,19 @@ class ApprovalPindahController extends Controller
                     'disetujui_at' => now(),
                     'user_pengapprove' => $user->username
                 ]);
+
+            $dataSiswa = DB::table('tb_siswa')->where('nisn', $approval->nisn)->first();
+
+            NisnHistory::create([
+                'nisn' => $approval->nisn,
+                'npsn' => $approval->npsn,
+                'nama' => $approval->nm_siswa,
+                'kelas' => $approval->kelas,
+                'jk' => $approval->jk,
+                'difabel' => $approval->difabel,
+                'status' => $approval->status,
+                'keterangan' => 'Approval oleh Admin Sekolah : ' . $user->username.', userid: '.$user->id
+            ]);
 
             // Update the student record
             DB::table('tb_siswa')

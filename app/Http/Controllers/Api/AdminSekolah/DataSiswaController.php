@@ -10,6 +10,7 @@ use App\Services\WaktuPemilihanService;
 use Illuminate\Support\Facades\Auth; // Untuk mendapatkan user yang login
 use Maatwebsite\Excel\Facades\Excel; // Import facade Excel
 use App\Exports\DataSiswaSekolah; // Akan kita buat nanti
+use App\Models\NisnHistory;
 
 class DataSiswaController extends Controller
 {
@@ -124,6 +125,19 @@ class DataSiswaController extends Controller
                 'status' => 1,
                 'create_at' => date('Y-m-d H:i:s')
             ]);
+
+
+            NisnHistory::create([
+                'nisn' => $request->nisn,
+                'npsn' => $npsn,
+                'nama' => $request->nm_siswa,
+                'kelas' => $request->kelas,
+                'jk' => $request->jk,
+                'difabel' => $request->difabel,
+                'status' => 1,
+                'keterangan' => 'Insert oleh Admin Sekolah : ' . $request->user()->username.', userid: '.$request->user()->id
+            ]);
+
             $jenisUpdate = 'insert baru';
             $message = 'Data disimpan';
             $success = true;
@@ -163,6 +177,18 @@ class DataSiswaController extends Controller
                     'status'=>1,
                     'npsn'=>$npsn,
                 ]);
+
+                NisnHistory::create([
+                    'nisn' => $cekNisn->nisn,
+                    'npsn' => $npsn,
+                    'nama' => $cekNisn->nm_siswa,
+                    'kelas' => $cekNisn->kelas,
+                    'jk' => $cekNisn->jk,
+                    'difabel' => $cekNisn->difabel,
+                    'status' => 1,
+                    'keterangan' => 'Update oleh Admin Sekolah : ' . $request->user()->username.', userid: '.$request->user()->id
+                ]);
+                
                 $message = 'Data disimpan';
                 $success = true;
                 $jenisUpdate = 'aquisisi npsn';
@@ -205,6 +231,8 @@ class DataSiswaController extends Controller
             'difabel' => 'required|integer'
         ]);
 
+        $cekNisn = DB::table('tb_siswa')->where('id', $id)->first();
+
         $affected = DB::table('tb_siswa')
             ->where('id', $id)
             ->where('npsn', $npsn)
@@ -215,6 +243,17 @@ class DataSiswaController extends Controller
                 'kelas' => $request->kelas,
                 'difabel' => $request->difabel,
             ]);
+
+        NisnHistory::create([
+            'nisn' => $cekNisn->nisn,
+            'npsn' => $npsn,
+            'nama' => $cekNisn->nm_siswa,
+            'kelas' => $cekNisn->kelas,
+            'jk' => $cekNisn->jk,
+            'difabel' => $cekNisn->difabel,
+            'status' => 1,
+            'keterangan' => 'Update oleh Admin Sekolah : ' . $request->user()->username.', userid: '.$request->user()->id
+        ]);
 
         if ($affected === 0) {
             return response()->json(['success' => false, 'message' => 'Data tidak ditemukan atau tidak ada perubahan'], 404);
