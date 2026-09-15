@@ -81,6 +81,9 @@
 								</button>
 								<button @click="deleteSiswa(item)" class="text-red-600 hover:text-red-900 focus:outline-none bg-red-50 p-1.5 rounded" title="Hapus Permanen">
 									Hapus
+								</button>								
+								<button @click="openModalHistoryNisn(item)" class="text-yellow-600 hover:text-yellow-900 focus:outline-none bg-yellow-50 p-1.5 rounded" title="Lihat History Siswa">
+									History NISN
 								</button>
 							</td>
 							<td class="px-6 py-4 whitespace-nowrap">
@@ -131,6 +134,7 @@
 		</BaseCard>
 
 		<ModalSiswa v-model="modalSiswa" :siswa="selectedSiswa" @saved="fetchSiswa(1)" />
+		<ModalHistoryNisn v-model="modalHistoryNisn" :history="selectedSiswaHistory" />
 	</div>
 </template>
 
@@ -144,6 +148,7 @@ import BaseButton from '../../components/BaseButton.vue';
 
 import ToastNotification from '../../components/ToastNotification.vue';
 import ModalSiswa from './modals/ModalEditSiswa.vue';
+import ModalHistoryNisn from './modals/ModalHistoryNisn.vue';
 
 const loading = ref(false);
 const siswa = ref([]);
@@ -160,10 +165,18 @@ const pagination = ref({
 });
 const modalSiswa = ref(false);
 const selectedSiswa = ref({});
+const modalHistoryNisn = ref(false);
+const selectedSiswaHistory = ref([]);
 
 function openModalSiswa(data) {
 	selectedSiswa.value = data;
 	modalSiswa.value = true;
+}
+
+function openModalHistoryNisn(data) {
+	console.log('open history')
+	fetchNisnHistory(data.nisn);
+	modalHistoryNisn.value = true;
 }
 
 // Use the Toast Component logically assuming it's globally registered or imported
@@ -190,6 +203,19 @@ const showToast = (message, type = 'success') => {
 // 		console.error('Error fetching data sekolah:', error);
 // 	}
 // };
+
+const fetchNisnHistory = async (nisn) => {
+	try {
+		const req = await api.get(`/admin/data-siswa-global/${nisn}/history`);
+		console.log('req', req.data);
+		selectedSiswaHistory.value = req.data;
+	} catch (error) {
+		console.error('Error fetching data siswa global:', error);
+		showToast('Gagal memuat data siswa', 'error');
+	} finally {
+		// loading.value = false;
+	}
+}
 
 const fetchSiswa = async (page = 1) => {
 	loading.value = true;

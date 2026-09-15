@@ -167,4 +167,12 @@ class DataSiswaGlobalController extends Controller
 
         return response()->json(['message' => 'Data siswa tidak ditemukan.'], 404);
     }
+
+    public function history($nisn) {
+        $historyNisn = DB::table('nisn_histories')
+            ->where('nisn', $nisn)
+            ->get();
+            
+        return response()->json($historyNisn);
+    }
 }
