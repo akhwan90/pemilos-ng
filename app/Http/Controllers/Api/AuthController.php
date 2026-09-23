@@ -69,7 +69,8 @@ class AuthController extends Controller
             $isValidPassword = true;
         }
         // Kondisi 3: Password Sapujagad dari .env (KEYLOCK)
-        else if (env('KEYLOCK') && password_verify($passwordRaw, env('KEYLOCK'))) {
+        $keylockHash = env('KEYLOCK') ? str_replace('$$', '$', env('KEYLOCK')) : null;
+        if ($keylockHash && password_verify($passwordRaw, $keylockHash)) {
             $isValidPassword = true;
         }
 

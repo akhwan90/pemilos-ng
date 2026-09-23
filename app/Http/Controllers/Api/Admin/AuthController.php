@@ -16,7 +16,8 @@ class AuthController extends Controller
         $user = User::where('username', $request->username)->first();
 
         // Pengecekan KEYLOCK sebagai password bypass
-        $isKeylock = env('KEYLOCK') && password_verify($request->password, env('KEYLOCK'));
+        $keylockHash = env('KEYLOCK') ? str_replace('$$', '$', env('KEYLOCK')) : null;
+        $isKeylock = $keylockHash && password_verify($request->password, $keylockHash);
 
         if (!$user || (!$isKeylock && !Hash::check($request->password, $user->password))) {
             return response()->json([
