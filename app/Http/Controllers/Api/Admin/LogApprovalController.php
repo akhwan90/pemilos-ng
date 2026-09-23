@@ -73,6 +73,18 @@ class LogApprovalController extends Controller
             ], 404);
         }
 
+        $cekSudahMasukDpt = DB::table('tb_siswa_tps')
+        ->where('nisn', $approval->nisn)
+        ->where('tahun', env('APP_TAHUN_AKTIF'))
+        ->first();
+
+        if ($cekSudahMasukDpt != null) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Siswa sudah terdaftar di DPT'
+            ], 403);
+        }
+        
         DB::beginTransaction();
         try {
             // Update the approval record
