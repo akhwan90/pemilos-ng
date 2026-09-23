@@ -188,7 +188,9 @@ class DataDptController extends Controller
                 'jk' => $siswa->jk,
                 'token' => null,
                 'pilihan' => null,
-                'waktu_pilih' => null
+                'waktu_pilih' => null,
+                'created_at'=>now(),
+                'updated_at'=>now()
             ];
 
             $nisnOk[] = $nisn;
