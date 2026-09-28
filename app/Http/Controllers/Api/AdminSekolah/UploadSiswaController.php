@@ -24,6 +24,7 @@ class UploadSiswaController extends Controller
         $tahun = env('TAHUN_AKTIF', date('Y'));
 
         $history = DB::table('upload_job')
+            ->where('npsn', $request->user()->npsn)
             // ->where('username', $username)
             ->whereYear('create_at', $tahun)
             ->orderBy('id', 'desc')
