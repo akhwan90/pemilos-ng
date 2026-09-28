@@ -89,6 +89,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // data dpt sekolah
     Route::get('/admin/data-sekolah/{npsn}/dpt', [App\Http\Controllers\Api\Admin\SekolahDptController::class, 'index']);
+    Route::get('/admin/data-sekolah/{npsn}/history-keikutsertaan', [App\Http\Controllers\Api\Admin\SekolahHistoryController::class, 'index']);
 
     // Data Siswa Global
     Route::get('/admin/data-siswa-global', [DataSiswaGlobalController::class, 'index']);
