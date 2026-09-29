@@ -172,7 +172,39 @@ class DataSiswaGlobalController extends Controller
         $historyNisn = DB::table('nisn_histories')
             ->where('nisn', $nisn)
             ->get();
+
+        $historyDpts = DB::table('tb_siswa_tps')
+        ->where('tb_siswa_tps.nisn', $nisn)
+        ->join('tb_sekolah', 'tb_siswa_tps.npsn', '=', 'tb_sekolah.npsn')
+        ->join('tb_kelas', 'tb_siswa_tps.id_tps', '=', 'tb_kelas.kd_kelas')
+        ->select(
+            'tb_sekolah.nama_sekolah',
+            'tb_kelas.nm_kelas',
+            'tb_siswa_tps.tahun',
+            'tb_siswa_tps.created_at',
+            'tb_siswa_tps.id'
+        )
+        ->get();
             
-        return response()->json($historyNisn);
+        return response()->json(compact('historyDpts', 'historyNisn'));
+    }
+
+    public function hapusDpt(Request $request, $idDpt) {
+        $dataDpt = DB::table('tb_siswa_tps')->where('id', $idDpt)->first();
+
+        if ($dataDpt->tahun != env('APP_TAHUN_AKTIF')) {
+            return response()->json(['message' => 'Tidak dapat menghapus data DPT Tahun '.$dataDpt->tahun], 422);
+        }
+
+        $deleted = DB::table('tb_siswa_tps')->where('id', $idDpt)->delete();
+
+        $activityService = new \App\Services\ActivityService();
+        $activityService->logActivity($request->user()->username, 44, json_encode($dataDpt));
+
+        if ($deleted) {
+            return response()->json(['message' => 'Data DPT berhasil dihapus secara permanen.']);
+        } else {
+            return response()->json(['message' => 'Data DPT tidak ditemukan.'], 404);
+        }
     }
 }

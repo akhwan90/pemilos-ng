@@ -96,6 +96,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/admin/data-siswa-global/{id}', [DataSiswaGlobalController::class, 'update']);
     Route::delete('/admin/data-siswa-global/{id}', [DataSiswaGlobalController::class, 'destroy']);
     Route::get('/admin/data-siswa-global/{nisn}/history', [DataSiswaGlobalController::class, 'history']);
+    Route::delete('/admin/data-siswa-global/{idDpt}/hapus-dpt', [DataSiswaGlobalController::class, 'hapusDpt']);
 
     // Data Aktivitas
     Route::get('/admin/aktivitas', [AktivitasController::class, 'index']);

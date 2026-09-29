@@ -134,7 +134,7 @@
 		</BaseCard>
 
 		<ModalSiswa v-model="modalSiswa" :siswa="selectedSiswa" @saved="fetchSiswa(1)" />
-		<ModalHistoryNisn v-model="modalHistoryNisn" :history="selectedSiswaHistory" />
+		<ModalHistoryNisn v-model="modalHistoryNisn" :history="historySiswa" />
 	</div>
 </template>
 
@@ -166,7 +166,7 @@ const pagination = ref({
 const modalSiswa = ref(false);
 const selectedSiswa = ref({});
 const modalHistoryNisn = ref(false);
-const selectedSiswaHistory = ref([]);
+const historySiswa = ref([]);
 
 function openModalSiswa(data) {
 	selectedSiswa.value = data;
@@ -208,7 +208,7 @@ const fetchNisnHistory = async (nisn) => {
 	try {
 		const req = await api.get(`/admin/data-siswa-global/${nisn}/history`);
 		console.log('req', req.data);
-		selectedSiswaHistory.value = req.data;
+		historySiswa.value = req.data;
 	} catch (error) {
 		console.error('Error fetching data siswa global:', error);
 		showToast('Gagal memuat data siswa', 'error');
