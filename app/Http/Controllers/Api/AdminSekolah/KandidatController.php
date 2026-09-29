@@ -37,7 +37,7 @@ class KandidatController extends Controller
     public function store(Request $request)
     {
         $npsn = $request->user()->npsn;
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
 
         $cek = $this->waktuPemilihanService->cekJadwalBuka('input_data_calon', $tahun, $npsn);
         if (!$cek['is_open']) {
@@ -68,7 +68,7 @@ class KandidatController extends Controller
     public function update(Request $request, $id)
     {
         $npsn = $request->user()->npsn;
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
 
         $cek = $this->waktuPemilihanService->cekJadwalBuka('input_data_calon', $tahun, $npsn);
         if (!$cek['is_open']) {
@@ -99,7 +99,7 @@ class KandidatController extends Controller
     public function destroy(Request $request, $id)
     {
         $npsn = $request->user()->npsn;
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
 
         $cek = $this->waktuPemilihanService->cekJadwalBuka('input_data_calon', $tahun, $npsn);
         if (!$cek['is_open']) {

@@ -12,7 +12,7 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $npsn = $request->user()->npsn;
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
 
         // Ambil data jenjang dari tb_sekolah
         $sekolah = DB::table('tb_sekolah')->where('npsn', $npsn)->first();

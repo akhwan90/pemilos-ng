@@ -10,7 +10,7 @@ class KandidatService
 {
     public function getAll($npsn)
     {
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
         $kandidat = DB::table('tb_pilihan')
             ->where('npsn', $npsn)
             ->where('tahun', $tahun)
@@ -40,7 +40,7 @@ class KandidatService
 
     public function create($npsn, $data, $file, $userId)
     {
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
 
         $exists = DB::table('tb_pilihan')
             ->where('npsn', $npsn->npsn)

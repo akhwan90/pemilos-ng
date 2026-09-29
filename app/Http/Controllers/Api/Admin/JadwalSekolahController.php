@@ -42,7 +42,7 @@ class JadwalSekolahController extends Controller
 
     public function index($npsn)
     {
-        $tahun = env('TAHUN_AKTIF', 2026);
+        $tahun = env('APP_TAHUN_AKTIF', 2026);
 
         // Ambil data yang sudah ada di database
         $existingData = DB::table('tb_setting_waktu_pemilihan')
@@ -96,7 +96,7 @@ class JadwalSekolahController extends Controller
 
     public function store(Request $request, $npsn)
     {
-        $tahun = env('TAHUN_AKTIF', 2026);
+        $tahun = env('APP_TAHUN_AKTIF', 2026);
         $settings = $request->input('settings'); // Expect array of settings
 
         if (!is_array($settings)) {

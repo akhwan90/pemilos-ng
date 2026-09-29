@@ -21,7 +21,7 @@ class UploadSiswaController extends Controller
     public function history(Request $request)
     {
         $username = $request->user()->username;
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
 
         $history = DB::table('upload_job')
             ->where('npsn', $request->user()->npsn)
@@ -39,7 +39,7 @@ class UploadSiswaController extends Controller
     public function upload(Request $request)
     {
         $user = $request->user();
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
 
         $cek = $this->waktuPemilihanService->cekJadwalBuka('input_data_dps', $tahun, $user->npsn);
         if (!$cek['is_open']) {
@@ -54,7 +54,7 @@ class UploadSiswaController extends Controller
         $cekSudahMemilih = DB::table('tb_siswa_tps')
             ->where('npsn', $user->npsn)
             ->whereNotNull('pilihan')
-            ->where('tahun', env('TAHUN_AKTIF', date('Y')))
+            ->where('tahun', env('APP_TAHUN_AKTIF', date('Y')))
             ->count();
 
         if ($cekSudahMemilih > 0) {

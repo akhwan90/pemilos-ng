@@ -24,7 +24,7 @@ class AdminPpoController extends Controller
         }
 
         $npsn = $user->npsn;
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
 
         $tpsSetting = DB::table('tb_sekolah_settings')
             ->where('npsn', $npsn)
@@ -54,7 +54,7 @@ class AdminPpoController extends Controller
         }
 
         $npsn = $user->npsn;
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
         $now = now();
 
         $tpsSetting = DB::table('tb_sekolah_settings')
@@ -248,7 +248,7 @@ class AdminPpoController extends Controller
 
         $tpsSetting = DB::table('tb_sekolah_settings')
             ->where('npsn', $user->npsn)
-            ->where('tahun', env('TAHUN_AKTIF', date('Y')))
+            ->where('tahun', env('APP_TAHUN_AKTIF', date('Y')))
             ->first();
 
         $perangkat = null;
@@ -301,7 +301,7 @@ class AdminPpoController extends Controller
         ]);
 
         $npsn = $user->npsn;
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
         $now = now();
 
         // Prepare the dynamic Saksi structure
@@ -356,7 +356,7 @@ class AdminPpoController extends Controller
 
         $tpsSetting = DB::table('tb_tps_setting')
             ->where('npsn', $user->npsn)
-            ->where('tahun', env('TAHUN_AKTIF', date('Y')))
+            ->where('tahun', env('APP_TAHUN_AKTIF', date('Y')))
             ->where('id_kelas', $user->id_tps)
             ->first();
 
@@ -385,7 +385,7 @@ class AdminPpoController extends Controller
                 'c2_config' => $c2Config,
                 'tps_info' => [
                     'nama_kelas' => $namaKelas,
-                    'tahun' => env('TAHUN_AKTIF', date('Y'))
+                    'tahun' => env('APP_TAHUN_AKTIF', date('Y'))
                 ],
                 'perangkat_tps' => $perangkatTps
             ]
@@ -412,7 +412,7 @@ class AdminPpoController extends Controller
 
         $npsn = $user->npsn;
         $tpsId = $user->id_tps;
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
         $now = date('Y-m-d H:i:s');
 
         // Prepare the config data
@@ -475,7 +475,7 @@ class AdminPpoController extends Controller
         }
 
         $npsn = $user->npsn;
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
 
         $tpsSetting = DB::table('tb_sekolah_settings')
             ->where('npsn', $npsn)
@@ -536,7 +536,7 @@ class AdminPpoController extends Controller
 
         $npsn = $user->npsn;
         $tpsId = $user->id_tps;
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
 
         $tpsSetting = DB::table('tb_tps_setting')
             ->where('npsn', $npsn)

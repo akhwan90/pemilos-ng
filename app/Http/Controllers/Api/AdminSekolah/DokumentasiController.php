@@ -12,7 +12,7 @@ class DokumentasiController extends Controller
     public function index(Request $request)
     {
         $npsn = $request->user()->npsn;
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
 
         $docs = DB::table('tb_dokumentasi')
             ->where('npsn', $npsn)
@@ -37,7 +37,7 @@ class DokumentasiController extends Controller
         ]);
 
         $npsn = $request->user()->npsn;
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
         
         $file = $request->file('foto');
         $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();

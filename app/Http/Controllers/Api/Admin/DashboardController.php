@@ -11,7 +11,7 @@ class DashboardController extends Controller
 {
     public function stats(Request $request)
     {
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
 
         // Statistik Total
         $totalSekolah = DB::table('tb_sekolah')->where('is_delete', 0)->count();

@@ -17,7 +17,7 @@ class DataSiswaGlobalController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
         $search = $request->query('cari');
         $filterNpsn = $request->query('npsn');
         $queryString = $request->query('query');

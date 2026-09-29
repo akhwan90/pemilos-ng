@@ -24,7 +24,7 @@ class DataDptController extends Controller
     public function index(Request $request)
     {
         $npsn = $request->user()->npsn;
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
         $search = $request->query('cari');
         $filterTps = $request->query('tps_id');
         $belumMemilih = $request->query('belum_memilih') === 'true';
@@ -101,7 +101,7 @@ class DataDptController extends Controller
     public function siswaBelumDpt(Request $request)
     {
         $npsn = $request->user()->npsn;
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
 
         // Ambil NISN yang SUDAH masuk DPT pada tahun ini
         $nisnSudahDpt = DB::table('tb_siswa_tps')
@@ -147,7 +147,7 @@ class DataDptController extends Controller
     public function storeBulk(Request $request)
     {
         $npsn = $request->user()->npsn;
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
 
         $cek = $this->waktuPemilihanService->cekJadwalBuka('input_data_dpt', $tahun, $npsn);
         if (!$cek['is_open']) {
@@ -217,7 +217,7 @@ class DataDptController extends Controller
     public function destroyBulk(Request $request)
     {
         $npsn = $request->user()->npsn;
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
 
         $cek = $this->waktuPemilihanService->cekJadwalBuka('input_data_dpt', $tahun, $npsn);
         if (!$cek['is_open']) {
@@ -269,7 +269,7 @@ class DataDptController extends Controller
     {
         $user = $request->user();
         $npsn = $user->npsn;
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
 
 
         $cek = $this->waktuPemilihanService->cekJadwalBuka('generate_token', $tahun, $npsn);
@@ -316,7 +316,7 @@ class DataDptController extends Controller
     {
         $user = $request->user();
         $npsn = $user->npsn;
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
 
 
         $cek = $this->waktuPemilihanService->cekJadwalBuka('generate_token', $tahun, $npsn);

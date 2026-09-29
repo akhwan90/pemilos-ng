@@ -132,7 +132,7 @@ class ImportSiswaJob implements ShouldQueue
                                     'difabel' => $difabel,
                                     'npsn' => $this->npsn,
                                     'status' => 1,
-                                    'tahun' => env('TAHUN_AKTIF', date('Y')),
+                                    'tahun' => env('APP_TAHUN_AKTIF', date('Y')),
                                     'create_at' => date('Y-m-d H:i:s')
                                 ]);
 

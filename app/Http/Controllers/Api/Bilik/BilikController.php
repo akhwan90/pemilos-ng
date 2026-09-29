@@ -25,7 +25,7 @@ class BilikController extends Controller
         }
 
         $npsn = $user->npsn;
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
 
         $idTps = $user->id_tps;
         if (!$idTps) {
@@ -84,7 +84,7 @@ class BilikController extends Controller
         $nisn = $request->nisn;
         $idTps = $user->id_tps;
         $npsn = $user->npsn;
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
 
         // Cek tipe TPS apakah ini TPS Luar Sekolah
         $tpsInfo = DB::table('tb_kelas')->where('kd_kelas', $idTps)->where('npsn', $npsn)->first();
@@ -169,7 +169,7 @@ class BilikController extends Controller
     public function listCalon(Request $request)
     {
         $npsn = $request->user()->npsn;
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
 
         $calon = DB::table('tb_pilihan')
             ->where('npsn', $npsn)
@@ -203,7 +203,7 @@ class BilikController extends Controller
 
         $idTps = $user->id_tps;
         $npsn = $user->npsn;
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
 
         $idSiswaTps = $request->id_siswa_tps;
         $idCalon = $request->id_calon;
@@ -291,7 +291,7 @@ class BilikController extends Controller
 
         $token = strtoupper($request->token);
         $nisn = $request->nisn;
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
 
         // --- Tambahan: Pengecekan Jadwal Pemilihan ---
         // Karena ini endpoint publik, kita perlu tau NPSN sekolah dari NISN tersebut

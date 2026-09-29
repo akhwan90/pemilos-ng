@@ -44,7 +44,7 @@ class PublicController extends Controller
      */
     public function detailSekolah($npsn)
     {
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
 
         $sekolah = DB::table('tb_sekolah')
             ->select('npsn', 'nama_sekolah', 'alamat_sekolah', 'logo')
@@ -86,7 +86,7 @@ class PublicController extends Controller
     */
     public function dataDps(Request $request, $npsn)
     {
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
 
         $cek = $this->waktuPemilihanService->cekJadwalBuka('pengumuman_data_dps', $tahun, $npsn);
 
@@ -129,7 +129,7 @@ class PublicController extends Controller
      */
     public function dataDpt(Request $request, $npsn)
     {
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
 
         $cek = $this->waktuPemilihanService->cekJadwalBuka('pengumuman_data_dpt', $tahun, $npsn);
 

@@ -24,7 +24,7 @@ class DataSiswaController extends Controller
     public function index(Request $request)
     {
         $npsn = $request->user()->npsn;
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
         $search = $request->query('cari');
         $filterKelas = $request->query('kelas');
 
@@ -59,7 +59,7 @@ class DataSiswaController extends Controller
     public function listKelas(Request $request)
     {
         $npsn = $request->user()->npsn;
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
 
         $kelas = DB::table('tb_siswa')
             ->select('kelas')
@@ -80,7 +80,7 @@ class DataSiswaController extends Controller
     public function store(Request $request, ActivityService $activityService)
     {
         $npsn = $request->user()->npsn;
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
 
         $cek = $this->waktuPemilihanService->cekJadwalBuka('input_data_dps', $tahun, $npsn);
         if (!$cek['is_open']) {
@@ -121,7 +121,7 @@ class DataSiswaController extends Controller
                 'kelas' => $request->kelas,
                 'difabel' => $request->difabel,
                 'npsn' => $npsn,
-                'tahun' => env('TAHUN_AKTIF', date('Y')),
+                'tahun' => env('APP_TAHUN_AKTIF', date('Y')),
                 'status' => 1,
                 'create_at' => date('Y-m-d H:i:s')
             ]);
@@ -216,7 +216,7 @@ class DataSiswaController extends Controller
     public function update(Request $request, $id, ActivityService $activityService)
     {
         $npsn = $request->user()->npsn;
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
 
         $cek = $this->waktuPemilihanService->cekJadwalBuka('input_data_dps', $tahun, $npsn);
         if (!$cek['is_open']) {
@@ -280,7 +280,7 @@ class DataSiswaController extends Controller
             return false;
         }
 
-        $tahunAktif = env('TAHUN_AKTIF', date('Y'));
+        $tahunAktif = env('APP_TAHUN_AKTIF', date('Y'));
         $sudahMasukDpt = DB::table('tb_siswa_tps')
             ->where('nisn', $siswa->nisn)
             ->where('tahun', $tahunAktif)
@@ -331,7 +331,7 @@ class DataSiswaController extends Controller
     public function destroy(Request $request, $id)
     {
         $npsn = $request->user()->npsn;
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
         $user_id = $request->user()->id; // id admin login
 
         $cek = $this->waktuPemilihanService->cekJadwalBuka('input_data_dps', $tahun, $npsn);
@@ -358,7 +358,7 @@ class DataSiswaController extends Controller
     public function bulkDestroy(Request $request)
     {
         $npsn = $request->user()->npsn;
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
         $user_id = $request->user()->id;
 
         $cek = $this->waktuPemilihanService->cekJadwalBuka('input_data_dps', $tahun, $npsn);

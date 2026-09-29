@@ -25,7 +25,7 @@ class AdminTpsController extends Controller
 
         $npsn = $user->npsn;
         $tpsId = $user->id_tps;
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
 
         $tpsSetting = DB::table('tb_tps_setting')
             ->where('npsn', $npsn)
@@ -57,7 +57,7 @@ class AdminTpsController extends Controller
 
         $npsn = $user->npsn;
         $tpsId = $user->id_tps;
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
         $now = date('Y-m-d H:i:s');
 
         $tpsSetting = DB::table('tb_tps_setting')
@@ -218,7 +218,7 @@ class AdminTpsController extends Controller
 
         $tpsSetting = DB::table('tb_tps_setting')
             ->where('npsn', $user->npsn)
-            ->where('tahun', env('TAHUN_AKTIF', date('Y')))
+            ->where('tahun', env('APP_TAHUN_AKTIF', date('Y')))
             ->where('id_kelas', $user->id_tps)
             ->first();
 
@@ -273,7 +273,7 @@ class AdminTpsController extends Controller
 
         $npsn = $user->npsn;
         $tpsId = $user->id_tps;
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
         $now = date('Y-m-d H:i:s');
 
         // Prepare the dynamic Saksi structure
@@ -332,7 +332,7 @@ class AdminTpsController extends Controller
 
         $tpsSetting = DB::table('tb_tps_setting')
             ->where('npsn', $user->npsn)
-            ->where('tahun', env('TAHUN_AKTIF', date('Y')))
+            ->where('tahun', env('APP_TAHUN_AKTIF', date('Y')))
             ->where('id_kelas', $user->id_tps)
             ->first();
 
@@ -361,7 +361,7 @@ class AdminTpsController extends Controller
                 'c2_config' => $c2Config,
                 'tps_info' => [
                     'nama_kelas' => $namaKelas,
-                    'tahun' => env('TAHUN_AKTIF', date('Y'))
+                    'tahun' => env('APP_TAHUN_AKTIF', date('Y'))
                 ],
                 'perangkat_tps' => $perangkatTps
             ]
@@ -388,7 +388,7 @@ class AdminTpsController extends Controller
 
         $npsn = $user->npsn;
         $tpsId = $user->id_tps;
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
         $now = date('Y-m-d H:i:s');
 
         // Prepare the config data
@@ -452,7 +452,7 @@ class AdminTpsController extends Controller
 
         $npsn = $user->npsn;
         $tpsId = $user->id_tps;
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
 
         $tpsSetting = DB::table('tb_tps_setting')
             ->where('npsn', $npsn)
@@ -508,7 +508,7 @@ class AdminTpsController extends Controller
 
         $npsn = $user->npsn;
         $tpsId = $user->id_tps;
-        $tahun = env('TAHUN_AKTIF', date('Y'));
+        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
 
         $tpsSetting = DB::table('tb_tps_setting')
             ->where('npsn', $npsn)
