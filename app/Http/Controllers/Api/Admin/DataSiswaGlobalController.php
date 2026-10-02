@@ -17,9 +17,6 @@ class DataSiswaGlobalController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $tahun = env('APP_TAHUN_AKTIF', date('Y'));
-        $search = $request->query('cari');
-        $filterNpsn = $request->query('npsn');
         $queryString = $request->query('query');
 
         DB::enableQueryLog();
@@ -30,17 +27,6 @@ class DataSiswaGlobalController extends Controller
             // ->where('tb_siswa.status', 1)
             ;
 
-        if (!empty($search)) {
-            $query->where(function($q) use ($search) {
-                $q->where('tb_siswa.nm_siswa', 'like', "%{$search}%")
-                  ->orWhere('tb_siswa.nisn', 'like', "%{$search}%")
-                  ->orWhere('tb_siswa.kelas', 'like', "%{$search}%");
-            });
-        }
-
-        if (!empty($filterNpsn)) {
-            $query->where('tb_siswa.npsn', $filterNpsn);
-        }
 
         $allowedColumns = [
             'tb_siswa.nisn',
@@ -71,25 +57,8 @@ class DataSiswaGlobalController extends Controller
                         ->orWhereNull('tb_siswa.jk');
                 });
             } else {
-                // Regex memecah: (kolom) (operator) ('nilai_teks' atau nilai_angka)
-                $pattern = '/^([a-zA-Z0-9_\.]+)\s*(==|=|!=|<>|<=|>=|<|>|like)\s*(?:\'([^\']*)\'|([0-9]+))$/i';
-
-                if (preg_match($pattern, trim($queryString), $matches)) {
-                    $column   = $matches[1];
-                    $operator = strtolower($matches[2]);
-
-                    // Ambil nilai teks (grup 3) atau angka (grup 4)
-                    $value    = $matches[3] !== '' ? $matches[3] : $matches[4];
-
-                    // Normalisasi operator '==' ke '='
-                    if ($operator === '==') {
-                        $operator = '=';
-                    }
-
-                    if (in_array($column, $allowedColumns)) {
-                        $query->where($column, $operator, $value);
-                    }
-                }
+                // Eksekusi queryString secara langsung menggunakan whereRaw
+                $query->whereRaw($queryString);
             }
         }
 
