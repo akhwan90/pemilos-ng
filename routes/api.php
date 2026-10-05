@@ -177,6 +177,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/admin-sekolah/akhiri-pemilihan', [AdminPpoController::class, 'akhiriPemilihan']);
     Route::get('/admin-sekolah/hasil-d1', [AdminPpoController::class, 'getHasilD1']);
 
+    // Pelaporan Pengawasan
+    Route::get('/admin-sekolah/pelaporan', [\App\Http\Controllers\Api\AdminSekolah\PelaporanController::class, 'getPelaporan']);
+    Route::post('/admin-sekolah/pelaporan', [\App\Http\Controllers\Api\AdminSekolah\PelaporanController::class, 'savePelaporan']);
+
     // ==========================================
     // LEVEL 3: ADMIN TPS API
     // ==========================================
