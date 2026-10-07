@@ -142,6 +142,11 @@ const routes = [
                 component: () => import('../views/admin_sekolah/Perangkat.vue'),
             },
             {
+                path: 'pelaporan',
+                name: 'admin-sekolah-pelaporan',
+                component: () => import('../views/admin_sekolah/Pelaporan.vue'),
+            },
+            {
                 path: 'selesai',
                 name: 'admin-sekolah-selesai',
                 component: () => import('../views/admin_sekolah/SelesaiPemilihan.vue'),
@@ -206,6 +211,12 @@ const routes = [
         path: '/admin-sekolah/cetak-kartu-pemilih',
         name: 'admin-sekolah-cetak-kartu',
         component: () => import('../views/admin_tps/CetakKartuPemilih.vue'),
+        meta: { requiresAuth: true, level: 2, layout: 'blank' },
+    },
+    {
+        path: '/admin-sekolah/cetak-pelaporan',
+        name: 'admin-sekolah-cetak-pelaporan',
+        component: () => import('../views/admin_sekolah/CetakPelaporan.vue'),
         meta: { requiresAuth: true, level: 2, layout: 'blank' },
     },
     {
