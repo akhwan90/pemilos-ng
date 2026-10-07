@@ -93,6 +93,7 @@ class BilikController extends Controller
         // --- Tambahan: Pengecekan Jadwal Pemilihan ---
         $waktuService = app(\App\Services\WaktuPemilihanService::class);
         $cekWaktu = $waktuService->cekJadwalBuka('pemilihan', $tahun, $npsn);
+        
         if (!$cekWaktu['is_open']) {
             return response()->json([
                 'success' => false,
