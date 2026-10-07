@@ -295,7 +295,7 @@ class BilikController extends Controller
 
         // --- Tambahan: Pengecekan Jadwal Pemilihan ---
         // Karena ini endpoint publik, kita perlu tau NPSN sekolah dari NISN tersebut
-        $siswa = DB::table('tb_siswa')->where('nisn', $nisn)->where('tahun', $tahun)->first();
+        $siswa = DB::table('tb_siswa')->where('nisn', $nisn)->first();
         if (!$siswa) {
             return response()->json([
                 'success' => false,
