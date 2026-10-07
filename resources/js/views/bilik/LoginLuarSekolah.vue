@@ -106,6 +106,7 @@ async function verifyToken() {
     const res = await api.post('/bilik-luar-sekolah/verify', payload);
 
     const dataSiswa = res.data.data;
+    const logId = res.data.log_id;
 
     if (dataSiswa.pilihan !== null) {
       toast.error('Maaf, Anda sudah menggunakan hak pilih sebelumnya (Sudah Mencoblos)!');
@@ -121,7 +122,8 @@ async function verifyToken() {
       id_siswa_tps: dataSiswa.id_siswa_tps,
       nisn: dataSiswa.nisn,
       nm_siswa: dataSiswa.nm_siswa,
-      kelas: dataSiswa.kelas
+      kelas: dataSiswa.kelas,
+      log_id: logId,
     }));
 
     // For Luar Sekolah, they act as their own "Bilik" so we fake the bilik_info
@@ -130,7 +132,8 @@ async function verifyToken() {
         is_luar_sekolah_mode: true, // Special flag for KertasSuara
         npsn: dataSiswa.npsn,
         nama_tps: 'TPS Luar Sekolah (Mandiri)',
-        token_akses: res.data.token // Temporary token provided by backend
+        token_akses: res.data.token, // Temporary token provided by backend,
+        // log_id: res.data.log_id
     }));
 
     router.push('/tpssekolah/vote');
