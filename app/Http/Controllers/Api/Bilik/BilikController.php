@@ -357,8 +357,8 @@ class BilikController extends Controller
             'success' => 0,
             'token' => $token,
             'tahun' => $tahun,
-            'created_at' => $waktuLogin,
-            'updated_at' => $waktuLogin
+            // 'created_at' => $waktuLogin,
+            // 'updated_at' => $waktuLogin
         ]);
 
         return response()->json([
