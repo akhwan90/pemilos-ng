@@ -46,7 +46,10 @@ class WaktuPemilihanService
             return [
                 'is_open' => false,
                 'message' => 'Jadwal pemilihan belum diatur.',
-                'setting' => $setting ?? null
+                'setting' => $setting ?? null,
+                'jenis' => $jenisReadable,
+                'tahun' => $tahun,
+                'npsn'=>$npsn,
             ];
         }
 

@@ -96,7 +96,8 @@ class BilikController extends Controller
         if (!$cekWaktu['is_open']) {
             return response()->json([
                 'success' => false,
-                'message' => 'Token ditolak: ' . $cekWaktu['message']
+                'message' => 'Token ditolak: ' . $cekWaktu['message'],
+                'cek_waktu' => $cekWaktu,
             ], 403);
         }
         // --- Akhir Tambahan ---
