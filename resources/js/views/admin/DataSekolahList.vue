@@ -100,7 +100,7 @@
 										<a href="#" @click.prevent="openModal('listAktifitas', item.npsn)" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Aktivitas</a>
 										<a href="#" @click.prevent="openModal('historyKeikutsertaan', item.npsn)" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Riwayat Keikutsertaan</a>
 										<div class="border-t border-gray-100 my-1"></div>
-										<router-link :to="'/admin/monitoring/hasil-vote/' + item.npsn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 font-medium text-emerald-600">Monitoring Hasil Vote</router-link>
+										<a href="#" @click.prevent="openModal('hasilVote', item.npsn)" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 font-medium text-emerald-600">Monitoring Hasil Vote</a>
 										<a href="#" @click.prevent="hapus(item.npsn)" class="block px-4 py-2 text-sm text-red-700 hover:bg-gray-100">Hapus</a>
 									</BaseDropdown>
 								</div>
@@ -179,6 +179,7 @@ import ModalEditSekolah from './sekolah_modals/ModalEditSekolah.vue';
 import ModalUpload from './sekolah_modals/ModalUpload.vue';
 import ModalAktivitasUser from './sekolah_modals/ModalAktivitasUser.vue';
 import ModalHistoryKeikutsertaan from './sekolah_modals/ModalHistoryKeikutsertaan.vue';
+import ModalHasilVote from './sekolah_modals/ModalHasilVote.vue';
 
 const auth = useAuthStore();
 const items = ref([]);
@@ -195,7 +196,8 @@ const modals = ref({
 	tps: false,
 	siswa: false,
 	listAktifitas: false,
-	historyKeikutsertaan: false
+	historyKeikutsertaan: false,
+	hasilVote: false
 });
 
 function openModal(modalName, npsn = null) {
