@@ -220,6 +220,12 @@ const routes = [
         meta: { requiresAuth: true, level: 2, layout: 'blank' },
     },
     {
+        path: '/admin-sekolah/print-d1',
+        name: 'admin-sekolah-print-d1',
+        component: () => import('../views/admin_sekolah/PrintD1.vue'),
+        meta: { requiresAuth: true, level: 2, layout: 'blank' },
+    },
+    {
         path: '/admin-tps/cetak-kartu-pemilih',
         name: 'admin-tps-cetak-kartu',
         component: () => import('../views/admin_tps/CetakKartuPemilih.vue'),
