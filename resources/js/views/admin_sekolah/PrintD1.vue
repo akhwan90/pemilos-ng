@@ -272,8 +272,8 @@ const fetchHasil = async () => {
         const res = await api.get('/admin-sekolah/hasil-d1');
         
         if (res.data.success) {
-            hasilData.value = res.data;
-            ppoName.value = res.data.tps || 'KPU Sekolah'; // Mengambil nama instansi/sekolah
+            hasilData.value = res.data.data;
+            ppoName.value = res.data.data?.tps || 'KPU Sekolah'; // Mengambil nama instansi/sekolah
 
             nextTick(() => {
                 setTimeout(() => {
