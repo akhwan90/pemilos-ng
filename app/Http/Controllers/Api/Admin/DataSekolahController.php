@@ -183,6 +183,34 @@ class DataSekolahController extends Controller
         ]);
     }
 
+    public function getDokumentasi(Request $request, $npsn)
+    {
+        $tahun = $request->query('tahun', date('Y'));
+        
+        $dokumentasi = DB::table('tb_dokumentasi')
+            ->where('npsn', $npsn)
+            ->where('tahun', $tahun)
+            ->orderBy('id', 'desc')
+            ->get();
+
+        if ($dokumentasi->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Belum ada dokumentasi untuk sekolah ini'
+            ], 404);
+        }
+
+        $dokumentasi = $dokumentasi->map(function($item) {
+            $item->foto_url = url('uploads/dokumentasi/' . $item->foto);
+            return $item;
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => $dokumentasi
+        ]);
+    }
+
     public function show($npsn)
     {
         $sekolah = DB::table('tb_sekolah')->where('npsn', $npsn)->first();

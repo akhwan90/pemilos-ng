@@ -51,6 +51,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/admin/data-sekolah/{npsn}', [DataSekolahController::class, 'show']);
     Route::get('/admin/data-sekolah/{npsn}/hasil-vote', [DataSekolahController::class, 'getHasilVote']);
     Route::get('/admin/data-sekolah/{npsn}/pelaporan', [DataSekolahController::class, 'getPelaporan']);
+    Route::get('/admin/data-sekolah/{npsn}/dokumentasi', [DataSekolahController::class, 'getDokumentasi']);
     Route::post('/admin/data-sekolah/{npsn}', [DataSekolahController::class, 'update']);
     Route::delete('/admin/data-sekolah/{npsn}', [DataSekolahController::class, 'destroy']);
 
