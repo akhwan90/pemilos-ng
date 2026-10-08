@@ -1,5 +1,5 @@
 <template>
-    <BaseModal v-model="isOpen" title="Monitoring Hasil Vote" max-width="6xl">
+    <BaseModal v-model="isOpen" title="Monitoring Hasil Vote" max-width="4xl">
         <div v-if="npsn" class="space-y-4">
             
             <div class="flex justify-between items-center bg-gray-50 p-4 rounded-lg border border-gray-200">
