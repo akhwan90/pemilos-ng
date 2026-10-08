@@ -247,12 +247,62 @@
                 </table>
             </div>
 
-            <!-- Signature -->
-            <div class="mt-8 flex justify-end">
-                <div class="text-center w-64">
-                    <p class="mb-20">Ketua Penyelenggara,</p>
-                    <p class="font-bold underline uppercase">{{ ppoName }}</p>
-                </div>
+            <!-- Signatures PPO -->
+            <div class="mt-10 break-inside-avoid">
+                <div class="text-center mb-4 font-bold">NAMA DAN TANDA TANGAN PANITIA PEMILIHAN ORGANISASI (PPO) TINGKAT SEKOLAH</div>
+                <table class="w-full text-center text-sm border-none">
+                    <thead>
+                        <tr>
+                            <th class="border border-black px-3 py-2 w-1/12 text-center">No</th>
+                            <th class="border border-black px-3 py-2 w-4/12 text-left">Nama</th>
+                            <th class="border border-black px-3 py-2 w-3/12 text-left">Jabatan</th>
+                            <th class="border border-black px-3 py-2 w-4/12 text-left">Tanda Tangan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="border border-black px-3 py-2 text-center">1</td>
+                            <td class="border border-black px-3 py-2 text-left">{{ hasilData?.perangkat_tps?.ketua?.nama }}</td>
+                            <td class="border border-black px-3 py-2 text-left">Ketua</td>
+                            <td class="border border-black px-3 pt-3 text-left">1. ................</td>                            
+                        </tr>
+                        <tr>
+                            <td class="border border-black px-3 py-2 text-center">2</td>
+                            <td class="border border-black px-3 py-2 text-left">{{ hasilData?.perangkat_tps?.anggota_1?.nama }}</td>
+                            <td class="border border-black px-3 py-2 text-left">Anggota 1</td>
+                            <td class="border border-black px-3 pt-3 text-left">2. ................</td>
+                        </tr>
+                        <tr>
+                            <td class="border border-black px-3 py-2 text-center">3</td>
+                            <td class="border border-black px-3 py-2 text-left">{{ hasilData?.perangkat_tps?.anggota_2?.nama }}</td>
+                            <td class="border border-black px-3 py-2 text-left">Anggota 2</td>
+                            <td class="border border-black px-3 pt-3 text-left">3. ................</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Signatures Saksi -->
+            <div class="mt-12 break-inside-avoid">
+                <div class="text-center mb-4 font-bold">NAMA DAN TANDA TANGAN SAKSI PASANGAN CALON</div>
+                <table class="w-full text-center text-sm border-none">
+                    <thead>
+                        <tr>
+                            <th class="border border-black px-3 py-2 w-1/12 text-center">No</th>
+                            <th class="border border-black px-3 py-2 w-4/12 text-left">Nama</th>
+                            <th class="border border-black px-3 py-2 w-3/12 text-left">Paslon</th>
+                            <th class="border border-black px-3 py-2 w-4/12 text-left">Tanda Tangan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(saksi, index) in hasilData?.perangkat_tps?.saksi" :key="index">
+                            <td class="border border-black px-3 py-2 text-center">{{ index + 1 }}</td>
+                            <td class="border border-black px-3 py-2 text-left">{{ saksi.nama }}</td>
+                            <td class="border border-black px-3 py-2 text-left">{{ saksi.paslon }}</td>
+                            <td class="border border-black px-3 pt-3 text-left">{{ index + 1 }}. ................</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
