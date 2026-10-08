@@ -164,7 +164,7 @@ async function checkStatus() {
     } catch (e) {
         toast.error(e.response?.data?.message);
         isPemilihanOpen.value = false;
-        statusMessage.value = 'Gagal terhubung ke server.';
+        statusMessage.value = e.response?.data?.message;
     } finally {
         isChecking.value = false;
     }

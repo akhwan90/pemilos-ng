@@ -20,7 +20,7 @@ class BilikController extends Controller
         if ($user->level != 3) {
             return response()->json([
                 'success' => false,
-                'message' => 'Akses ditolak! Anda bukan Admin TPS.'
+                'message' => 'Akses ditolak! Anda bukan Admin TPS. Username: ' . $user->username.' Level: '.$user->level
             ], 403);
         }
 
@@ -31,7 +31,7 @@ class BilikController extends Controller
         if (!$idTps) {
             return response()->json([
                 'success' => false,
-                'message' => 'ID TPS harus disertakan.'
+                'message' => 'ID TPS harus disertakan. Username: ' . $user->username.' Level: '.$user->level
             ], 422);
         }
         // Cek apakah pemilihan sudah diselesaikan (closed)
@@ -44,7 +44,7 @@ class BilikController extends Controller
         if ($tpsSetting && !empty($tpsSetting->selesai_pemilihan_time)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal get status pemilihan, karena Waktu pemilihan telah ditutup/diakhiri.'
+                'message' => 'Gagal get status pemilihan, karena Waktu pemilihan telah ditutup/diakhiri. Username: ' . $user->username.' Level: '.$user->level
             ], 422);
         }
 
@@ -71,7 +71,7 @@ class BilikController extends Controller
         if ($user->level != 3) {
             return response()->json([
                 'success' => false,
-                'message' => 'Akses ditolak! Anda bukan Admin TPS.'
+                'message' => 'Akses ditolak! Anda bukan Admin TPS. Username: ' . $user->username.' Level: '.$user->level
             ], 403);
         }
 
