@@ -115,15 +115,15 @@ const toast = useToast()
 const isLoading = ref(false)
 
 const form = ref({
-    nomor_laporan: '001/P-Bawaslu/SMA1/X/2026',
-    tahapan: 'Pemungutan dan Penghitungan Suara',
-    pelaksana: 'Akhwan Maulana',
-    jabatan: 'Ketua Panitia Pengawas Organisasi (PPO)',
-    nama_sekolah: 'SMAN 1 Kota Simulasi',
-    tujuan: 'Memastikan proses pemungutan suara berjalan dengan LUBER JURDIL tanpa ada paksaan dari pihak manapun.',
-    sasaran: 'Panitia, Pemilih, dan Kandidat Ketua OSIS',
-    waktu_tempat: 'Senin, 10 Oktober 2026 pukul 08:00 WIB di TPS 01, TPS 02, dan TPS 03',
-    uraian: 'Pemungutan suara berjalan dengan lancar. Tingkat partisipasi pemilih mencapai 95%. Terdapat sedikit kendala teknis pada pembacaan barcode di TPS 02 pada pagi hari, namun segera diatasi oleh tim teknisi dalam waktu 15 menit. Tidak ditemukan adanya indikasi kecurangan maupun kampanye gelap di area TPS.'
+    nomor_laporan: '',
+    tahapan: '',
+    pelaksana: '',
+    jabatan: '',
+    nama_sekolah: '',
+    tujuan: '',
+    sasaran: '',
+    waktu_tempat: '',
+    uraian: ''
 })
 
 // Karena backend belum dibuat spesifik untuk pelaporan, 
