@@ -161,6 +161,28 @@ class DataSekolahController extends Controller
         ]);
     }
 
+    public function getPelaporan(Request $request, $npsn)
+    {
+        $tahun = $request->query('tahun', date('Y'));
+        
+        $setting = DB::table('tb_sekolah_settings')
+            ->where('npsn', $npsn)
+            ->where('tahun', $tahun)
+            ->first();
+
+        if (!$setting || !$setting->pelaporan) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Laporan belum dikirimkan oleh sekolah ini'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => json_decode($setting->pelaporan, true)
+        ]);
+    }
+
     public function show($npsn)
     {
         $sekolah = DB::table('tb_sekolah')->where('npsn', $npsn)->first();

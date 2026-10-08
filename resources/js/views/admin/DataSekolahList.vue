@@ -101,6 +101,7 @@
 										<a href="#" @click.prevent="openModal('historyKeikutsertaan', item.npsn)" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Riwayat Keikutsertaan</a>
 										<div class="border-t border-gray-100 my-1"></div>
 										<a href="#" @click.prevent="openModal('hasilVote', item.npsn)" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 font-medium text-emerald-600">Monitoring Hasil Vote</a>
+										<a href="#" @click.prevent="openModal('pelaporan', item.npsn)" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 font-medium text-blue-600">Pelaporan</a>
 										<a href="#" @click.prevent="hapus(item.npsn)" class="block px-4 py-2 text-sm text-red-700 hover:bg-gray-100">Hapus</a>
 									</BaseDropdown>
 								</div>
@@ -158,6 +159,7 @@
 		<ModalAktivitasUser v-model="modals.listAktifitas" :npsn="selectedNpsn"/>
 		<ModalHistoryKeikutsertaan v-model="modals.historyKeikutsertaan" :npsn="selectedNpsn"/>
 		<ModalHasilVote v-model="modals.hasilVote" :npsn="selectedNpsn" :tahun="filterTahun" />
+		<ModalPelaporan v-model="modals.pelaporan" :npsn="selectedNpsn" :tahun="filterTahun" />
 	</div>
 </template>
 
@@ -181,6 +183,7 @@ import ModalUpload from './sekolah_modals/ModalUpload.vue';
 import ModalAktivitasUser from './sekolah_modals/ModalAktivitasUser.vue';
 import ModalHistoryKeikutsertaan from './sekolah_modals/ModalHistoryKeikutsertaan.vue';
 import ModalHasilVote from './sekolah_modals/ModalHasilVote.vue';
+import ModalPelaporan from './sekolah_modals/ModalPelaporan.vue';
 
 const auth = useAuthStore();
 const items = ref([]);
@@ -198,7 +201,8 @@ const modals = ref({
 	siswa: false,
 	listAktifitas: false,
 	historyKeikutsertaan: false,
-	hasilVote: false
+	hasilVote: false,
+	pelaporan: false
 });
 
 function openModal(modalName, npsn = null) {

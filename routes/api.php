@@ -50,6 +50,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/admin/data-sekolah', [DataSekolahController::class, 'store']);
     Route::get('/admin/data-sekolah/{npsn}', [DataSekolahController::class, 'show']);
     Route::get('/admin/data-sekolah/{npsn}/hasil-vote', [DataSekolahController::class, 'getHasilVote']);
+    Route::get('/admin/data-sekolah/{npsn}/pelaporan', [DataSekolahController::class, 'getPelaporan']);
     Route::post('/admin/data-sekolah/{npsn}', [DataSekolahController::class, 'update']);
     Route::delete('/admin/data-sekolah/{npsn}', [DataSekolahController::class, 'destroy']);
 
