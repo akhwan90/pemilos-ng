@@ -358,4 +358,8 @@ function cetakC1() {
     // Buka halaman print-c1 di tab baru
     window.open('/admin-sekolah/print-c1', '_blank');
 }
+
+function cetakD1() {
+    window.open('/admin-sekolah/print-d1', '_blank');
+}
 </script>
