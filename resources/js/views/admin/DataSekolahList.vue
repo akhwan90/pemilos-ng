@@ -157,6 +157,7 @@
 		<ModalUpload v-model="modals.upload" :npsn="selectedNpsn"/>
 		<ModalAktivitasUser v-model="modals.listAktifitas" :npsn="selectedNpsn"/>
 		<ModalHistoryKeikutsertaan v-model="modals.historyKeikutsertaan" :npsn="selectedNpsn"/>
+		<ModalHasilVote v-model="modals.hasilVote" :npsn="selectedNpsn" :tahun="filterTahun" />
 	</div>
 </template>
 
