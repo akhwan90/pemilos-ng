@@ -163,20 +163,20 @@
                     <tbody>
                         <tr>
                             <td class="border border-black px-3 py-2 text-center">1</td>
-                            <td class="border border-black px-3 py-2 text-left">{{ hasilData.perangkat_tps.ketua.nama }}</td>
+                            <td class="border border-black px-3 py-2 text-left">{{ hasilData?.perangkat_tps?.ketua?.nama }}</td>
                             <td class="border border-black px-3 py-2 text-left">Ketua</td>
                             <td class="border border-black px-3 pt-3 text-left">1. ................</td>                            
                         </tr>
                         <tr>
                             <td class="border border-black px-3 py-2 text-center">2</td>
-                            <td class="border border-black px-3 py-2 text-left">{{ hasilData.perangkat_tps.anggota_1.nama }}
+                            <td class="border border-black px-3 py-2 text-left">{{ hasilData?.perangkat_tps?.anggota_1?.nama }}
                             </td>
                             <td class="border border-black px-3 py-2 text-left">Anggota 1</td>
                             <td class="border border-black px-3 pt-3 text-left">2. ................</td>
                         </tr>
                         <tr>
                             <td class="border border-black px-3 py-2 text-center">3</td>
-                            <td class="border border-black px-3 py-2 text-left">{{ hasilData.perangkat_tps.anggota_2.nama }}
+                            <td class="border border-black px-3 py-2 text-left">{{ hasilData?.perangkat_tps?.anggota_2?.nama }}
                             </td>
                             <td class="border border-black px-3 py-2 text-left">Anggota 2</td>
                             <td class="border border-black px-3 pt-3 text-left">3. ................</td>
@@ -198,7 +198,7 @@
                     </thead>
 
                     <tbody>
-                        <tr v-for="(saksi, index) in hasilData.perangkat_tps.saksi" :key="index">
+                        <tr v-for="(saksi, index) in hasilData?.perangkat_tps?.saksi" :key="index">
                             <td class="border border-black px-3 py-2 text-center">{{ index + 1 }}</td>
                             <td class="border border-black px-3 py-2 text-left">{{ saksi.nama }}
                             </td>
@@ -239,7 +239,7 @@ async function fetchHasil() {
             hasilData.value = res.data.data;
             // Delay sedikit lalu panggil print dialog otomatis
             setTimeout(() => {
-                // window.print();
+                window.print();
             }, 1000);
         }
     } catch (error) {

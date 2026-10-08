@@ -47,34 +47,79 @@
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead>
                                     <tr>
-                                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider" style="width: 40%">Uraian</th>
+                                        <th rowspan="2" class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider align-middle border-r border-gray-200" style="width: 25%">Uraian</th>
                                         <th 
-                                            :style="{ width: `${60 / (hasilData.hasil?.length || 1)}%` }"
+                                            colspan="3"
                                             v-for="(tps, index) in hasilData.hasil" 
                                             :key="index" 
-                                            class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                            class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider border-r border-gray-200">
                                             {{ tps.nama_tps.substring(0, 5) }}
                                         </th>
-                                        
+                                        <th colspan="3" class="px-4 py-3 text-center text-xs font-bold text-gray-800 uppercase tracking-wider bg-indigo-50">
+                                            Jumlah Akhir
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <template v-for="(tps, index) in hasilData.hasil" :key="'sub_'+index">
+                                            <th class="px-2 py-2 text-center text-xs font-medium text-gray-500 border-t border-gray-200">L</th>
+                                            <th class="px-2 py-2 text-center text-xs font-medium text-gray-500 border-t border-gray-200">P</th>
+                                            <th class="px-2 py-2 text-center text-xs font-medium text-gray-500 border-t border-r border-gray-200">Total</th>
+                                        </template>
+                                        <th class="px-2 py-2 text-center text-xs font-bold text-gray-800 border-t border-gray-200 bg-indigo-50">L</th>
+                                        <th class="px-2 py-2 text-center text-xs font-bold text-gray-800 border-t border-gray-200 bg-indigo-50">P</th>
+                                        <th class="px-2 py-2 text-center text-xs font-bold text-gray-800 border-t border-gray-200 bg-indigo-50">Total</th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200 text-sm">
                                     <tr>
-                                        <td class="px-4 py-3 font-medium text-gray-700">1. Jumlah Pemilih dalam Daftar Pemilih Tetap (DPT)</td>
-                                        <td v-for="(tps, index) in hasilData.hasil" :key="index" class="px-4 py-3 text-center font-bold">
-                                            L : {{ tps.hasil.total_dpt[0].jumlah_l }} | P : {{ tps.hasil.total_dpt[0].jumlah_p }} | Total : {{ tps.hasil.total_dpt[0].total }}
+                                        <td class="px-4 py-3 font-medium text-gray-700 border-r border-gray-200">1. Jumlah Pemilih dalam Daftar Pemilih Tetap (DPT)</td>
+                                        <template v-for="(tps, index) in hasilData.hasil" :key="index">
+                                            <td class="px-2 py-3 text-center">{{ tps.hasil.total_dpt[0].jumlah_l }}</td>
+                                            <td class="px-2 py-3 text-center">{{ tps.hasil.total_dpt[0].jumlah_p }}</td>
+                                            <td class="px-2 py-3 text-center font-bold border-r border-gray-200">{{ tps.hasil.total_dpt[0].total }}</td>
+                                        </template>
+                                        <td class="px-2 py-3 text-center font-bold bg-indigo-50">
+                                            {{ hasilData.hasil.reduce((sum, t) => sum + parseInt(t.hasil.total_dpt[0].jumlah_l || 0), 0) }}
+                                        </td>
+                                        <td class="px-2 py-3 text-center font-bold bg-indigo-50">
+                                            {{ hasilData.hasil.reduce((sum, t) => sum + parseInt(t.hasil.total_dpt[0].jumlah_p || 0), 0) }}
+                                        </td>
+                                        <td class="px-2 py-3 text-center font-bold bg-indigo-50 text-indigo-700">
+                                            {{ hasilData.hasil.reduce((sum, t) => sum + parseInt(t.hasil.total_dpt[0].total || 0), 0) }}
                                         </td>
                                     </tr>
                                     <tr class="bg-gray-50">
-                                        <td class="px-4 py-3 font-medium text-gray-700">2. Jumlah Pengguna Hak Pilih (Suara Masuk)</td>
-                                        <td v-for="(tps, index) in hasilData.hasil" :key="index" class="px-4 py-3 text-center font-bold">
-                                            L : {{ tps.hasil.suara_masuk[0].jumlah_l }} | P : {{ tps.hasil.suara_masuk[0].jumlah_p }} | Total : {{ tps.hasil.suara_masuk[0].total }}
+                                        <td class="px-4 py-3 font-medium text-gray-700 border-r border-gray-200">2. Jumlah Pengguna Hak Pilih (Suara Masuk)</td>
+                                        <template v-for="(tps, index) in hasilData.hasil" :key="index">
+                                            <td class="px-2 py-3 text-center">{{ tps.hasil.suara_masuk[0].jumlah_l }}</td>
+                                            <td class="px-2 py-3 text-center">{{ tps.hasil.suara_masuk[0].jumlah_p }}</td>
+                                            <td class="px-2 py-3 text-center font-bold border-r border-gray-200">{{ tps.hasil.suara_masuk[0].total }}</td>
+                                        </template>
+                                        <td class="px-2 py-3 text-center font-bold bg-indigo-50">
+                                            {{ hasilData.hasil.reduce((sum, t) => sum + parseInt(t.hasil.suara_masuk[0].jumlah_l || 0), 0) }}
+                                        </td>
+                                        <td class="px-2 py-3 text-center font-bold bg-indigo-50">
+                                            {{ hasilData.hasil.reduce((sum, t) => sum + parseInt(t.hasil.suara_masuk[0].jumlah_p || 0), 0) }}
+                                        </td>
+                                        <td class="px-2 py-3 text-center font-bold bg-indigo-50 text-indigo-700">
+                                            {{ hasilData.hasil.reduce((sum, t) => sum + parseInt(t.hasil.suara_masuk[0].total || 0), 0) }}
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td class="px-4 py-3 font-medium text-gray-700 text-red-600">3. Jumlah Pemilih yang Tidak Menggunakan Hak Pilih</td>
-                                        <td v-for="(tps, index) in hasilData.hasil" :key="index" class="px-4 py-3 text-center font-bold">
-                                            L : {{ tps.hasil.total_dpt[0].jumlah_l - tps.hasil.suara_masuk[0].jumlah_l }} | P : {{ tps.hasil.total_dpt[0].jumlah_p - tps.hasil.suara_masuk[0].jumlah_p }} | Total : {{ tps.hasil.total_dpt[0].total - tps.hasil.suara_masuk[0].total }}
+                                        <td class="px-4 py-3 font-medium text-red-600 border-r border-gray-200">3. Jumlah Pemilih yang Tidak Menggunakan Hak Pilih</td>
+                                        <template v-for="(tps, index) in hasilData.hasil" :key="index">
+                                            <td class="px-2 py-3 text-center text-red-600">{{ tps.hasil.total_dpt[0].jumlah_l - tps.hasil.suara_masuk[0].jumlah_l }}</td>
+                                            <td class="px-2 py-3 text-center text-red-600">{{ tps.hasil.total_dpt[0].jumlah_p - tps.hasil.suara_masuk[0].jumlah_p }}</td>
+                                            <td class="px-2 py-3 text-center font-bold text-red-600 border-r border-gray-200">{{ tps.hasil.total_dpt[0].total - tps.hasil.suara_masuk[0].total }}</td>
+                                        </template>
+                                        <td class="px-2 py-3 text-center font-bold text-red-600 bg-red-50">
+                                            {{ hasilData.hasil.reduce((sum, t) => sum + (parseInt(t.hasil.total_dpt[0].jumlah_l || 0) - parseInt(t.hasil.suara_masuk[0].jumlah_l || 0)), 0) }}
+                                        </td>
+                                        <td class="px-2 py-3 text-center font-bold text-red-600 bg-red-50">
+                                            {{ hasilData.hasil.reduce((sum, t) => sum + (parseInt(t.hasil.total_dpt[0].jumlah_p || 0) - parseInt(t.hasil.suara_masuk[0].jumlah_p || 0)), 0) }}
+                                        </td>
+                                        <td class="px-2 py-3 text-center font-bold text-red-600 bg-red-50">
+                                            {{ hasilData.hasil.reduce((sum, t) => sum + (parseInt(t.hasil.total_dpt[0].total || 0) - parseInt(t.hasil.suara_masuk[0].total || 0)), 0) }}
                                         </td>
                                     </tr>
                                 </tbody>
@@ -90,35 +135,62 @@
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead>
                                     <tr>
-                                        <th
-                                            class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider" style="width: 40%">
-                                            Uraian</th>
-                                        <th :style="{ width: `${60 / (hasilData.hasil?.length || 1)}%` }"
-                                            v-for="(tps, index) in hasilData.hasil" :key="index"
-                                            class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                        <th rowspan="2" class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider align-middle border-r border-gray-200" style="width: 25%">Uraian</th>
+                                        <th 
+                                            colspan="3"
+                                            v-for="(tps, index) in hasilData.hasil" 
+                                            :key="index" 
+                                            class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider border-r border-gray-200">
                                             {{ tps.nama_tps.substring(0, 5) }}
                                         </th>
+                                        <th colspan="3" class="px-4 py-3 text-center text-xs font-bold text-gray-800 uppercase tracking-wider bg-indigo-50">
+                                            Jumlah Akhir
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <template v-for="(tps, index) in hasilData.hasil" :key="'sub_'+index">
+                                            <th class="px-2 py-2 text-center text-xs font-medium text-gray-500 border-t border-gray-200">L</th>
+                                            <th class="px-2 py-2 text-center text-xs font-medium text-gray-500 border-t border-gray-200">P</th>
+                                            <th class="px-2 py-2 text-center text-xs font-medium text-gray-500 border-t border-r border-gray-200">Total</th>
+                                        </template>
+                                        <th class="px-2 py-2 text-center text-xs font-bold text-gray-800 border-t border-gray-200 bg-indigo-50">L</th>
+                                        <th class="px-2 py-2 text-center text-xs font-bold text-gray-800 border-t border-gray-200 bg-indigo-50">P</th>
+                                        <th class="px-2 py-2 text-center text-xs font-bold text-gray-800 border-t border-gray-200 bg-indigo-50">Total</th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200 text-sm">
                                     <tr>
-                                        <td class="px-4 py-3 font-medium text-gray-700">1. Jumlah Pemilih
-                                            Disabilitas / Penyandang Cacat</td>
-                                        <td v-for="(tps, index) in hasilData.hasil" :key="index"
-                                            class="px-4 py-3 text-center font-bold">
-                                            L : {{ tps.hasil.difabel[0].jumlah_l }} | P : {{
-                                            tps.hasil.difabel[0].jumlah_p }} | Total : {{
-                                            tps.hasil.difabel[0].total }}
+                                        <td class="px-4 py-3 font-medium text-gray-700 border-r border-gray-200">1. Jumlah Pemilih Disabilitas / Penyandang Cacat</td>
+                                        <template v-for="(tps, index) in hasilData.hasil" :key="index">
+                                            <td class="px-2 py-3 text-center">{{ tps.hasil.difabel[0].jumlah_l }}</td>
+                                            <td class="px-2 py-3 text-center">{{ tps.hasil.difabel[0].jumlah_p }}</td>
+                                            <td class="px-2 py-3 text-center font-bold border-r border-gray-200">{{ tps.hasil.difabel[0].total }}</td>
+                                        </template>
+                                        <td class="px-2 py-3 text-center font-bold bg-indigo-50">
+                                            {{ hasilData.hasil.reduce((sum, t) => sum + parseInt(t.hasil.difabel[0].jumlah_l || 0), 0) }}
+                                        </td>
+                                        <td class="px-2 py-3 text-center font-bold bg-indigo-50">
+                                            {{ hasilData.hasil.reduce((sum, t) => sum + parseInt(t.hasil.difabel[0].jumlah_p || 0), 0) }}
+                                        </td>
+                                        <td class="px-2 py-3 text-center font-bold bg-indigo-50 text-indigo-700">
+                                            {{ hasilData.hasil.reduce((sum, t) => sum + parseInt(t.hasil.difabel[0].total || 0), 0) }}
                                         </td>
                                     </tr>
                                     <tr class="bg-gray-50">
-                                        <td class="px-4 py-3 font-medium text-gray-700">2. Jumlah Pemilih Disabilitas /
-                                            Penyandang Cacat yang menggunakan hak pilih</td>
-                                         <td v-for="(tps, index) in hasilData.hasil" :key="index"
-                                            class="px-4 py-3 text-center font-bold">
-                                            L : {{ tps.hasil.difabel_memilih[0].jumlah_l }} | P : {{
-                                                tps.hasil.difabel_memilih[0].jumlah_p }} | Total : {{
-                                                tps.hasil.difabel_memilih[0].total }}
+                                        <td class="px-4 py-3 font-medium text-gray-700 border-r border-gray-200">2. Jumlah Pemilih Disabilitas / Penyandang Cacat yang menggunakan hak pilih</td>
+                                        <template v-for="(tps, index) in hasilData.hasil" :key="index">
+                                            <td class="px-2 py-3 text-center">{{ tps.hasil.difabel_memilih[0].jumlah_l }}</td>
+                                            <td class="px-2 py-3 text-center">{{ tps.hasil.difabel_memilih[0].jumlah_p }}</td>
+                                            <td class="px-2 py-3 text-center font-bold border-r border-gray-200">{{ tps.hasil.difabel_memilih[0].total }}</td>
+                                        </template>
+                                        <td class="px-2 py-3 text-center font-bold bg-indigo-50">
+                                            {{ hasilData.hasil.reduce((sum, t) => sum + parseInt(t.hasil.difabel_memilih[0].jumlah_l || 0), 0) }}
+                                        </td>
+                                        <td class="px-2 py-3 text-center font-bold bg-indigo-50">
+                                            {{ hasilData.hasil.reduce((sum, t) => sum + parseInt(t.hasil.difabel_memilih[0].jumlah_p || 0), 0) }}
+                                        </td>
+                                        <td class="px-2 py-3 text-center font-bold bg-indigo-50 text-indigo-700">
+                                            {{ hasilData.hasil.reduce((sum, t) => sum + parseInt(t.hasil.difabel_memilih[0].total || 0), 0) }}
                                         </td>
                                     </tr>
                                 </tbody>
@@ -134,29 +206,26 @@
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead class="bg-white">
                                     <tr>
-                                        <th
-                                            class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider" style="width: 5%">
-                                            No</th>
-                                        <th
-                                            class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider" style="width: 35%">
-                                            Nama Calon / Paslon</th>
-                                        <th :style="{ width: `${60 / (hasilData.hasil?.length || 1)}%` }"
-                                            v-for="(tps, index) in hasilData.hasil" :key="index"
-                                            class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider border-r border-gray-200" style="width: 5%">No</th>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider border-r border-gray-200" style="width: 25%">Nama Calon / Paslon</th>
+                                        <th v-for="(tps, index) in hasilData.hasil" :key="index" class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider border-r border-gray-200">
                                             {{ tps.nama_tps.substring(0, 5) }}
+                                        </th>
+                                        <th class="px-4 py-3 text-center text-xs font-bold text-gray-800 uppercase tracking-wider bg-indigo-50">
+                                            Jumlah Akhir
                                         </th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200 text-sm">
                                     <tr v-for="paslon in hasilData.calons" :key="paslon.id">
-                                        <td class="px-4 py-3 font-bold text-center bg-gray-50">{{ paslon.no }}</td>
-                                        <td class="px-4 py-3 font-medium text-gray-900" v-html="paslon.nama"></td>
-                                        <th :style="{ width: `${60 / (hasilData.hasil?.length || 1)}%` }"
-                                            v-for="(tps, index) in hasilData.hasil" :key="index"
-                                            class="px-4 py-3 text-center font-bold  tracking-wider">
+                                        <td class="px-4 py-3 font-bold text-center bg-gray-50 border-r border-gray-200">{{ paslon.no }}</td>
+                                        <td class="px-4 py-3 font-medium text-gray-900 border-r border-gray-200" v-html="paslon.nama"></td>
+                                        <td v-for="(tps, index) in hasilData.hasil" :key="index" class="px-4 py-3 text-center font-bold tracking-wider border-r border-gray-200">
                                             {{ tps.hasil?.perolehan_paslon?.[paslon.id]?.total ?? 0 }}
-
-                                        </th>
+                                        </td>
+                                        <td class="px-4 py-3 text-center font-bold text-indigo-700 bg-indigo-50">
+                                            {{ hasilData.hasil.reduce((sum, t) => sum + parseInt(t.hasil?.perolehan_paslon?.[paslon.id]?.total || 0), 0) }}
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
